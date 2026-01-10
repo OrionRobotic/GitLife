@@ -1,73 +1,58 @@
-# Welcome to your Lovable project
+<div align="center">
 
-## Project info
+  <h1>LifeGit 🟧</h1>
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+  <p>
+    <strong>Commit to a better version of yourself.</strong>
+  </p>
 
-## How can I edit this code?
+  <p>
+    <a href="#-the-concept">The Concept</a> •
+    <a href="#-how-it-works">How It Works</a> •
+    <a href="#-the-algorithm">The Algorithm</a> •
+    <a href="#-tech-stack">Tech Stack</a>
+  </p>
 
-There are several ways of editing your application.
+  ![License](https://img.shields.io/badge/license-MIT-blue.svg)
+  ![Status](https://img.shields.io/badge/status-active-success.svg)
+  ![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20Android-lightgrey)
 
-**Use Lovable**
+</div>
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+<br />
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🚀 The Concept
 
-**Use your preferred IDE**
+As developers, we are obsessed with keeping our GitHub contribution graph populated. We hate breaking streaks. **LifeGit** applies that same psychological "streak" mechanic to your physical and mental health.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Instead of the standard GitHub Green, LifeGit uses a **Burning Orange** heatmap to represent your daily intensity.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+> "You wouldn't leave your main branch unmaintained. Don't do it to your body."
 
-Follow these steps:
+## 🕹 How It Works
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Every day, you create a **"Commit"** by logging three core metrics. Instead of lines of code, you are measuring effort on a scale of **1 to 5**:
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+1.  💪 **Workout:** Did you move your body? (Intensity/Duration)
+2.  🥗 **Nutrition:** Did you eat clean? (Quality/Adherence)
+3.  📚 **Reading:** Did you expand your mind? (Pages/Time)
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 📊 The Algorithm
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+The app calculates a **Daily Commit Score** (Total: 0–15) to determine the color intensity of that day's square on your calendar.
 
-**Edit a file directly in GitHub**
+$$Score = Workout_{(1-5)} + Nutrition_{(1-5)} + Reading_{(1-5)}$$
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🤝 Contributing
 
-**Use GitHub Codespaces**
+Contributions are always welcome! Please create a PR to merge your changes.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+1.  Fork the Project
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the Branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
 
-## What technologies are used for this project?
+## 📄 License
 
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Distributed under the MIT License. See `LICENSE` for more information.
