@@ -10,7 +10,6 @@
     <a href="#-the-concept">The Concept</a> •
     <a href="#-how-it-works">How It Works</a> •
     <a href="#-the-algorithm">The Algorithm</a> •
-    <a href="#-tech-stack">Tech Stack</a>
   </p>
 
   ![License](https://img.shields.io/badge/license-MIT-blue.svg)
