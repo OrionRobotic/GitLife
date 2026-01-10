@@ -1,6 +1,6 @@
 <div align="center">
 
-  <h1>LifeGit 🟧</h1>
+  <h1>LifeGit </h1>
 
   <p>
     <strong>Commit to a better version of yourself.</strong>
@@ -19,6 +19,10 @@
   ![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20Android-lightgrey)
 
 </div>
+
+<br />
+
+![LifeGit Cover](cover.png)
 
 <br />
 
