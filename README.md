@@ -10,6 +10,8 @@
     <a href="#-the-concept">The Concept</a> •
     <a href="#-how-it-works">How It Works</a> •
     <a href="#-the-algorithm">The Algorithm</a> •
+    <a href="#️-getting-started">Getting Started</a> •
+    <a href="#-contributing">Contributing</a> •
   </p>
 
   ![License](https://img.shields.io/badge/license-MIT-blue.svg)
@@ -41,6 +43,45 @@ Every day, you create a **"Commit"** by logging three core metrics. Instead of l
 The app calculates a **Daily Commit Score** (Total: 0–15) to determine the color intensity of that day's square on your calendar.
 
 $$Score = Workout_{(1-5)} + Nutrition_{(1-5)} + Reading_{(1-5)}$$
+
+## 🛠️ Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or higher recommended)
+- npm or bun package manager
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/LifeGit.git
+   cd LifeGit
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+   or if using bun:
+   ```bash
+   bun install
+   ```
+
+### Running the App
+
+Start the development server:
+```bash
+npm run dev
+```
+
+The app will be available at `http://localhost:5173` (or another port if 5173 is in use).
+
+### Other Available Commands
+
+- `npm run build` - Build for production
+- `npm run preview` - Preview the production build
+- `npm run lint` - Run the linter
 
 ## 🤝 Contributing
 
