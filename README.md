@@ -1,6 +1,6 @@
 <div align="center">
 
-  <h1>LifeGit </h1>
+  <h1>LifeGit 🌱</h1>
 
   <p>
     <strong>Commit to a better version of yourself.</strong>
