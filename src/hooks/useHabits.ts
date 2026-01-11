@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 
 export interface DayEntry {
-  workout: boolean;
-  eating: boolean;
-  reading: boolean;
+  workout: number;
+  eating: number;
+  reading: number;
+  sleep: number;
 }
 
 export interface HabitData {
