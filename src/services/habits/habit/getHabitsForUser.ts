@@ -1,20 +1,38 @@
 import { supabase } from "@/lib/supabase";
-import { Habit } from "@/types/database";
+
+export interface HabitLogWithDetails {
+  id: string;
+  habitId: string;
+  userId: string;
+  createdAt: string;
+  integerDate: number;
+  name: string; // From joined habits table
+}
 
 /**
- * Get all habits for a user
+ * Get all habit logs for a user with habit details (name)
  * @param userId - User ID
- * @returns Array of habits or null if failed
+ * @returns Array of habit logs with details or null if failed
  */
 export async function getHabitsForUser(
   userId: string,
-): Promise<Habit[] | null> {
+): Promise<HabitLogWithDetails[] | null> {
   try {
     console.log("Fetching habits for user:", userId);
 
+    // Join habitsLogs with habits table to get the habit name
     const { data, error, status, statusText } = await supabase
-      .from("habits") // This should work if the table exists in public schema
-      .select("*")
+      .from("habitsLogs")
+      .select(`
+        id,
+        habitId,
+        userId,
+        createdAt,
+        integerDate,
+        habits (
+          name
+        )
+      `)
       .eq("userId", userId)
       .order("createdAt", { ascending: false });
 
@@ -28,8 +46,6 @@ export async function getHabitsForUser(
       return null;
     }
 
-    console.log("Successfully fetched habits:", data?.length || 0);
-    return data;
   } catch (error) {
     console.error("Unexpected error fetching habits:", {
       error,

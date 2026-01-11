@@ -2,12 +2,11 @@ import { supabase } from "@/lib/supabase";
 
 /**
  * Get all available habits from the habits table
- * @param userId - User ID (kept for API compatibility)
  * @returns Array of all habits
  */
-export async function getVisibleHabits(
-  userId: string,
-): Promise<Array<{ id: string; name: string }>> {
+export async function getVisibleHabits(): Promise<
+  Array<{ id: string; name: string }>
+> {
   try {
     const { data, error } = await supabase
       .from("habits")
@@ -19,7 +18,6 @@ export async function getVisibleHabits(
       return [];
     }
 
-    console.log("Visible habits:", data);
     return data || [];
   } catch (error) {
     console.error("Error getting habits:", error);

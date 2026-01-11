@@ -41,13 +41,6 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   >([]);
   const { user } = useAuth();
 
-  useEffect(() => {
-    if (user) {
-      loadAllHabitsFromDatabase();
-      refreshVisibleHabits();
-    }
-  }, [user, loadAllHabitsFromDatabase, refreshVisibleHabits]);
-
   const loadAllHabitsFromDatabase = useCallback(async () => {
     if (!user) return;
 
@@ -66,12 +59,19 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     if (!user) return;
 
     try {
-      const habits = await getVisibleHabits(user.id);
+      const habits = await getVisibleHabits();
       setVisibleHabits(habits);
     } catch (error) {
       console.error("Error refreshing visible habits:", error);
     }
   }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      loadAllHabitsFromDatabase();
+      refreshVisibleHabits();
+    }
+  }, [user, loadAllHabitsFromDatabase, refreshVisibleHabits]);
 
   // Get habits with logs for a specific date
   const getHabitsWithLogsForDate = async (
@@ -102,26 +102,32 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     if (!user) return false;
 
     try {
-      const habits = await getHabitsForUser(user.id);
-      if (!habits) return false;
+      // Find habit from visibleHabits (which comes from habits table)
+      const allHabits = await getVisibleHabits();
+      
+      let habitId: string;
 
-      const habit = habits.find(
+      const existingHabit = allHabits.find(
         (h) => h.name.toLowerCase() === habitName.toLowerCase(),
       );
-      if (!habit) {
+
+      if (existingHabit) {
+        habitId = existingHabit.id;
+      } else {
+        // Create new habit if it doesn't exist
         const newHabit = await createHabit({ name: habitName }, user.id);
         if (!newHabit) return false;
-        habit.id = newHabit.id;
+        habitId = newHabit.id;
       }
 
       if (completed) {
-        const success = await addHabitLogForToday(habit.id, user.id);
+        const success = await addHabitLogForToday(habitId, user.id);
         if (!success) {
           console.error("Failed to add habit log for today");
           return false;
         }
       } else {
-        const success = await removeHabitLogForToday(habit.id, user.id);
+        const success = await removeHabitLogForToday(habitId, user.id);
         if (!success) {
           console.error("Failed to remove habit log for today");
           return false;
