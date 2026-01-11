@@ -13,12 +13,17 @@ import {
   addHabitLogForToday,
   removeHabitLogForToday,
 } from "@/services/habits";
-import { Habit, HabitLog, HabitWithLogs as DatabaseHabitWithLogs } from "@/types/database";
+import {
+  Habit,
+  HabitWithLogs as DatabaseHabitWithLogs,
+} from "@/types/database";
 
 interface HabitsContextType {
   databaseHabits: Habit[];
   visibleHabits: Array<{ id: string; name: string }>;
-  getHabitsWithLogsForDate: (date: Date) => Promise<DatabaseHabitWithLogs[] | null>;
+  getHabitsWithLogsForDate: (
+    date: Date,
+  ) => Promise<DatabaseHabitWithLogs[] | null>;
   updateHabitStatus: (
     habitName: string,
     completed: boolean,
