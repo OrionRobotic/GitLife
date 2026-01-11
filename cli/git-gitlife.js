@@ -42,7 +42,22 @@ Usage:
 
 function main() {
   const args = process.argv.slice(2);
-  
+  if (args[0] === 'summary') {
+    showToday();
+    return;
+  }
+
+  if (args[0] === 'add') {
+    const taskName = args[1];
+
+    if (!taskName) {
+      console.error('Please specify a task name');
+      process.exit(1);
+    }
+
+    completeTask(taskName);
+    return;
+  }
   if (args.length === 0 || args.includes('-h') || args.includes('--help')) {
     showHelp();
     return;
