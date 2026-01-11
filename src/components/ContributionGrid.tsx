@@ -70,24 +70,21 @@ export const ContributionGrid = ({
 
     const monthLabels: { month: string; columnIndex: number }[] = [];
     let lastColumnIndex = -1;
-    
+
     for (let month = 0; month < 12; month++) {
       const firstDayOfMonth = startOfMonth(new Date(year, month, 1));
-      
 
-      const dayIndex = allDays.findIndex(day => 
-        day.getTime() === firstDayOfMonth.getTime()
+      const dayIndex = allDays.findIndex(
+        (day) => day.getTime() === firstDayOfMonth.getTime(),
       );
-      
-      if (dayIndex !== -1) {
 
+      if (dayIndex !== -1) {
         const columnIndex = Math.floor(dayIndex / 7);
-        
 
         if (columnIndex !== lastColumnIndex) {
-          monthLabels.push({ 
-            month: MONTHS[month], 
-            columnIndex 
+          monthLabels.push({
+            month: MONTHS[month],
+            columnIndex,
           });
           lastColumnIndex = columnIndex;
         }
@@ -125,7 +122,7 @@ export const ContributionGrid = ({
             // Each column is 11px (cell) + 3px (gap) = 14px wide
             // Add a small offset to the right (like GitHub) for better visual alignment
             const leftPosition = columnIndex * 14 + 4;
-            
+
             return (
               <div
                 key={`${month}-${i}`}
