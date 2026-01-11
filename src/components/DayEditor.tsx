@@ -48,21 +48,13 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
 
   return (
     <div className="p-6 bg-card border border-border rounded-lg max-w-sm w-full">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-lg font-medium text-foreground">
-            {format(date, "EEEE")}
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            {format(date, "MMMM d, yyyy")}
-          </p>
-        </div>
-        <button
-          onClick={onClose}
-          className="text-muted-foreground hover:text-foreground transition-colors text-xl"
-        >
-          ×
-        </button>
+      <div className="mb-6">
+        <h2 className="text-lg font-medium text-foreground">
+          {format(date, "EEEE")}
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          {format(date, "MMMM d, yyyy")}
+        </p>
       </div>
 
       {future ? (
