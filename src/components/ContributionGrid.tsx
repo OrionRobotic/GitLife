@@ -149,6 +149,8 @@ export const ContributionGrid = ({
                     selectedDate &&
                     getDateKey(selectedDate) === getDateKey(day);
 
+                  const isFutureEmpty = future && isInYear;
+
                   return (
                     <button
                       key={day.toISOString()}
@@ -156,9 +158,10 @@ export const ContributionGrid = ({
                       disabled={true}
                       className={`
                         w-[11px] h-[11px] rounded-sm transition-all
-                        ${isInYear && !future ? getContributionClass(level) : "bg-transparent border border-border/50"}
+                        ${isInYear && !future ? getContributionClass(level) : "bg-transparent"}
+                        ${isFutureEmpty ? "border border-border/50" : "border-none"}
+                        outline-none ring-0
                         cursor-default
-                        border-none outline-none ring-0
                       `}
                       title={isInYear ? format(day, "MMM d, yyyy") : ""}
                     />
