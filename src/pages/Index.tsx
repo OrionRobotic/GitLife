@@ -1,22 +1,33 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { format } from "date-fns";
 import { ContributionGrid } from "@/components/ContributionGrid";
 import { DayEditor } from "@/components/DayEditor";
 import { Legend } from "@/components/Legend";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/context/AuthContext";
-import { Loader2, LogOut, User } from "lucide-react";
+import { useHabits } from "@/context/HabitsContext";
+import { Loader2, LogOut, User, Plus } from "lucide-react";
 
 const Index = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const currentYear = new Date().getFullYear();
   const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
+  const { getEntry } = useHabits();
 
-  useEffect(() => {
-    const today = new Date();
-    setSelectedDate(today);
-  }, []);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
+  // Calculate completed ratio for the selected date (or today)
+  const displayDate = selectedDate || new Date();
+  const entry = getEntry(displayDate);
+  const totalScore =
+    (entry?.workout ? 1 : 0) +
+    (entry?.eating ? 1 : 0) +
+    (entry?.reading ? 1 : 0) +
+    (entry?.sleep ? 1 : 0);
+  const totalHabits = 4;
 
   const handleSignOut = async () => {
     await signOut();
@@ -87,20 +98,62 @@ const Index = () => {
             </div>
             <ContributionGrid
               year={currentYear}
-              onSelectDate={setSelectedDate}
+              onSelectDate={(date) => {
+                setSelectedDate(date);
+                setIsPopoverOpen(true);
+              }}
               selectedDate={selectedDate}
             />
           </div>
+          
+          {/* Date and Button Row - Outside the grid */}
+          <div className="flex justify-between items-start -mt-3 mb-8">
+            {/* Left side: Date and Completed info */}
+            <div className="flex flex-col">
+              <div className="text-sm text-muted-foreground">
+                {format(displayDate, "EEEE, MMMM d, yyyy")}
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs text-muted-foreground">Completed</span>
+                <span className="text-sm font-medium text-foreground">
+                  {totalScore}/{totalHabits}
+                </span>
+              </div>
+            </div>
 
-          {/* Day editor */}
-          {selectedDate && <DayEditor date={selectedDate} onClose={() => {}} />}
-
-          {/* Instructions */}
-          {!selectedDate && (
-            <p className="text-sm text-muted-foreground text-center">
-              Today's habits are shown below
-            </p>
-          )}
+            {/* Right side: Add Contribution Button */}
+            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="secondary"
+                  size="sm"
+                  className="gap-1.5 bg-foreground/10 hover:bg-foreground/15 text-foreground h-7 px-2.5 text-xs"
+                  onClick={() => {
+                    if (!selectedDate) {
+                      setSelectedDate(new Date());
+                    }
+                  }}
+                >
+                  <Plus className="w-3 h-3" />
+                  Add Contribution
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent 
+                align="end" 
+                side="bottom"
+                sideOffset={8}
+                avoidCollisions={false}
+                className="w-auto p-0 border-0 shadow-lg z-50"
+              >
+                {(selectedDate || new Date()) && (
+                  <DayEditor 
+                    date={selectedDate || new Date()} 
+                    onClose={() => setIsPopoverOpen(false)} 
+                  />
+                )}
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
       </div>
     </div>
