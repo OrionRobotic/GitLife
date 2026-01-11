@@ -38,7 +38,7 @@ const Index = () => {
               GitLife
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Track your daily habits
+              Commit to a better version of yourself.
             </p>
           </div>
           <div className="flex items-center gap-4">
