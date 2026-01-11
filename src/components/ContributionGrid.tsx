@@ -155,13 +155,19 @@ export const ContributionGrid = ({
           <div className="flex gap-[3px]">
             {weeks.map((week, weekIndex) => (
               <div key={weekIndex} className="flex flex-col gap-[3px]">
-                {week.map((day) => {
+                {week.map((day, dayIndexInWeek) => {
                   const dayOfWeek = getDay(day);
                   const isInYear = day.getFullYear() === year;
                   const future = isFuture(day) && !isToday(day);
 
+                  // For days not in the year and not future, render invisible placeholder to maintain alignment
                   if (!isInYear && !future) {
-                    return null;
+                    return (
+                      <div
+                        key={day.toISOString()}
+                        className="w-[11px] h-[11px] invisible"
+                      />
+                    );
                   }
 
                   const level =
