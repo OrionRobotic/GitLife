@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export interface DayEntry {
   workout: number;
@@ -10,7 +10,7 @@ export interface HabitData {
   [date: string]: DayEntry;
 }
 
-const STORAGE_KEY = 'lifegit-habits';
+const STORAGE_KEY = "lifegit-habits";
 
 export const useHabits = () => {
   const [habits, setHabits] = useState<HabitData>(() => {
@@ -23,7 +23,7 @@ export const useHabits = () => {
   }, [habits]);
 
   const getDateKey = (date: Date): string => {
-    return date.toISOString().split('T')[0];
+    return date.toISOString().split("T")[0];
   };
 
   const getEntry = (date: Date): DayEntry | null => {
@@ -31,9 +31,9 @@ export const useHabits = () => {
   };
 
   const setEntry = (date: Date, entry: DayEntry) => {
-    setHabits(prev => ({
+    setHabits((prev) => ({
       ...prev,
-      [getDateKey(date)]: entry
+      [getDateKey(date)]: entry,
     }));
   };
 
@@ -59,6 +59,6 @@ export const useHabits = () => {
     setEntry,
     getTotalScore,
     getContributionLevel,
-    getDateKey
+    getDateKey,
   };
 };

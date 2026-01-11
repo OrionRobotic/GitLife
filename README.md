@@ -14,9 +14,9 @@
     <a href="#-contributing">Contributing</a> •
   </p>
 
-  ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-  ![Status](https://img.shields.io/badge/status-active-success.svg)
-  ![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20Android-lightgrey)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Status](https://img.shields.io/badge/status-active-success.svg)
+![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20Android-lightgrey)
 
 </div>
 
@@ -58,6 +58,7 @@ $$Score = Workout_{(1-5)} + Nutrition_{(1-5)} + Reading_{(1-5)}$$
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/yourusername/LifeGit.git
    cd LifeGit
@@ -75,6 +76,7 @@ $$Score = Workout_{(1-5)} + Nutrition_{(1-5)} + Reading_{(1-5)}$$
 ### Running the App
 
 Start the development server:
+
 ```bash
 npm run dev
 ```
@@ -92,7 +94,7 @@ The app will be available at `http://localhost:5173` (or another port if 5173 is
 Contributions are always welcome! Please create a PR to merge your changes.
 
 1.  Fork the Project
-2.  Open issue 
+2.  Open issue
 3.  Create your Feature Branch from the issue (`git checkout -b feature/AmazingFeature`)
 4.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
 5.  Push to the Branch (`git push origin feature/AmazingFeature`)
