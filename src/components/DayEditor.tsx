@@ -101,7 +101,7 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
           <div className="pt-4 border-t border-border">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Completed</span>
-              <span className="text-lg font-medium text-foreground">{totalScore}/3</span>
+              <span className="text-lg font-medium text-foreground">{totalScore}/{HABITS.length}</span>
             </div>
           </div>
         </div>
