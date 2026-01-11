@@ -52,7 +52,7 @@ const Index = () => {
               Commit to a better version of yourself.
             </p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col items-end gap-2">
             {authLoading ? (
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             ) : user ? (
@@ -88,6 +88,18 @@ const Index = () => {
 
         {/* Main content */}
         <div className="space-y-8">
+          {/* Date display above grid */}
+          <div className="flex justify-start mt-4 -mb-6 pl-2">
+            <div className="flex flex-col items-start">
+              <div className="text-sm font-medium text-foreground">
+                {format(displayDate, "EEEE")}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {format(displayDate, "MMMM d, yyyy")}
+              </div>
+            </div>
+          </div>
+          
           {/* Contribution grid */}
           <div className="p-6 bg-card border border-border rounded-lg">
             <div className="flex items-center justify-between mb-6">
@@ -106,22 +118,8 @@ const Index = () => {
             />
           </div>
           
-          {/* Date and Button Row - Outside the grid */}
-          <div className="flex justify-between items-start -mt-3 mb-8">
-            {/* Left side: Date and Completed info */}
-            <div className="flex flex-col">
-              <div className="text-sm text-muted-foreground">
-                {format(displayDate, "EEEE, MMMM d, yyyy")}
-              </div>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-xs text-muted-foreground">Completed</span>
-                <span className="text-sm font-medium text-foreground">
-                  {totalScore}/{totalHabits}
-                </span>
-              </div>
-            </div>
-
-            {/* Right side: Add Contribution Button */}
+          {/* Add Contribution Button - Outside the grid */}
+          <div className="flex justify-end -mt-3 mb-8">
             <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
               <PopoverTrigger asChild>
                 <Button 
