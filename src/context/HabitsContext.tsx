@@ -45,7 +45,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       loadAllHabitsFromDatabase();
       refreshVisibleHabits();
     }
-  }, [user]);
+  }, [user, loadAllHabitsFromDatabase, refreshVisibleHabits]);
 
   const loadAllHabitsFromDatabase = async () => {
     if (!user) return;
