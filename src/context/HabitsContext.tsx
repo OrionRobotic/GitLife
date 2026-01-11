@@ -3,6 +3,7 @@ import {
   useContext,
   useState,
   useEffect,
+  useCallback,
   ReactNode,
 } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -47,7 +48,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [user, loadAllHabitsFromDatabase, refreshVisibleHabits]);
 
-  const loadAllHabitsFromDatabase = async () => {
+  const loadAllHabitsFromDatabase = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -58,10 +59,10 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("Error loading all habits from database:", error);
     }
-  };
+  }, [user]);
 
   // Refresh visible habits from database
-  const refreshVisibleHabits = async () => {
+  const refreshVisibleHabits = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -70,7 +71,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("Error refreshing visible habits:", error);
     }
-  };
+  }, [user]);
 
   // Get habits with logs for a specific date
   const getHabitsWithLogsForDate = async (
