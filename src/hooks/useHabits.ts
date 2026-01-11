@@ -4,6 +4,7 @@ export interface DayEntry {
   workout: number;
   eating: number;
   reading: number;
+  sleep: number;
 }
 
 export interface HabitData {
@@ -40,16 +41,16 @@ export const useHabits = () => {
   const getTotalScore = (date: Date): number => {
     const entry = getEntry(date);
     if (!entry) return 0;
-    return entry.workout + entry.eating + entry.reading;
+    return entry.workout + entry.eating + entry.reading + entry.sleep;
   };
 
   const getContributionLevel = (date: Date): number => {
     const total = getTotalScore(date);
     if (total === 0) return 0;
-    if (total <= 3) return 1;
-    if (total <= 6) return 2;
-    if (total <= 9) return 3;
-    if (total <= 12) return 4;
+    if (total <= 4) return 1;
+    if (total <= 8) return 2;
+    if (total <= 12) return 3;
+    if (total <= 16) return 4;
     return 5;
   };
 

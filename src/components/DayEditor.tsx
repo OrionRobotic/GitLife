@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { format, isToday, isFuture } from 'date-fns';
 import { useHabits, DayEntry } from '@/hooks/useHabits';
-import { Dumbbell, Utensils, BookOpen } from 'lucide-react';
+import { Dumbbell, Utensils, BookOpen, Moon } from 'lucide-react';
 
 interface DayEditorProps {
   date: Date;
@@ -12,6 +12,7 @@ const HABITS = [
   { key: 'workout' as const, label: 'Workout', icon: Dumbbell },
   { key: 'eating' as const, label: 'Eating', icon: Utensils },
   { key: 'reading' as const, label: 'Reading', icon: BookOpen },
+  { key: 'sleep' as const, label: 'Sleep', icon: Moon },
 ];
 
 export const DayEditor = ({ date, onClose }: DayEditorProps) => {
@@ -22,6 +23,7 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
     workout: existingEntry?.workout || 0,
     eating: existingEntry?.eating || 0,
     reading: existingEntry?.reading || 0,
+    sleep: existingEntry?.sleep || 0,
   });
 
   const future = isFuture(date) && !isToday(date);
@@ -32,6 +34,7 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
       workout: entry?.workout || 0,
       eating: entry?.eating || 0,
       reading: entry?.reading || 0,
+      sleep: entry?.sleep || 0,
     });
   }, [date]);
 
@@ -41,7 +44,7 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
     setEntry(date, newValues);
   };
 
-  const totalScore = values.workout + values.eating + values.reading;
+  const totalScore = values.workout + values.eating + values.reading + values.sleep;
 
   return (
     <div className="p-6 bg-card border border-border rounded-lg max-w-sm w-full">
@@ -98,7 +101,7 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
           <div className="pt-4 border-t border-border">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Total score</span>
-              <span className="text-lg font-medium text-foreground">{totalScore}/15</span>
+              <span className="text-lg font-medium text-foreground">{totalScore}/20</span>
             </div>
           </div>
         </div>
