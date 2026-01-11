@@ -28,12 +28,10 @@ const Index = () => {
 
   const displayDate = useMemo(() => selectedDate || new Date(), [selectedDate]);
 
-  // Load habits with logs for the selected date (or today)
   useEffect(() => {
     const loadHabitsForDate = async () => {
       const habits = await getHabitsWithLogsForDate(displayDate);
       if (habits) {
-        // Convert to the format expected by the rest of the component
         const habitsForDisplay = habits.map((habit) => ({
           id: habit.id,
           name: habit.name,
@@ -46,7 +44,6 @@ const Index = () => {
     loadHabitsForDate();
   }, [displayDate, getHabitsWithLogsForDate]);
 
-  // Calculate completed ratio
   const totalScore = habitsWithLogs.filter((habit) => habit.completed).length;
   const totalHabits = habitsWithLogs.length;
 

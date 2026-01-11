@@ -35,7 +35,6 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
     const loadCompletedHabits = async () => {
       if (!user) return;
 
-      // Use the databaseHabits from context instead of fetching directly
       const habitLogs = databaseHabits;
       if (!habitLogs || habitLogs.length === 0) return;
 

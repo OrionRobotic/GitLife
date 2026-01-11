@@ -38,10 +38,6 @@ export const ContributionGrid = ({
   onSelectDate,
   selectedDate,
 }: ContributionGridProps) => {
-  // Note: We've removed the getContributionLevelForDate function to prevent
-  // excessive API calls during rendering. The contribution data should be
-  // pre-loaded or handled differently to avoid performance issues.
-
   const { weeks, monthLabels, allDays } = useMemo(() => {
     const yearStart = startOfYear(new Date(year, 0, 1));
     const yearEnd = endOfYear(new Date(year, 0, 1));
@@ -168,9 +164,6 @@ export const ContributionGrid = ({
                     );
                   }
 
-                  // For now, set level to 0 since we're not loading contribution data
-                  // to prevent performance issues. This should be implemented with
-                  // proper data pre-loading in a future update.
                   const level = 0;
                   const isSelected =
                     selectedDate && day.getTime() === selectedDate.getTime();

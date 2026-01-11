@@ -76,8 +76,6 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       if (!user) return null;
 
       try {
-        // Return the already loaded databaseHabits without triggering new fetches
-        // If databaseHabits is empty, return empty array instead of fetching
         if (databaseHabits.length === 0) {
           return [];
         }
@@ -129,10 +127,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
         }
       }
 
-      // Refresh the data after updating
       await refreshVisibleHabits();
-      // Note: We don't need to call loadAllHabitsFromDatabase here since
-      // the habit logs are handled separately and databaseHabits should already be populated
     } catch (error) {
       console.error("Error updating habit status:", error);
     }
