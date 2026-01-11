@@ -18,7 +18,7 @@ const HABITS = [
 export const DayEditor = ({ date, onClose }: DayEditorProps) => {
   const { getEntry, setEntry, getTotalScore } = useHabits();
   const existingEntry = getEntry(date);
-  
+
   const [values, setValues] = useState<DayEntry>({
     workout: existingEntry?.workout || false,
     eating: existingEntry?.eating || false,
@@ -51,13 +51,13 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-lg font-medium text-foreground">
-            {format(date, 'EEEE')}
+            {format(date, "EEEE")}
           </h2>
           <p className="text-sm text-muted-foreground">
-            {format(date, 'MMMM d, yyyy')}
+            {format(date, "MMMM d, yyyy")}
           </p>
         </div>
-        <button 
+        <button
           onClick={onClose}
           className="text-muted-foreground hover:text-foreground transition-colors text-xl"
         >

@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { ContributionGrid } from '@/components/ContributionGrid';
-import { DayEditor } from '@/components/DayEditor';
-import { Legend } from '@/components/Legend';
+import { useState } from "react";
+import { ContributionGrid } from "@/components/ContributionGrid";
+import { DayEditor } from "@/components/DayEditor";
+import { Legend } from "@/components/Legend";
 
 const Index = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
