@@ -119,7 +119,13 @@ const Index = () => {
           </div>
           
           {/* Add Contribution Button - Outside the grid */}
-          <div className="flex justify-end -mt-3 mb-8">
+          <div className="flex justify-between items-center -mt-3 mb-8">
+            <div className="flex items-center gap-2 pl-2">
+              <span className="text-sm text-muted-foreground">Completed</span>
+              <span className="text-sm font-medium text-foreground">
+                {totalScore}/{totalHabits}
+              </span>
+            </div>
             <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
               <PopoverTrigger asChild>
                 <Button 
