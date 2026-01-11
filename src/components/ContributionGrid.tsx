@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { useHabits } from "@/context/useHabits";
 import {
   startOfYear,
   endOfYear,
@@ -39,23 +38,9 @@ export const ContributionGrid = ({
   onSelectDate,
   selectedDate,
 }: ContributionGridProps) => {
-  const { getHabitsWithLogsForDate } = useHabits();
-
-  const getContributionLevelForDate = async (date: Date): Promise<number> => {
-    try {
-      const habitsWithLogs = await getHabitsWithLogsForDate(date);
-      if (!habitsWithLogs) return 0;
-
-      const completedCount = habitsWithLogs.filter(
-        (habit) => habit.logs && habit.logs.length > 0,
-      ).length;
-
-      return Math.min(completedCount, 4);
-    } catch (error) {
-      console.error("Error calculating contribution level:", error);
-      return 0;
-    }
-  };
+  // Note: We've removed the getContributionLevelForDate function to prevent
+  // excessive API calls during rendering. The contribution data should be
+  // pre-loaded or handled differently to avoid performance issues.
 
   const { weeks, monthLabels, allDays } = useMemo(() => {
     const yearStart = startOfYear(new Date(year, 0, 1));
@@ -183,8 +168,12 @@ export const ContributionGrid = ({
                     );
                   }
 
+                  // For now, set level to 0 since we're not loading contribution data
+                  // to prevent performance issues. This should be implemented with
+                  // proper data pre-loading in a future update.
                   const level = 0;
-                  const isSelected = false;
+                  const isSelected = selectedDate && 
+                    day.getTime() === selectedDate.getTime();
 
                   const isFutureEmpty = future && isInYear;
 

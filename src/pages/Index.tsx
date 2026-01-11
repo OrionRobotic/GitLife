@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { ContributionGrid } from "@/components/ContributionGrid";
@@ -22,10 +22,11 @@ const Index = () => {
   const { getHabitsWithLogsForDate } = useHabits();
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const [habitsWithLogs, setHabitsWithLogs] = useState<{ id: string; name: string; completed: boolean }[]>([]);
+  const [habitsWithLogs, setHabitsWithLogs] = useState<
+    { id: string; name: string; completed: boolean }[]
+  >([]);
 
-  // Calculate the display date (selected date or today)
-  const displayDate = selectedDate || new Date();
+  const displayDate = useMemo(() => selectedDate || new Date(), [selectedDate]);
 
   // Load habits with logs for the selected date (or today)
   useEffect(() => {
@@ -33,20 +34,20 @@ const Index = () => {
       const habits = await getHabitsWithLogsForDate(displayDate);
       if (habits) {
         // Convert to the format expected by the rest of the component
-        const habitsForDisplay = habits.map(habit => ({
+        const habitsForDisplay = habits.map((habit) => ({
           id: habit.id,
           name: habit.name,
-          completed: habit.logs && habit.logs.length > 0
+          completed: habit.logs && habit.logs.length > 0,
         }));
         setHabitsWithLogs(habitsForDisplay);
       }
     };
-    
+
     loadHabitsForDate();
   }, [displayDate, getHabitsWithLogsForDate]);
 
   // Calculate completed ratio
-  const totalScore = habitsWithLogs.filter(habit => habit.completed).length;
+  const totalScore = habitsWithLogs.filter((habit) => habit.completed).length;
   const totalHabits = habitsWithLogs.length;
 
   const handleSignOut = async () => {

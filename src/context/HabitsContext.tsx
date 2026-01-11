@@ -69,18 +69,21 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       loadAllHabitsFromDatabase();
       refreshVisibleHabits();
     }
-  }, [user, loadAllHabitsFromDatabase, refreshVisibleHabits]);
+  }, [user]);
 
-  const getHabitsWithLogsForDate = async (
+  const getHabitsWithLogsForDate = useCallback(async (
     date: Date,
   ): Promise<DatabaseHabitWithLogs[] | null> => {
     if (!user) return null;
 
     try {
-      const habits = await getHabitsForUser(user.id);
-      if (!habits) return null;
+      // Return the already loaded databaseHabits without triggering new fetches
+      // If databaseHabits is empty, return empty array instead of fetching
+      if (databaseHabits.length === 0) {
+        return [];
+      }
 
-      const habitsWithLogs: DatabaseHabitWithLogs[] = habits.map((habit) => ({
+      const habitsWithLogs: DatabaseHabitWithLogs[] = databaseHabits.map((habit) => ({
         ...habit,
         logs: [],
       }));
@@ -90,7 +93,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       console.error("Error fetching habits with logs:", error);
       return null;
     }
-  };
+  }, [user, databaseHabits]);
 
   const updateHabitStatus = async (
     habitName: string,
@@ -123,8 +126,10 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
         }
       }
 
-      await loadAllHabitsFromDatabase();
+      // Refresh the data after updating
       await refreshVisibleHabits();
+      // Note: We don't need to call loadAllHabitsFromDatabase here since
+      // the habit logs are handled separately and databaseHabits should already be populated
     } catch (error) {
       console.error("Error updating habit status:", error);
     }
