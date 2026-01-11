@@ -1,6 +1,6 @@
 import { format, isToday, isFuture } from "date-fns";
 import { useState, useEffect } from "react";
-import { useHabits } from "@/context/HabitsContext";
+import { useHabits } from "@/context/useHabits";
 import { getHabitsForUser } from "@/services/habits";
 import { useAuth } from "@/context/AuthContext";
 import { Dumbbell, Utensils, BookOpen, Moon } from "lucide-react";
