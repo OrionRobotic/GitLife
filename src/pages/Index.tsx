@@ -4,8 +4,9 @@ import { ContributionGrid } from "@/components/ContributionGrid";
 import { DayEditor } from "@/components/DayEditor";
 import { Legend } from "@/components/Legend";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/context/AuthContext";
-import { Loader2, LogOut, User } from "lucide-react";
+import { Loader2, LogOut, User, Plus } from "lucide-react";
 
 const Index = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -13,10 +14,7 @@ const Index = () => {
   const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const today = new Date();
-    setSelectedDate(today);
-  }, []);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
@@ -87,20 +85,48 @@ const Index = () => {
             </div>
             <ContributionGrid
               year={currentYear}
-              onSelectDate={setSelectedDate}
+              onSelectDate={(date) => {
+                setSelectedDate(date);
+                setIsPopoverOpen(true);
+              }}
               selectedDate={selectedDate}
             />
           </div>
-
-          {/* Day editor */}
-          {selectedDate && <DayEditor date={selectedDate} onClose={() => {}} />}
-
-          {/* Instructions */}
-          {!selectedDate && (
-            <p className="text-sm text-muted-foreground text-center">
-              Today's habits are shown below
-            </p>
-          )}
+          
+          {/* Add Contribution Button - Outside the grid */}
+          <div className="flex justify-end -mt-3 mb-8">
+            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="secondary"
+                  size="sm"
+                  className="gap-1.5 bg-foreground/10 hover:bg-foreground/15 text-foreground h-7 px-2.5 text-xs"
+                  onClick={() => {
+                    if (!selectedDate) {
+                      setSelectedDate(new Date());
+                    }
+                  }}
+                >
+                  <Plus className="w-3 h-3" />
+                  Add Contribution
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent 
+                align="end" 
+                side="bottom"
+                sideOffset={8}
+                avoidCollisions={false}
+                className="w-auto p-0 border-0 shadow-lg z-50"
+              >
+                {(selectedDate || new Date()) && (
+                  <DayEditor 
+                    date={selectedDate || new Date()} 
+                    onClose={() => setIsPopoverOpen(false)} 
+                  />
+                )}
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
       </div>
     </div>
