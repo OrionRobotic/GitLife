@@ -9,6 +9,7 @@ import {
   startOfWeek,
   isFuture,
   isToday,
+  startOfMonth,
 } from "date-fns";
 
 interface ContributionGridProps {
@@ -40,7 +41,7 @@ export const ContributionGrid = ({
 }: ContributionGridProps) => {
   const { getContributionLevel, getDateKey } = useHabits();
 
-  const { weeks, monthLabels } = useMemo(() => {
+  const { weeks, monthLabels, allDays } = useMemo(() => {
     const yearStart = startOfYear(new Date(year, 0, 1));
     const yearEnd = endOfYear(new Date(year, 0, 1));
 
@@ -65,20 +66,35 @@ export const ContributionGrid = ({
       weeks.push(currentWeek);
     }
 
-    // Calculate month labels positions
-    const monthLabels: { month: string; weekIndex: number }[] = [];
-    let lastMonth = -1;
+    // Calculate month labels positions - align with columns (weeks)
 
-    weeks.forEach((week, weekIndex) => {
-      const firstDayOfWeek = week[0];
-      const month = firstDayOfWeek.getMonth();
-      if (month !== lastMonth && firstDayOfWeek.getFullYear() === year) {
-        monthLabels.push({ month: MONTHS[month], weekIndex });
-        lastMonth = month;
+    const monthLabels: { month: string; columnIndex: number }[] = [];
+    let lastColumnIndex = -1;
+    
+    for (let month = 0; month < 12; month++) {
+      const firstDayOfMonth = startOfMonth(new Date(year, month, 1));
+      
+
+      const dayIndex = allDays.findIndex(day => 
+        day.getTime() === firstDayOfMonth.getTime()
+      );
+      
+      if (dayIndex !== -1) {
+
+        const columnIndex = Math.floor(dayIndex / 7);
+        
+
+        if (columnIndex !== lastColumnIndex) {
+          monthLabels.push({ 
+            month: MONTHS[month], 
+            columnIndex 
+          });
+          lastColumnIndex = columnIndex;
+        }
       }
-    });
+    }
 
-    return { weeks, monthLabels };
+    return { weeks, monthLabels, allDays };
   }, [year]);
 
   const getContributionClass = (level: number): string => {
@@ -104,20 +120,25 @@ export const ContributionGrid = ({
     <div className="w-full overflow-x-auto">
       <div className="inline-block min-w-max">
         {/* Month labels */}
-        <div className="flex mb-2 ml-8">
-          {monthLabels.map(({ month, weekIndex }, i) => (
-            <div
-              key={`${month}-${i}`}
-              className="text-xs text-muted-foreground"
-              style={{
-                position: "relative",
-                left: `${weekIndex * 14}px`,
-                width: "40px",
-              }}
-            >
-              {month}
-            </div>
-          ))}
+        <div className="flex mb-2 ml-8 relative h-4">
+          {monthLabels.map(({ month, columnIndex }, i) => {
+            // Each column is 11px (cell) + 3px (gap) = 14px wide
+            // Add a small offset to the right (like GitHub) for better visual alignment
+            const leftPosition = columnIndex * 14 + 4;
+            
+            return (
+              <div
+                key={`${month}-${i}`}
+                className="text-xs text-muted-foreground absolute top-0"
+                style={{
+                  left: `${leftPosition}px`,
+                  minWidth: "40px",
+                }}
+              >
+                {month}
+              </div>
+            );
+          })}
         </div>
 
         <div className="flex gap-1">
@@ -134,15 +155,28 @@ export const ContributionGrid = ({
           <div className="flex gap-[3px]">
             {weeks.map((week, weekIndex) => (
               <div key={weekIndex} className="flex flex-col gap-[3px]">
-                {week.map((day) => {
+                {week.map((day, dayIndexInWeek) => {
                   const dayOfWeek = getDay(day);
                   const isInYear = day.getFullYear() === year;
                   const future = isFuture(day) && !isToday(day);
+
+                  // For days not in the year and not future, render invisible placeholder to maintain alignment
+                  if (!isInYear && !future) {
+                    return (
+                      <div
+                        key={day.toISOString()}
+                        className="w-[11px] h-[11px] invisible"
+                      />
+                    );
+                  }
+
                   const level =
                     isInYear && !future ? getContributionLevel(day) : 0;
                   const isSelected =
                     selectedDate &&
                     getDateKey(selectedDate) === getDateKey(day);
+
+                  const isFutureEmpty = future && isInYear;
 
                   return (
                     <button
@@ -150,11 +184,11 @@ export const ContributionGrid = ({
                       onClick={() => !future && isInYear && onSelectDate(day)}
                       disabled={true}
                       className={`
-                        w-[11px] h-[11px] rounded-sm transition-all
+                        w-[11px] h-[11px] rounded-[3px] transition-all
                         ${isInYear && !future ? getContributionClass(level) : "bg-transparent"}
+                        ${isFutureEmpty ? "border border-border/50" : "border-none"}
+                        outline-none ring-0
                         cursor-default
-                        ${isSelected ? "ring-2 ring-foreground" : ""}
-                        ${isToday(day) ? "ring-1 ring-foreground/50" : ""}
                       `}
                       title={isInYear ? format(day, "MMM d, yyyy") : ""}
                     />

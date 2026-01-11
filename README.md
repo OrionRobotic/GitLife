@@ -1,6 +1,6 @@
 <div align="center">
 
-  <h1>LifeGit 🌱</h1>
+  <h1>GitLife <img src="public/favicon.svg" alt="GitLife" width="24" height="24" style="vertical-align: middle;" /></h1>
 
   <p>
     <strong>Commit to a better version of yourself.</strong>
@@ -22,15 +22,15 @@
 
 <br />
 
-![LifeGit Cover](cover.png)
+![GitLife Cover](cover.png)
 
 <br />
 
 ## 🚀 The Concept
 
-As developers, we are obsessed with keeping our GitHub contribution graph populated. We hate breaking streaks. **LifeGit** applies that same psychological "streak" mechanic to your physical and mental health.
+As developers, we are obsessed with keeping our GitHub contribution graph populated. We hate breaking streaks. **GitLife** applies that same psychological "streak" mechanic to your physical and mental health.
 
-Instead of the standard GitHub Green, LifeGit uses a **Burning Orange** heatmap to represent your daily intensity.
+Instead of the standard GitHub Green, GitLife uses a **Burning Orange** heatmap to represent your daily intensity.
 
 > "You wouldn't leave your main branch unmaintained. Don't do it to your body."
 
@@ -54,24 +54,51 @@ $$Score = Workout_{(1-5)} + Nutrition_{(1-5)} + Reading_{(1-5)}$$
 
 - Node.js (v18 or higher recommended)
 - npm or bun package manager
+- Supabase account (for authentication)
 
 ### Installation
 
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/LifeGit.git
-   cd LifeGit
+   git clone https://github.com/yourusername/GitLife.git
+   cd GitLife
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
+
    or if using bun:
+
    ```bash
    bun install
    ```
+
+3. Set up Supabase:
+
+- Create a new project on [Supabase](https://supabase.com/)
+- Copy your Supabase URL and Anon Key
+- Create a `.env` file from the template:
+
+  ```bash
+  cp .env.template .env
+  ```
+
+- Edit the `.env` file with your Supabase credentials:
+
+  ```env
+  VITE_SUPABASE_URL=your-supabase-project-url
+  VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+  ```
+
+4. Enable Email/Password authentication in Supabase:
+   - Go to your Supabase project dashboard
+   - Navigate to Authentication → Providers
+   - Enable Email/Password authentication
+   - Configure your SMTP settings for email verification
 
 ### Running the App
 

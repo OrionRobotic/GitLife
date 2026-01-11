@@ -1,7 +1,7 @@
-import { format, isToday, isFuture } from 'date-fns';
-import { useHabits } from '@/context/HabitsContext';
-import { DayEntry } from '@/types/habits';
-import { Dumbbell, Utensils, BookOpen, Moon } from 'lucide-react';
+import { format, isToday, isFuture } from "date-fns";
+import { useHabits } from "@/context/HabitsContext";
+import { DayEntry } from "@/types/habits";
+import { Dumbbell, Utensils, BookOpen, Moon } from "lucide-react";
 
 interface DayEditorProps {
   date: Date;
@@ -9,10 +9,10 @@ interface DayEditorProps {
 }
 
 const HABITS = [
-  { key: 'workout' as const, label: 'Workout', icon: Dumbbell },
-  { key: 'eating' as const, label: 'Eating', icon: Utensils },
-  { key: 'reading' as const, label: 'Reading', icon: BookOpen },
-  { key: 'sleep' as const, label: 'Sleep', icon: Moon },
+  { key: "workout" as const, label: "Workout", icon: Dumbbell },
+  { key: "eating" as const, label: "Eating", icon: Utensils },
+  { key: "reading" as const, label: "Reading", icon: BookOpen },
+  { key: "sleep" as const, label: "Sleep", icon: Moon },
 ];
 
 export const DayEditor = ({ date, onClose }: DayEditorProps) => {
@@ -33,7 +33,11 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
     setEntry(date, newValues);
   };
 
-  const totalScore = (values.workout ? 1 : 0) + (values.eating ? 1 : 0) + (values.reading ? 1 : 0) + (values.sleep ? 1 : 0);
+  const totalScore =
+    (values.workout ? 1 : 0) +
+    (values.eating ? 1 : 0) +
+    (values.reading ? 1 : 0) +
+    (values.sleep ? 1 : 0);
 
   return (
     <div className="p-6 bg-card border border-border rounded-lg max-w-sm w-full">
@@ -56,15 +60,18 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
             <div key={key}>
               <div className="flex items-center gap-2">
                 <Icon className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-medium text-foreground">{label}</span>
+                <span className="text-sm font-medium text-foreground">
+                  {label}
+                </span>
                 <div className="ml-auto flex gap-1">
                   <button
                     onClick={() => handleChange(key, false)}
                     className={`
                       h-8 px-3 rounded text-sm font-medium transition-all
-                      ${values[key] === false 
-                        ? 'bg-foreground text-background' 
-                        : 'bg-muted hover:bg-muted-foreground/20 text-foreground'
+                      ${
+                        values[key] === false
+                          ? "bg-foreground text-background"
+                          : "bg-muted hover:bg-muted-foreground/20 text-foreground"
                       }
                     `}
                   >
@@ -74,9 +81,10 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
                     onClick={() => handleChange(key, true)}
                     className={`
                       h-8 px-3 rounded text-sm font-medium transition-all
-                      ${values[key] === true 
-                        ? 'bg-foreground text-background' 
-                        : 'bg-muted hover:bg-muted-foreground/20 text-foreground'
+                      ${
+                        values[key] === true
+                          ? "bg-foreground text-background"
+                          : "bg-muted hover:bg-muted-foreground/20 text-foreground"
                       }
                     `}
                   >
@@ -90,7 +98,9 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
           <div className="pt-4 border-t border-border">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Completed</span>
-              <span className="text-lg font-medium text-foreground">{totalScore}/{HABITS.length}</span>
+              <span className="text-lg font-medium text-foreground">
+                {totalScore}/{HABITS.length}
+              </span>
             </div>
           </div>
         </div>
