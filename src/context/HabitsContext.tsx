@@ -1,4 +1,10 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import { DayEntry, HabitData } from "@/types/habits";
 
 const STORAGE_KEY = "lifegit-habits";
@@ -27,8 +33,8 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   const getDateKey = (date: Date): string => {
     // Use local timezone instead of UTC
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
 
@@ -46,7 +52,12 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   const getTotalScore = (date: Date): number => {
     const entry = getEntry(date);
     if (!entry) return 0;
-    return (entry.workout ? 1 : 0) + (entry.eating ? 1 : 0) + (entry.reading ? 1 : 0) + (entry.sleep ? 1 : 0);
+    return (
+      (entry.workout ? 1 : 0) +
+      (entry.eating ? 1 : 0) +
+      (entry.reading ? 1 : 0) +
+      (entry.sleep ? 1 : 0)
+    );
   };
 
   const getContributionLevel = (date: Date): number => {
@@ -61,13 +72,13 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <HabitsContext.Provider
-      value={{ 
-        habits, 
-        getEntry, 
-        setEntry, 
-        getTotalScore, 
+      value={{
+        habits,
+        getEntry,
+        setEntry,
+        getTotalScore,
         getContributionLevel,
-        getDateKey 
+        getDateKey,
       }}
     >
       {children}
@@ -78,7 +89,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
 export const useHabits = () => {
   const context = useContext(HabitsContext);
   if (context === undefined) {
-    throw new Error('useHabits must be used within a HabitsProvider');
+    throw new Error("useHabits must be used within a HabitsProvider");
   }
   return context;
 };

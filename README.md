@@ -54,6 +54,7 @@ $$Score = Workout_{(1-5)} + Nutrition_{(1-5)} + Reading_{(1-5)}$$
 
 - Node.js (v18 or higher recommended)
 - npm or bun package manager
+- Supabase account (for authentication)
 
 ### Installation
 
@@ -65,13 +66,39 @@ $$Score = Workout_{(1-5)} + Nutrition_{(1-5)} + Reading_{(1-5)}$$
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
+
    or if using bun:
+
    ```bash
    bun install
    ```
+
+3. Set up Supabase:
+
+- Create a new project on [Supabase](https://supabase.com/)
+- Copy your Supabase URL and Anon Key
+- Create a `.env` file from the template:
+
+  ```bash
+  cp .env.template .env
+  ```
+
+- Edit the `.env` file with your Supabase credentials:
+
+  ```env
+  VITE_SUPABASE_URL=your-supabase-project-url
+  VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+  ```
+
+4. Enable Email/Password authentication in Supabase:
+   - Go to your Supabase project dashboard
+   - Navigate to Authentication → Providers
+   - Enable Email/Password authentication
+   - Configure your SMTP settings for email verification
 
 ### Running the App
 
