@@ -30,7 +30,6 @@ export async function getHabitsForUser(
   try {
     console.log("Fetching habits for user:", userId);
 
-    // Join habitsLogs with habits table to get the habit name
     const { data, error, status, statusText } = await supabase
       .from("habitsLogs")
       .select(
@@ -58,8 +57,6 @@ export async function getHabitsForUser(
       return null;
     }
 
-    // Supabase returns: { habits: { name: "reading" } } or { habits: [{ name: "reading" }] }
-    // We flatten it to: { name: "reading" } for easier access
     return (
       (data as HabitLogRaw[])?.map((log) => {
         const habits = log.habits;
