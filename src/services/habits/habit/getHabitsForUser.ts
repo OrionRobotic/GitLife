@@ -9,6 +9,16 @@ export interface HabitLogWithDetails {
   name: string; // From joined habits table
 }
 
+// Type for Supabase join result
+interface HabitLogRaw {
+  id: string;
+  habitId: string;
+  userId: string;
+  createdAt: string;
+  integerDate: number;
+  habits: { name: string } | { name: string }[] | null;
+}
+
 /**
  * Get all habit logs for a user with habit details (name)
  * @param userId - User ID
@@ -46,16 +56,23 @@ export async function getHabitsForUser(
       return null;
     }
 
-    // Supabase returns: { habits: { name: "reading" } }
+    // Supabase returns: { habits: { name: "reading" } } or { habits: [{ name: "reading" }] }
     // We flatten it to: { name: "reading" } for easier access
-    return data?.map((log: any) => ({
-      id: log.id,
-      habitId: log.habitId,
-      userId: log.userId,
-      createdAt: log.createdAt,
-      integerDate: log.integerDate,
-      name: log.habits?.name || "Unknown",
-    })) || [];
+    return (data as HabitLogRaw[])?.map((log) => {
+      const habits = log.habits;
+      const name = Array.isArray(habits)
+        ? habits[0]?.name || "Unknown"
+        : habits?.name || "Unknown";
+      
+      return {
+        id: log.id,
+        habitId: log.habitId,
+        userId: log.userId,
+        createdAt: log.createdAt,
+        integerDate: log.integerDate,
+        name,
+      };
+    }) || [];
   } catch (error) {
     console.error("Unexpected error fetching habits:", {
       error,
