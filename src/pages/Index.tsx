@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ContributionGrid } from "@/components/ContributionGrid";
 import { DayEditor } from "@/components/DayEditor";
 import { Legend } from "@/components/Legend";
@@ -6,6 +6,11 @@ import { Legend } from "@/components/Legend";
 const Index = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const currentYear = new Date().getFullYear();
+
+  useEffect(() => {
+    const today = new Date();
+    setSelectedDate(today);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -38,17 +43,12 @@ const Index = () => {
           </div>
 
           {/* Day editor */}
-          {selectedDate && (
-            <DayEditor
-              date={selectedDate}
-              onClose={() => setSelectedDate(null)}
-            />
-          )}
+          {selectedDate && <DayEditor date={selectedDate} onClose={() => {}} />}
 
           {/* Instructions */}
           {!selectedDate && (
             <p className="text-sm text-muted-foreground text-center">
-              Click on a day to log your habits
+              Today's habits are shown below
             </p>
           )}
         </div>

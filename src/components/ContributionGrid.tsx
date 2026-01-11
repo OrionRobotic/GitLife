@@ -148,11 +148,11 @@ export const ContributionGrid = ({
                     <button
                       key={day.toISOString()}
                       onClick={() => !future && isInYear && onSelectDate(day)}
-                      disabled={future || !isInYear}
+                      disabled={true}
                       className={`
                         w-[11px] h-[11px] rounded-sm transition-all
                         ${isInYear && !future ? getContributionClass(level) : "bg-transparent"}
-                        ${isInYear && !future ? "hover:ring-1 hover:ring-foreground/30 cursor-pointer" : "cursor-default"}
+                        cursor-default
                         ${isSelected ? "ring-2 ring-foreground" : ""}
                         ${isToday(day) ? "ring-1 ring-foreground/50" : ""}
                       `}
