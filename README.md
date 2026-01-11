@@ -1,6 +1,6 @@
 <div align="center">
 
-  <h1>LifeGit 🌱</h1>
+  <h1>GitLife <img src="public/favicon.svg" alt="GitLife" width="24" height="24" style="vertical-align: middle;" /></h1>
 
   <p>
     <strong>Commit to a better version of yourself.</strong>
@@ -22,15 +22,15 @@
 
 <br />
 
-![LifeGit Cover](cover.png)
+![GitLife Cover](cover.png)
 
 <br />
 
 ## 🚀 The Concept
 
-As developers, we are obsessed with keeping our GitHub contribution graph populated. We hate breaking streaks. **LifeGit** applies that same psychological "streak" mechanic to your physical and mental health.
+As developers, we are obsessed with keeping our GitHub contribution graph populated. We hate breaking streaks. **GitLife** applies that same psychological "streak" mechanic to your physical and mental health.
 
-Instead of the standard GitHub Green, LifeGit uses a **Burning Orange** heatmap to represent your daily intensity.
+Instead of the standard GitHub Green, GitLife uses a **Burning Orange** heatmap to represent your daily intensity.
 
 > "You wouldn't leave your main branch unmaintained. Don't do it to your body."
 
@@ -61,8 +61,8 @@ $$Score = Workout_{(1-5)} + Nutrition_{(1-5)} + Reading_{(1-5)}$$
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/LifeGit.git
-   cd LifeGit
+   git clone https://github.com/yourusername/GitLife.git
+   cd GitLife
    ```
 
 2. Install dependencies:
