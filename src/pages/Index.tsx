@@ -1,11 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { format } from "date-fns";
 import { ContributionGrid } from "@/components/ContributionGrid";
 import { DayEditor } from "@/components/DayEditor";
 import { Legend } from "@/components/Legend";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/context/AuthContext";
+import { useHabits } from "@/context/HabitsContext";
 import { Loader2, LogOut, User, Plus } from "lucide-react";
 
 const Index = () => {
@@ -13,8 +15,19 @@ const Index = () => {
   const currentYear = new Date().getFullYear();
   const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
+  const { getEntry } = useHabits();
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
+  // Calculate completed ratio for the selected date (or today)
+  const displayDate = selectedDate || new Date();
+  const entry = getEntry(displayDate);
+  const totalScore =
+    (entry?.workout ? 1 : 0) +
+    (entry?.eating ? 1 : 0) +
+    (entry?.reading ? 1 : 0) +
+    (entry?.sleep ? 1 : 0);
+  const totalHabits = 4;
 
   const handleSignOut = async () => {
     await signOut();
@@ -93,8 +106,22 @@ const Index = () => {
             />
           </div>
           
-          {/* Add Contribution Button - Outside the grid */}
-          <div className="flex justify-end -mt-3 mb-8">
+          {/* Date and Button Row - Outside the grid */}
+          <div className="flex justify-between items-start -mt-3 mb-8">
+            {/* Left side: Date and Completed info */}
+            <div className="flex flex-col">
+              <div className="text-sm text-muted-foreground">
+                {format(displayDate, "EEEE, MMMM d, yyyy")}
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs text-muted-foreground">Completed</span>
+                <span className="text-sm font-medium text-foreground">
+                  {totalScore}/{totalHabits}
+                </span>
+              </div>
+            </div>
+
+            {/* Right side: Add Contribution Button */}
             <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
               <PopoverTrigger asChild>
                 <Button 
