@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="15" fill="#FF6B35" opacity="0.1"/>
+  
+  <!-- Minimal grid pattern - 3x3 squares -->
+  <g fill="#FF6B35">
+    <!-- Top row -->
+    <rect x="8" y="8" width="4" height="4" rx="0.5"/>
+    <rect x="14" y="8" width="4" height="4" rx="0.5" opacity="0.6"/>
+    <rect x="20" y="8" width="4" height="4" rx="0.5" opacity="0.3"/>
+    
+    <!-- Middle row -->
+    <rect x="8" y="14" width="4" height="4" rx="0.5" opacity="0.6"/>
+    <rect x="14" y="14" width="4" height="4" rx="0.5"/>
+    <rect x="20" y="14" width="4" height="4" rx="0.5" opacity="0.4"/>
+    
+    <!-- Bottom row -->
+    <rect x="8" y="20" width="4" height="4" rx="0.5" opacity="0.3"/>
+    <rect x="14" y="20" width="4" height="4" rx="0.5" opacity="0.5"/>
+    <rect x="20" y="20" width="4" height="4" rx="0.5"/>
+  </g>
+</svg>

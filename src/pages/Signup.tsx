@@ -46,7 +46,7 @@ export default function Signup() {
         toast({
           title: "Signup successful",
           description:
-            "Welcome to LifeGit! Please check your email to verify your account.",
+            "Welcome to GitLife! Please check your email to verify your account.",
         });
       }
     } catch (err) {
@@ -64,7 +64,7 @@ export default function Signup() {
             Create an account
           </CardTitle>
           <CardDescription className="text-center">
-            Join LifeGit to track your daily habits
+            Join GitLife to track your daily habits
           </CardDescription>
         </CardHeader>
 
