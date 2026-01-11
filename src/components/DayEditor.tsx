@@ -39,7 +39,7 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
       const habitLogs = await getHabitsForUser(user.id);
       if (!habitLogs) return;
 
-      // Get the date string for comparison
+      // Get the date string for comparison (YYYY-MM-DD)
       const selectedDateStr = format(date, "yyyy-MM-dd");
       
       // Find habit logs for the selected date
