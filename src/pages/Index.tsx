@@ -1,13 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { ContributionGrid } from "@/components/ContributionGrid";
 import { DayEditor } from "@/components/DayEditor";
 import { Legend } from "@/components/Legend";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useAuth } from "@/context/AuthContext";
-import { useHabits } from "@/context/HabitsContext";
+import { useHabits } from "@/context/useHabits";
 import { Loader2, LogOut, User, Plus } from "lucide-react";
 
 const Index = () => {
@@ -15,19 +19,35 @@ const Index = () => {
   const currentYear = new Date().getFullYear();
   const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
-  const { getEntry } = useHabits();
+  const { getHabitsWithLogsForDate } = useHabits();
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [habitsWithLogs, setHabitsWithLogs] = useState<{ id: string; name: string; completed: boolean }[]>([]);
 
-  // Calculate completed ratio for the selected date (or today)
+  // Calculate the display date (selected date or today)
   const displayDate = selectedDate || new Date();
-  const entry = getEntry(displayDate);
-  const totalScore =
-    (entry?.workout ? 1 : 0) +
-    (entry?.eating ? 1 : 0) +
-    (entry?.reading ? 1 : 0) +
-    (entry?.sleep ? 1 : 0);
-  const totalHabits = 4;
+
+  // Load habits with logs for the selected date (or today)
+  useEffect(() => {
+    const loadHabitsForDate = async () => {
+      const habits = await getHabitsWithLogsForDate(displayDate);
+      if (habits) {
+        // Convert to the format expected by the rest of the component
+        const habitsForDisplay = habits.map(habit => ({
+          id: habit.id,
+          name: habit.name,
+          completed: habit.logs && habit.logs.length > 0
+        }));
+        setHabitsWithLogs(habitsForDisplay);
+      }
+    };
+    
+    loadHabitsForDate();
+  }, [displayDate, getHabitsWithLogsForDate]);
+
+  // Calculate completed ratio
+  const totalScore = habitsWithLogs.filter(habit => habit.completed).length;
+  const totalHabits = habitsWithLogs.length;
 
   const handleSignOut = async () => {
     await signOut();
@@ -101,7 +121,7 @@ const Index = () => {
               selectedDate={selectedDate}
             />
           </div>
-          
+
           {/* Date and Button Row - Outside the grid */}
           <div className="flex justify-between items-start -mt-3 mb-8">
             {/* Left side: Date and Completed info */}
@@ -120,7 +140,7 @@ const Index = () => {
             {/* Right side: Add Contribution Button */}
             <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
               <PopoverTrigger asChild>
-                <Button 
+                <Button
                   variant="secondary"
                   size="sm"
                   className="gap-1.5 bg-foreground/10 hover:bg-foreground/15 text-foreground h-7 px-2.5 text-xs"
@@ -134,17 +154,17 @@ const Index = () => {
                   Add Contribution
                 </Button>
               </PopoverTrigger>
-              <PopoverContent 
-                align="end" 
+              <PopoverContent
+                align="end"
                 side="bottom"
                 sideOffset={8}
                 avoidCollisions={false}
                 className="w-auto p-0 border-0 shadow-lg z-50"
               >
                 {(selectedDate || new Date()) && (
-                  <DayEditor 
-                    date={selectedDate || new Date()} 
-                    onClose={() => setIsPopoverOpen(false)} 
+                  <DayEditor
+                    date={selectedDate || new Date()}
+                    onClose={() => setIsPopoverOpen(false)}
                   />
                 )}
               </PopoverContent>
