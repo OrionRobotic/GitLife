@@ -104,7 +104,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     try {
       // Find habit from visibleHabits (which comes from habits table)
       const allHabits = await getVisibleHabits();
-      
+
       let habitId: string;
 
       const existingHabit = allHabits.find(

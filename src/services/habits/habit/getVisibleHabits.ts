@@ -18,7 +18,14 @@ export async function getVisibleHabits(): Promise<
       return [];
     }
 
-    return data || [];
+    return (
+      data?.map((habit) => ({
+        ...habit,
+        name:
+          habit.name.charAt(0).toUpperCase() +
+          habit.name.slice(1).toLowerCase(),
+      })) || []
+    );
   } catch (error) {
     console.error("Error getting habits:", error);
     return [];

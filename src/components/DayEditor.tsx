@@ -27,7 +27,9 @@ const getHabitIcon = (name: string): LucideIcon => {
 export const DayEditor = ({ date, onClose }: DayEditorProps) => {
   const { visibleHabits, updateHabitStatus } = useHabits();
   const { user } = useAuth();
-  const [completedHabitIds, setCompletedHabitIds] = useState<Set<string>>(new Set());
+  const [completedHabitIds, setCompletedHabitIds] = useState<Set<string>>(
+    new Set(),
+  );
 
   const future = isFuture(date) && !isToday(date);
 
@@ -35,13 +37,13 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
   useEffect(() => {
     const loadCompletedHabits = async () => {
       if (!user) return;
-      
+
       const habitLogs = await getHabitsForUser(user.id);
       if (!habitLogs) return;
 
       // Get the date string for comparison (YYYY-MM-DD)
       const selectedDateStr = format(date, "yyyy-MM-dd");
-      
+
       // Find habit logs for the selected date
       const completedIds = new Set<string>();
       for (const log of habitLogs) {
@@ -50,7 +52,7 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
           completedIds.add(log.habitId);
         }
       }
-      
+
       setCompletedHabitIds(completedIds);
     };
 
@@ -72,7 +74,7 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
     completed: boolean,
   ) => {
     await updateHabitStatus(habitName, completed);
-    
+
     // Update local state immediately after selecting a habit
     setCompletedHabitIds((prev) => {
       const newSet = new Set(prev);
@@ -119,9 +121,10 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
                       onClick={() => handleChange(id, name, false)}
                       className={`
                         h-8 px-3 rounded text-sm font-medium transition-all
-                        ${!completed 
-                          ? "bg-foreground text-background" 
-                          : "bg-muted hover:bg-muted-foreground/20 text-foreground"
+                        ${
+                          !completed
+                            ? "bg-foreground text-background"
+                            : "bg-muted hover:bg-muted-foreground/20 text-foreground"
                         }
                       `}
                     >
@@ -131,9 +134,10 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
                       onClick={() => handleChange(id, name, true)}
                       className={`
                         h-8 px-3 rounded text-sm font-medium transition-all
-                        ${completed 
-                          ? "bg-foreground text-background" 
-                          : "bg-muted hover:bg-muted-foreground/20 text-foreground"
+                        ${
+                          completed
+                            ? "bg-foreground text-background"
+                            : "bg-muted hover:bg-muted-foreground/20 text-foreground"
                         }
                       `}
                     >

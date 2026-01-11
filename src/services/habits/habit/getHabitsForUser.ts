@@ -33,7 +33,8 @@ export async function getHabitsForUser(
     // Join habitsLogs with habits table to get the habit name
     const { data, error, status, statusText } = await supabase
       .from("habitsLogs")
-      .select(`
+      .select(
+        `
         id,
         habitId,
         userId,
@@ -42,7 +43,8 @@ export async function getHabitsForUser(
         habits (
           name
         )
-      `)
+      `,
+      )
       .eq("userId", userId)
       .order("createdAt", { ascending: false });
 
@@ -58,21 +60,26 @@ export async function getHabitsForUser(
 
     // Supabase returns: { habits: { name: "reading" } } or { habits: [{ name: "reading" }] }
     // We flatten it to: { name: "reading" } for easier access
-    return (data as HabitLogRaw[])?.map((log) => {
-      const habits = log.habits;
-      const name = Array.isArray(habits)
-        ? habits[0]?.name || "Unknown"
-        : habits?.name || "Unknown";
-      
-      return {
-        id: log.id,
-        habitId: log.habitId,
-        userId: log.userId,
-        createdAt: log.createdAt,
-        integerDate: log.integerDate,
-        name,
-      };
-    }) || [];
+    return (
+      (data as HabitLogRaw[])?.map((log) => {
+        const habits = log.habits;
+        const name = Array.isArray(habits)
+          ? habits[0]?.name || "Unknown"
+          : habits?.name || "Unknown";
+
+        const capitalizedName =
+          name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+
+        return {
+          id: log.id,
+          habitId: log.habitId,
+          userId: log.userId,
+          createdAt: log.createdAt,
+          integerDate: log.integerDate,
+          name: capitalizedName,
+        };
+      }) || []
+    );
   } catch (error) {
     console.error("Unexpected error fetching habits:", {
       error,
