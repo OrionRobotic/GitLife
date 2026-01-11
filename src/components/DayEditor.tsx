@@ -73,18 +73,21 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
     habitName: string,
     completed: boolean,
   ) => {
-    await updateHabitStatus(habitName, completed);
+    try {
+      await updateHabitStatus(habitName, completed);
 
-    // Update local state immediately after selecting a habit
-    setCompletedHabitIds((prev) => {
-      const newSet = new Set(prev);
-      if (completed) {
-        newSet.add(habitId);
-      } else {
-        newSet.delete(habitId);
-      }
-      return newSet;
-    });
+      setCompletedHabitIds((prev) => {
+        const newSet = new Set(prev);
+        if (completed) {
+          newSet.add(habitId);
+        } else {
+          newSet.delete(habitId);
+        }
+        return newSet;
+      });
+    } catch (error) {
+      console.error("Failed to update habit status:", error);
+    }
   };
 
   return (

@@ -98,7 +98,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   const updateHabitStatus = async (
     habitName: string,
     completed: boolean,
-  ): Promise<boolean> => {
+  ): Promise<void> => {
     if (!user) return false;
 
     try {
@@ -114,33 +114,25 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       if (existingHabit) {
         habitId = existingHabit.id;
       } else {
-        // Create new habit if it doesn't exist
-        const newHabit = await createHabit({ name: habitName }, user.id);
-        if (!newHabit) return false;
-        habitId = newHabit.id;
+        throw new Error(`Habit "${habitName}" does not exist`);
       }
 
       if (completed) {
         const success = await addHabitLogForToday(habitId, user.id);
         if (!success) {
-          console.error("Failed to add habit log for today");
-          return false;
+          throw new Error("Failed to add habit log for today");
         }
       } else {
         const success = await removeHabitLogForToday(habitId, user.id);
         if (!success) {
-          console.error("Failed to remove habit log for today");
-          return false;
+          throw new Error("Failed to remove habit log for today");
         }
       }
 
       await loadAllHabitsFromDatabase();
       await refreshVisibleHabits();
-
-      return true;
     } catch (error) {
       console.error("Error updating habit status:", error);
-      return false;
     }
   };
 
