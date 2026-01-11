@@ -38,7 +38,7 @@ export default function Login() {
         navigate("/");
         toast({
           title: "Login successful",
-          description: "Welcome back to LifeGit!",
+          description: "Welcome back to GitLife!",
         });
       }
     } catch (err) {
@@ -56,7 +56,7 @@ export default function Login() {
             Welcome back
           </CardTitle>
           <CardDescription className="text-center">
-            Sign in to your LifeGit account
+            Sign in to your GitLife account
           </CardDescription>
         </CardHeader>
 

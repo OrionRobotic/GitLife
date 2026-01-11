@@ -30,7 +30,7 @@ const Index = () => {
         <header className="mb-12 flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-medium text-foreground tracking-tight">
-              LifeGit
+              GitLife
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
               Track your daily habits
