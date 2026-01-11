@@ -153,8 +153,7 @@ export const ContributionGrid = ({
                         w-[11px] h-[11px] rounded-sm transition-all
                         ${isInYear && !future ? getContributionClass(level) : "bg-transparent"}
                         cursor-default
-                        ${isSelected ? "ring-2 ring-foreground" : ""}
-                        ${isToday(day) ? "ring-1 ring-foreground/50" : ""}
+                        border-none outline-none ring-0
                       `}
                       title={isInYear ? format(day, "MMM d, yyyy") : ""}
                     />
