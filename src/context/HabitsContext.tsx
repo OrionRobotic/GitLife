@@ -25,10 +25,7 @@ interface HabitsContextType {
   getHabitsWithLogsForDate: (
     date: Date,
   ) => Promise<DatabaseHabitWithLogs[] | null>;
-  updateHabitStatus: (
-    habitName: string,
-    completed: boolean,
-  ) => Promise<boolean>;
+  updateHabitStatus: (habitName: string, completed: boolean) => Promise<void>;
   refreshVisibleHabits: () => Promise<void>;
 }
 
@@ -99,10 +96,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     habitName: string,
     completed: boolean,
   ): Promise<void> => {
-    if (!user) return false;
-
     try {
-      // Find habit from visibleHabits (which comes from habits table)
       const allHabits = await getVisibleHabits();
 
       let habitId: string;
