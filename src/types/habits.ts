@@ -59,35 +59,29 @@ export interface ApiResponse<T> {
   status: number;
 }
 
-export namespace Supabase {
-  export type Json =
-    | string
-    | number
-    | boolean
-    | null
-    | { [key: string]: Json | undefined }
-    | Json[];
+export type SupabaseJson =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: SupabaseJson | undefined }
+  | SupabaseJson[];
 
-  export interface Database {
-    public: {
-      Tables: {
-        habits: {
-          Row: Habit;
-          Insert: Omit<Habit, "id" | "createdAt"> & { id?: string };
-          Update: Partial<Habit> & { id: string };
-        };
-        habitsLogs: {
-          Row: HabitLog;
-          Insert: Omit<HabitLog, "id" | "createdAt"> & { id?: string };
-          Update: Partial<HabitLog> & { id: string };
-        };
+export interface SupabaseDatabase {
+  public: {
+    Tables: {
+      habits: {
+        Row: Habit;
+        Insert: Omit<Habit, "id" | "createdAt"> & { id?: string };
+        Update: Partial<Habit> & { id: string };
       };
-      Views: {
-        // Add any database views here
-      };
-      Functions: {
-        // Add any database functions here
+      habitsLogs: {
+        Row: HabitLog;
+        Insert: Omit<HabitLog, "id" | "createdAt"> & { id?: string };
+        Update: Partial<HabitLog> & { id: string };
       };
     };
-  }
+    Views: Record<string, unknown>;
+    Functions: Record<string, unknown>;
+  };
 }
