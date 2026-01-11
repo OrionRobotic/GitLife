@@ -1,6 +1,6 @@
 # Contributing Guidelines
 
-We welcome contributions! Please follow these rules to ensure a smooth workflow.
+We welcome contributions! Please follow these rules to ensure a smooth workflow with others.
 
 ## 1. Issues
 * **Create an Issue:** Every piece of work (feature or bug) must have a corresponding issue.
