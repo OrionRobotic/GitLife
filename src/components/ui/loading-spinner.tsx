@@ -20,7 +20,7 @@ export const LoadingSpinner = ({
       <div
         className={cn(
           "animate-spin rounded-full border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]",
-          sizeClasses[size]
+          sizeClasses[size],
         )}
         role="status"
       >
