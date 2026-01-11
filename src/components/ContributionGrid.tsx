@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useHabits } from "@/hooks/useHabits";
+import { useHabits } from "@/context/HabitsContext";
 import {
   startOfYear,
   endOfYear,

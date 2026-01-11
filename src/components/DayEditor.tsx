@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
 import { format, isToday, isFuture } from 'date-fns';
-import { useHabits, DayEntry } from '@/hooks/useHabits';
+import { useHabits } from '@/context/HabitsContext';
+import { DayEntry } from '@/types/habits';
 import { Dumbbell, Utensils, BookOpen, Moon } from 'lucide-react';
 
 interface DayEditorProps {
@@ -16,35 +16,24 @@ const HABITS = [
 ];
 
 export const DayEditor = ({ date, onClose }: DayEditorProps) => {
-  const { getEntry, setEntry, getTotalScore } = useHabits();
-  const existingEntry = getEntry(date);
+  const { getEntry, setEntry } = useHabits();
+  const entry = getEntry(date);
 
-  const [values, setValues] = useState<DayEntry>({
-    workout: existingEntry?.workout || false,
-    eating: existingEntry?.eating || false,
-    reading: existingEntry?.reading || false,
-    sleep: existingEntry?.sleep || false,
-  });
+  const values = {
+    workout: entry?.workout || false,
+    eating: entry?.eating || false,
+    reading: entry?.reading || false,
+    sleep: entry?.sleep || false,
+  };
 
   const future = isFuture(date) && !isToday(date);
 
-  useEffect(() => {
-    const entry = getEntry(date);
-    setValues({
-      workout: entry?.workout || false,
-      eating: entry?.eating || false,
-      reading: entry?.reading || false,
-      sleep: entry?.sleep || false,
-    });
-  }, [date, getEntry]);
-
   const handleChange = (key: keyof DayEntry, value: boolean) => {
     const newValues = { ...values, [key]: value };
-    setValues(newValues);
     setEntry(date, newValues);
   };
 
-  const totalScore = values.workout + values.eating + values.reading + values.sleep;
+  const totalScore = (values.workout ? 1 : 0) + (values.eating ? 1 : 0) + (values.reading ? 1 : 0) + (values.sleep ? 1 : 0);
 
   return (
     <div className="p-6 bg-card border border-border rounded-lg max-w-sm w-full">
