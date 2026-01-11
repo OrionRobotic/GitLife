@@ -46,6 +46,16 @@ export async function getHabitsForUser(
       return null;
     }
 
+    // Supabase returns: { habits: { name: "reading" } }
+    // We flatten it to: { name: "reading" } for easier access
+    return data?.map((log: any) => ({
+      id: log.id,
+      habitId: log.habitId,
+      userId: log.userId,
+      createdAt: log.createdAt,
+      integerDate: log.integerDate,
+      name: log.habits?.name || "Unknown",
+    })) || [];
   } catch (error) {
     console.error("Unexpected error fetching habits:", {
       error,
