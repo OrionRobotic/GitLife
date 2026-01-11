@@ -138,6 +138,11 @@ export const ContributionGrid = ({
                   const dayOfWeek = getDay(day);
                   const isInYear = day.getFullYear() === year;
                   const future = isFuture(day) && !isToday(day);
+
+                  if (!isInYear && !future) {
+                    return null;
+                  }
+
                   const level =
                     isInYear && !future ? getContributionLevel(day) : 0;
                   const isSelected =
@@ -151,7 +156,7 @@ export const ContributionGrid = ({
                       disabled={true}
                       className={`
                         w-[11px] h-[11px] rounded-sm transition-all
-                        ${isInYear && !future ? getContributionClass(level) : "bg-transparent"}
+                        ${isInYear && !future ? getContributionClass(level) : "bg-transparent border border-border/50"}
                         cursor-default
                         ${isSelected ? "ring-2 ring-foreground" : ""}
                         ${isToday(day) ? "ring-1 ring-foreground/50" : ""}
