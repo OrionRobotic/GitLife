@@ -184,7 +184,7 @@ export const ContributionGrid = ({
                       onClick={() => !future && isInYear && onSelectDate(day)}
                       disabled={true}
                       className={`
-                        w-[11px] h-[11px] rounded-sm transition-all
+                        w-[11px] h-[11px] rounded-[3px] transition-all
                         ${isInYear && !future ? getContributionClass(level) : "bg-transparent"}
                         ${isFutureEmpty ? "border border-border/50" : "border-none"}
                         outline-none ring-0
