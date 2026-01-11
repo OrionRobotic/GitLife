@@ -18,7 +18,6 @@ const HABIT_ICONS: Record<string, LucideIcon> = {
   sleep: Moon,
 };
 
-// TODO: Change this lowercase
 const getHabitIcon = (name: string): LucideIcon => {
   const normalizedName = name.toLowerCase();
   return HABIT_ICONS[normalizedName] || BookOpen;
@@ -33,7 +32,6 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
 
   const future = isFuture(date) && !isToday(date);
 
-  // Load completed habits for the selected date
   useEffect(() => {
     const loadCompletedHabits = async () => {
       if (!user) return;
@@ -41,10 +39,8 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
       const habitLogs = await getHabitsForUser(user.id);
       if (!habitLogs) return;
 
-      // Get the date string for comparison (YYYY-MM-DD)
       const selectedDateStr = format(date, "yyyy-MM-dd");
 
-      // Find habit logs for the selected date
       const completedIds = new Set<string>();
       for (const log of habitLogs) {
         const logDateStr = format(new Date(log.createdAt), "yyyy-MM-dd");

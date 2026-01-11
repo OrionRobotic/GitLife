@@ -51,7 +51,6 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [user]);
 
-  // Refresh visible habits from database
   const refreshVisibleHabits = useCallback(async () => {
     if (!user) return;
 
@@ -70,7 +69,6 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [user, loadAllHabitsFromDatabase, refreshVisibleHabits]);
 
-  // Get habits with logs for a specific date
   const getHabitsWithLogsForDate = async (
     date: Date,
   ): Promise<DatabaseHabitWithLogs[] | null> => {
