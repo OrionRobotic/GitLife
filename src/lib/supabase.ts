@@ -9,4 +9,22 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+  },
+  realtime: {
+    params: {
+      eventsPerSecond: 10,
+    },
+  },
+});
+
+console.log("Supabase client initialized:", {
+  url: supabaseUrl,
+  hasAnonKey: !!supabaseAnonKey,
+});
+
+export { supabase };

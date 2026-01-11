@@ -5,80 +5,141 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import { DayEntry, HabitData } from "@/types/habits";
-
-const STORAGE_KEY = "lifegit-habits";
+import { useAuth } from "@/context/AuthContext";
+import {
+  createHabit,
+  getHabitsForUser,
+  getVisibleHabits,
+  addHabitLogForToday,
+  removeHabitLogForToday,
+} from "@/services/habits";
+import { Habit, HabitLog, HabitWithLogs as DatabaseHabitWithLogs } from "@/types/database";
 
 interface HabitsContextType {
-  habits: HabitData;
-  getEntry: (date: Date) => DayEntry | null;
-  setEntry: (date: Date, entry: DayEntry) => void;
-  getTotalScore: (date: Date) => number;
-  getContributionLevel: (date: Date) => number;
-  getDateKey: (date: Date) => string;
+  databaseHabits: Habit[];
+  visibleHabits: Array<{ id: string; name: string }>;
+  getHabitsWithLogsForDate: (date: Date) => Promise<DatabaseHabitWithLogs[] | null>;
+  updateHabitStatus: (
+    habitName: string,
+    completed: boolean,
+  ) => Promise<boolean>;
+  refreshVisibleHabits: () => Promise<void>;
 }
 
 const HabitsContext = createContext<HabitsContextType | undefined>(undefined);
 
 export const HabitsProvider = ({ children }: { children: ReactNode }) => {
-  const [habits, setHabits] = useState<HabitData>(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : {};
-  });
+  const [databaseHabits, setDatabaseHabits] = useState<Habit[]>([]);
+  const [visibleHabits, setVisibleHabits] = useState<
+    Array<{ id: string; name: string }>
+  >([]);
+  const { user } = useAuth();
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(habits));
-  }, [habits]);
+    if (user) {
+      loadAllHabitsFromDatabase();
+      refreshVisibleHabits();
+    }
+  }, [user]);
 
-  const getDateKey = (date: Date): string => {
-    // Use local timezone instead of UTC
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+  const loadAllHabitsFromDatabase = async () => {
+    if (!user) return;
+
+    try {
+      const habits = await getHabitsForUser(user.id);
+      if (habits) {
+        setDatabaseHabits(habits);
+      }
+    } catch (error) {
+      console.error("Error loading all habits from database:", error);
+    }
   };
 
-  const getEntry = (date: Date): DayEntry | null => {
-    return habits[getDateKey(date)] || null;
+  // Refresh visible habits from database
+  const refreshVisibleHabits = async () => {
+    if (!user) return;
+
+    try {
+      const habits = await getVisibleHabits(user.id);
+      setVisibleHabits(habits);
+    } catch (error) {
+      console.error("Error refreshing visible habits:", error);
+    }
   };
 
-  const setEntry = (date: Date, entry: DayEntry) => {
-    setHabits((prev) => ({
-      ...prev,
-      [getDateKey(date)]: entry,
-    }));
+  // Get habits with logs for a specific date
+  const getHabitsWithLogsForDate = async (
+    date: Date,
+  ): Promise<DatabaseHabitWithLogs[] | null> => {
+    if (!user) return null;
+
+    try {
+      const habits = await getHabitsForUser(user.id);
+      if (!habits) return null;
+
+      const habitsWithLogs: DatabaseHabitWithLogs[] = habits.map((habit) => ({
+        ...habit,
+        logs: [],
+      }));
+
+      return habitsWithLogs;
+    } catch (error) {
+      console.error("Error fetching habits with logs:", error);
+      return null;
+    }
   };
 
-  const getTotalScore = (date: Date): number => {
-    const entry = getEntry(date);
-    if (!entry) return 0;
-    return (
-      (entry.workout ? 1 : 0) +
-      (entry.eating ? 1 : 0) +
-      (entry.reading ? 1 : 0) +
-      (entry.sleep ? 1 : 0)
-    );
-  };
+  const updateHabitStatus = async (
+    habitName: string,
+    completed: boolean,
+  ): Promise<boolean> => {
+    if (!user) return false;
 
-  const getContributionLevel = (date: Date): number => {
-    const total = getTotalScore(date);
-    if (total === 0) return 0;
-    if (total === 1) return 1;
-    if (total === 2) return 2;
-    if (total === 3) return 3;
-    if (total === 4) return 4;
-    return 0;
+    try {
+      const habits = await getHabitsForUser(user.id);
+      if (!habits) return false;
+
+      const habit = habits.find(
+        (h) => h.name.toLowerCase() === habitName.toLowerCase(),
+      );
+      if (!habit) {
+        const newHabit = await createHabit({ name: habitName }, user.id);
+        if (!newHabit) return false;
+        habit.id = newHabit.id;
+      }
+
+      if (completed) {
+        const success = await addHabitLogForToday(habit.id, user.id);
+        if (!success) {
+          console.error("Failed to add habit log for today");
+          return false;
+        }
+      } else {
+        const success = await removeHabitLogForToday(habit.id, user.id);
+        if (!success) {
+          console.error("Failed to remove habit log for today");
+          return false;
+        }
+      }
+
+      await loadAllHabitsFromDatabase();
+      await refreshVisibleHabits();
+
+      return true;
+    } catch (error) {
+      console.error("Error updating habit status:", error);
+      return false;
+    }
   };
 
   return (
     <HabitsContext.Provider
       value={{
-        habits,
-        getEntry,
-        setEntry,
-        getTotalScore,
-        getContributionLevel,
-        getDateKey,
+        databaseHabits,
+        visibleHabits,
+        getHabitsWithLogsForDate,
+        updateHabitStatus,
+        refreshVisibleHabits,
       }}
     >
       {children}

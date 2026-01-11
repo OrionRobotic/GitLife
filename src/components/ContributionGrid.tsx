@@ -39,7 +39,23 @@ export const ContributionGrid = ({
   onSelectDate,
   selectedDate,
 }: ContributionGridProps) => {
-  const { getContributionLevel, getDateKey } = useHabits();
+  const { getHabitsWithLogsForDate } = useHabits();
+
+  const getContributionLevelForDate = async (date: Date): Promise<number> => {
+    try {
+      const habitsWithLogs = await getHabitsWithLogsForDate(date);
+      if (!habitsWithLogs) return 0;
+
+      const completedCount = habitsWithLogs.filter(
+        (habit) => habit.logs && habit.logs.length > 0,
+      ).length;
+
+      return Math.min(completedCount, 4);
+    } catch (error) {
+      console.error("Error calculating contribution level:", error);
+      return 0;
+    }
+  };
 
   const { weeks, monthLabels, allDays } = useMemo(() => {
     const yearStart = startOfYear(new Date(year, 0, 1));
@@ -161,11 +177,8 @@ export const ContributionGrid = ({
                     return null;
                   }
 
-                  const level =
-                    isInYear && !future ? getContributionLevel(day) : 0;
-                  const isSelected =
-                    selectedDate &&
-                    getDateKey(selectedDate) === getDateKey(day);
+                  const level = 0;
+                  const isSelected = false;
 
                   const isFutureEmpty = future && isInYear;
 

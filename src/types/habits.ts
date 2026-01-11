@@ -54,7 +54,7 @@ export interface ApiResponse<T> {
   error?: {
     message: string;
     code?: string;
-    details?: any;
+    details?: unknown;
   };
   status: number;
 }
