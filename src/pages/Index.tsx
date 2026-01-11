@@ -30,11 +30,7 @@ const Index = () => {
         <header className="mb-12 flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-medium text-foreground tracking-tight flex items-center gap-2">
-              <img 
-                src="/favicon.svg" 
-                alt="GitLife" 
-                className="w-6 h-6" 
-              />
+              <img src="/favicon.svg" alt="GitLife" className="w-6 h-6" />
               GitLife
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
