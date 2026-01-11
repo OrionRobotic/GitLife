@@ -1,5 +1,8 @@
 import { format, isToday, isFuture } from "date-fns";
+import { useState, useEffect } from "react";
 import { useHabits } from "@/context/HabitsContext";
+import { getHabitsForUser } from "@/services/habits";
+import { useAuth } from "@/context/AuthContext";
 import { Dumbbell, Utensils, BookOpen, Moon } from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
@@ -9,22 +12,59 @@ interface DayEditorProps {
 }
 
 const HABIT_ICONS: Record<string, LucideIcon> = {
-  Workout: Dumbbell,
-  "Healthy Eating": Utensils,
-  Reading: BookOpen,
-  "Good Sleep": Moon,
+  workout: Dumbbell,
+  eating: Utensils,
+  reading: BookOpen,
+  sleep: Moon,
+};
+
+// TODO: Change this lowercase
+const getHabitIcon = (name: string): LucideIcon => {
+  const normalizedName = name.toLowerCase();
+  return HABIT_ICONS[normalizedName] || BookOpen;
 };
 
 export const DayEditor = ({ date, onClose }: DayEditorProps) => {
   const { visibleHabits, updateHabitStatus } = useHabits();
+  const { user } = useAuth();
+  const [completedHabitIds, setCompletedHabitIds] = useState<Set<string>>(new Set());
 
   const future = isFuture(date) && !isToday(date);
+
+  // Load completed habits for the selected date
+  useEffect(() => {
+    const loadCompletedHabits = async () => {
+      if (!user) return;
+      
+      const habitLogs = await getHabitsForUser(user.id);
+      if (!habitLogs) return;
+
+      // Get the date string for comparison
+      const selectedDateStr = format(date, "yyyy-MM-dd");
+      
+      // Find habit logs for the selected date
+      const completedIds = new Set<string>();
+      for (const log of habitLogs) {
+        const logDateStr = format(new Date(log.createdAt), "yyyy-MM-dd");
+        if (logDateStr === selectedDateStr) {
+          completedIds.add(log.habitId);
+        }
+      }
+      
+      setCompletedHabitIds(completedIds);
+    };
+
+    loadCompletedHabits();
+  }, [user, date]);
 
   const habitsForDisplay = visibleHabits.map((habit) => ({
     id: habit.id,
     name: habit.name,
-    icon: HABIT_ICONS[habit.name] || BookOpen,
+    icon: getHabitIcon(habit.name),
+    completed: completedHabitIds.has(habit.id),
   }));
+
+  const completedCount = habitsForDisplay.filter((h) => h.completed).length;
 
   const handleChange = async (
     habitId: string,
@@ -32,6 +72,17 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
     completed: boolean,
   ) => {
     await updateHabitStatus(habitName, completed);
+    
+    // Update local state immediately after selecting a habit
+    setCompletedHabitIds((prev) => {
+      const newSet = new Set(prev);
+      if (completed) {
+        newSet.add(habitId);
+      } else {
+        newSet.delete(habitId);
+      }
+      return newSet;
+    });
   };
 
   return (
@@ -56,7 +107,7 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
               No habits found. Create some habits first!
             </p>
           ) : (
-            habitsForDisplay.map(({ id, name, icon: Icon }) => (
+            habitsForDisplay.map(({ id, name, icon: Icon, completed }) => (
               <div key={id}>
                 <div className="flex items-center gap-2">
                   <Icon className="w-4 h-4 text-muted-foreground" />
@@ -68,7 +119,10 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
                       onClick={() => handleChange(id, name, false)}
                       className={`
                         h-8 px-3 rounded text-sm font-medium transition-all
-                        bg-foreground text-background
+                        ${!completed 
+                          ? "bg-foreground text-background" 
+                          : "bg-muted hover:bg-muted-foreground/20 text-foreground"
+                        }
                       `}
                     >
                       No
@@ -77,7 +131,10 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
                       onClick={() => handleChange(id, name, true)}
                       className={`
                         h-8 px-3 rounded text-sm font-medium transition-all
-                        bg-muted hover:bg-muted-foreground/20 text-foreground
+                        ${completed 
+                          ? "bg-foreground text-background" 
+                          : "bg-muted hover:bg-muted-foreground/20 text-foreground"
+                        }
                       `}
                     >
                       Yes
@@ -92,7 +149,7 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Completed</span>
               <span className="text-lg font-medium text-foreground">
-                {habitsForDisplay.length}/{habitsForDisplay.length}
+                {completedCount}/{habitsForDisplay.length}
               </span>
             </div>
           </div>
