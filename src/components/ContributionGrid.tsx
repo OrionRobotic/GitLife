@@ -172,8 +172,8 @@ export const ContributionGrid = ({
                   // to prevent performance issues. This should be implemented with
                   // proper data pre-loading in a future update.
                   const level = 0;
-                  const isSelected = selectedDate && 
-                    day.getTime() === selectedDate.getTime();
+                  const isSelected =
+                    selectedDate && day.getTime() === selectedDate.getTime();
 
                   const isFutureEmpty = future && isInYear;
 
