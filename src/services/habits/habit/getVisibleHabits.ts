@@ -1,26 +1,26 @@
-import { getHabitsForUser } from "./getHabitsForUser";
+import { supabase } from "@/lib/supabase";
 
 /**
- * Get all habits for a user to display on the homepage
- * Retrieves habits directly from the database without filtering
- * @param userId - User ID
- * @returns Array of all user's habits
+ * Get all available habits from the habits table
+ * @param userId - User ID (kept for API compatibility)
+ * @returns Array of all habits
  */
 export async function getVisibleHabits(
   userId: string,
 ): Promise<Array<{ id: string; name: string }>> {
   try {
-    const habits = await getHabitsForUser(userId);
+    const { data, error } = await supabase
+      .from("habits")
+      .select("id, name")
+      .order("createdAt", { ascending: true });
 
-    if (!habits || habits.length === 0) {
+    if (error) {
+      console.error("Error fetching habits:", error.message);
       return [];
     }
 
-    // Return all habits without filtering
-    return habits.map((habit) => ({
-      id: habit.id,
-      name: habit.name,
-    }));
+    console.log("Visible habits:", data);
+    return data || [];
   } catch (error) {
     console.error("Error getting habits:", error);
     return [];
