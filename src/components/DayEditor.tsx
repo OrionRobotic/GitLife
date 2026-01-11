@@ -1,43 +1,90 @@
 import { format, isToday, isFuture } from "date-fns";
-import { useHabits } from "@/context/HabitsContext";
-import { DayEntry } from "@/types/habits";
+import { useState, useEffect } from "react";
+import { useHabits } from "@/context/useHabits";
+import { getHabitsForUser } from "@/services/habits";
+import { useAuth } from "@/context/AuthContext";
 import { Dumbbell, Utensils, BookOpen, Moon } from "lucide-react";
+import { LucideIcon } from "lucide-react";
 
 interface DayEditorProps {
   date: Date;
   onClose: () => void;
 }
 
-const HABITS = [
-  { key: "workout" as const, label: "Workout", icon: Dumbbell },
-  { key: "eating" as const, label: "Eating", icon: Utensils },
-  { key: "reading" as const, label: "Reading", icon: BookOpen },
-  { key: "sleep" as const, label: "Sleep", icon: Moon },
-];
+const HABIT_ICONS: Record<string, LucideIcon> = {
+  workout: Dumbbell,
+  eating: Utensils,
+  reading: BookOpen,
+  sleep: Moon,
+};
+
+const getHabitIcon = (name: string): LucideIcon => {
+  const normalizedName = name.toLowerCase();
+  return HABIT_ICONS[normalizedName] || BookOpen;
+};
 
 export const DayEditor = ({ date, onClose }: DayEditorProps) => {
-  const { getEntry, setEntry } = useHabits();
-  const entry = getEntry(date);
-
-  const values = {
-    workout: entry?.workout || false,
-    eating: entry?.eating || false,
-    reading: entry?.reading || false,
-    sleep: entry?.sleep || false,
-  };
+  const { visibleHabits, updateHabitStatus } = useHabits();
+  const { user } = useAuth();
+  const [completedHabitIds, setCompletedHabitIds] = useState<Set<string>>(
+    new Set(),
+  );
 
   const future = isFuture(date) && !isToday(date);
 
-  const handleChange = (key: keyof DayEntry, value: boolean) => {
-    const newValues = { ...values, [key]: value };
-    setEntry(date, newValues);
-  };
+  useEffect(() => {
+    const loadCompletedHabits = async () => {
+      if (!user) return;
 
-  const totalScore =
-    (values.workout ? 1 : 0) +
-    (values.eating ? 1 : 0) +
-    (values.reading ? 1 : 0) +
-    (values.sleep ? 1 : 0);
+      const habitLogs = await getHabitsForUser(user.id);
+      if (!habitLogs) return;
+
+      const selectedDateStr = format(date, "yyyy-MM-dd");
+
+      const completedIds = new Set<string>();
+      for (const log of habitLogs) {
+        const logDateStr = format(new Date(log.createdAt), "yyyy-MM-dd");
+        if (logDateStr === selectedDateStr) {
+          completedIds.add(log.habitId);
+        }
+      }
+
+      setCompletedHabitIds(completedIds);
+    };
+
+    loadCompletedHabits();
+  }, [user, date]);
+
+  const habitsForDisplay = visibleHabits.map((habit) => ({
+    id: habit.id,
+    name: habit.name,
+    icon: getHabitIcon(habit.name),
+    completed: completedHabitIds.has(habit.id),
+  }));
+
+  const completedCount = habitsForDisplay.filter((h) => h.completed).length;
+
+  const handleChange = async (
+    habitId: string,
+    habitName: string,
+    completed: boolean,
+  ) => {
+    try {
+      await updateHabitStatus(habitName, completed);
+
+      setCompletedHabitIds((prev) => {
+        const newSet = new Set(prev);
+        if (completed) {
+          newSet.add(habitId);
+        } else {
+          newSet.delete(habitId);
+        }
+        return newSet;
+      });
+    } catch (error) {
+      console.error("Failed to update habit status:", error);
+    }
+  };
 
   return (
     <div className="p-6 bg-card border border-border rounded-lg max-w-sm w-full">
@@ -56,50 +103,56 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
         </p>
       ) : (
         <div className="space-y-3">
-          {HABITS.map(({ key, label, icon: Icon }) => (
-            <div key={key}>
-              <div className="flex items-center gap-2">
-                <Icon className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-medium text-foreground">
-                  {label}
-                </span>
-                <div className="ml-auto flex gap-1">
-                  <button
-                    onClick={() => handleChange(key, false)}
-                    className={`
-                      h-8 px-3 rounded text-sm font-medium transition-all
-                      ${
-                        values[key] === false
-                          ? "bg-foreground text-background"
-                          : "bg-muted hover:bg-muted-foreground/20 text-foreground"
-                      }
-                    `}
-                  >
-                    No
-                  </button>
-                  <button
-                    onClick={() => handleChange(key, true)}
-                    className={`
-                      h-8 px-3 rounded text-sm font-medium transition-all
-                      ${
-                        values[key] === true
-                          ? "bg-foreground text-background"
-                          : "bg-muted hover:bg-muted-foreground/20 text-foreground"
-                      }
-                    `}
-                  >
-                    Yes
-                  </button>
+          {habitsForDisplay.length === 0 ? (
+            <p className="text-muted-foreground text-sm">
+              No habits found. Create some habits first!
+            </p>
+          ) : (
+            habitsForDisplay.map(({ id, name, icon: Icon, completed }) => (
+              <div key={id}>
+                <div className="flex items-center gap-2">
+                  <Icon className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium text-foreground">
+                    {name}
+                  </span>
+                  <div className="ml-auto flex gap-1">
+                    <button
+                      onClick={() => handleChange(id, name, false)}
+                      className={`
+                        h-8 px-3 rounded text-sm font-medium transition-all
+                        ${
+                          !completed
+                            ? "bg-foreground text-background"
+                            : "bg-muted hover:bg-muted-foreground/20 text-foreground"
+                        }
+                      `}
+                    >
+                      No
+                    </button>
+                    <button
+                      onClick={() => handleChange(id, name, true)}
+                      className={`
+                        h-8 px-3 rounded text-sm font-medium transition-all
+                        ${
+                          completed
+                            ? "bg-foreground text-background"
+                            : "bg-muted hover:bg-muted-foreground/20 text-foreground"
+                        }
+                      `}
+                    >
+                      Yes
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
 
           <div className="pt-4 border-t border-border">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Completed</span>
               <span className="text-lg font-medium text-foreground">
-                {totalScore}/{HABITS.length}
+                {completedCount}/{habitsForDisplay.length}
               </span>
             </div>
           </div>
