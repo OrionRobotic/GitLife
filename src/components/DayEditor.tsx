@@ -20,10 +20,10 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
   const existingEntry = getEntry(date);
   
   const [values, setValues] = useState<DayEntry>({
-    workout: existingEntry?.workout || 0,
-    eating: existingEntry?.eating || 0,
-    reading: existingEntry?.reading || 0,
-    sleep: existingEntry?.sleep || 0,
+    workout: existingEntry?.workout || false,
+    eating: existingEntry?.eating || false,
+    reading: existingEntry?.reading || false,
+    sleep: existingEntry?.sleep || false,
   });
 
   const future = isFuture(date) && !isToday(date);
@@ -31,14 +31,14 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
   useEffect(() => {
     const entry = getEntry(date);
     setValues({
-      workout: entry?.workout || 0,
-      eating: entry?.eating || 0,
-      reading: entry?.reading || 0,
-      sleep: entry?.sleep || 0,
+      workout: entry?.workout || false,
+      eating: entry?.eating || false,
+      reading: entry?.reading || false,
+      sleep: entry?.sleep || false,
     });
-  }, [date]);
+  }, [date, getEntry]);
 
-  const handleChange = (key: keyof DayEntry, value: number) => {
+  const handleChange = (key: keyof DayEntry, value: boolean) => {
     const newValues = { ...values, [key]: value };
     setValues(newValues);
     setEntry(date, newValues);
@@ -70,38 +70,46 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
           Cannot log future dates.
         </p>
       ) : (
-        <div className="space-y-5">
+        <div className="space-y-3">
           {HABITS.map(({ key, label, icon: Icon }) => (
             <div key={key}>
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-2">
                 <Icon className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm font-medium text-foreground">{label}</span>
-                <span className="ml-auto text-sm text-muted-foreground">{values[key]}/5</span>
-              </div>
-              <div className="flex gap-1">
-                {[0, 1, 2, 3, 4, 5].map((val) => (
+                <div className="ml-auto flex gap-1">
                   <button
-                    key={val}
-                    onClick={() => handleChange(key, val)}
+                    onClick={() => handleChange(key, false)}
                     className={`
-                      flex-1 h-8 rounded text-sm font-medium transition-all
-                      ${values[key] === val 
+                      h-8 px-3 rounded text-sm font-medium transition-all
+                      ${values[key] === false 
                         ? 'bg-foreground text-background' 
                         : 'bg-muted hover:bg-muted-foreground/20 text-foreground'
                       }
                     `}
                   >
-                    {val}
+                    No
                   </button>
-                ))}
+                  <button
+                    onClick={() => handleChange(key, true)}
+                    className={`
+                      h-8 px-3 rounded text-sm font-medium transition-all
+                      ${values[key] === true 
+                        ? 'bg-foreground text-background' 
+                        : 'bg-muted hover:bg-muted-foreground/20 text-foreground'
+                      }
+                    `}
+                  >
+                    Yes
+                  </button>
+                </div>
               </div>
             </div>
           ))}
 
           <div className="pt-4 border-t border-border">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Total score</span>
-              <span className="text-lg font-medium text-foreground">{totalScore}/20</span>
+              <span className="text-sm text-muted-foreground">Completed</span>
+              <span className="text-lg font-medium text-foreground">{totalScore}/3</span>
             </div>
           </div>
         </div>
