@@ -1,14 +1,19 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "gitlife",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "bin": {
+    "gitlife": "./cli/git-gitlife.js",
+    "git-gitlife": "./cli/git-gitlife.js"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "install-cli": "bash scripts/install-cli.sh"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

@@ -102,13 +102,27 @@ $$Score = Workout_{(1-5)} + Nutrition_{(1-5)} + Reading_{(1-5)}$$
 
 ### Running the App
 
-Start the development server:
-
 ```bash
 npm run dev
 ```
 
-The app will be available at `http://localhost:5173` (or another port if 5173 is in use).
+The app will be available at `http://localhost:5173`.
+
+Install the CLI to log habits from your terminal:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"  # Add to ~/.zshrc
+```
+
+Usage:
+
+```bash
+gitlife -t workout   # Complete workout
+gitlife -t eat       # Complete eating
+gitlife -t read      # Complete reading
+gitlife -t sleep     # Complete sleep
+gitlife -s           # Show today's status
+```
 
 ### Other Available Commands
 
