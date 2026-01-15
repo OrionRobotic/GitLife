@@ -69,20 +69,45 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
     habitName: string,
     completed: boolean,
   ) => {
-    try {
-      await updateHabitStatus(habitName, completed);
+    // Optimistic update - update UI immediately
+    setCompletedHabitIds((prev) => {
+      const newSet = new Set(prev);
+      if (completed) {
+        newSet.add(habitId);
+      } else {
+        newSet.delete(habitId);
+      }
+      return newSet;
+    });
 
+    try {
+      await updateHabitStatus(habitName, completed, date);
+      
+      // Reload to ensure consistency
+      const habitLogs = await getHabitsForUser(user!.id);
+      if (habitLogs) {
+        const selectedDateStr = format(date, "yyyy-MM-dd");
+        const completedIds = new Set<string>();
+        for (const log of habitLogs) {
+          const logDateStr = format(new Date(log.createdAt), "yyyy-MM-dd");
+          if (logDateStr === selectedDateStr) {
+            completedIds.add(log.habitId);
+          }
+        }
+        setCompletedHabitIds(completedIds);
+      }
+    } catch (error) {
+      console.error("Failed to update habit status:", error);
+      // Revert optimistic update on error
       setCompletedHabitIds((prev) => {
         const newSet = new Set(prev);
         if (completed) {
-          newSet.add(habitId);
-        } else {
           newSet.delete(habitId);
+        } else {
+          newSet.add(habitId);
         }
         return newSet;
       });
-    } catch (error) {
-      console.error("Failed to update habit status:", error);
     }
   };
 

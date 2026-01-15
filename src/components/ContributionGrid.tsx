@@ -1,5 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useHabits } from "@/context/useHabits";
+import { getHabitsForUser } from "@/services/habits";
+import { useAuth } from "@/context/AuthContext";
 import {
   startOfYear,
   endOfYear,
@@ -39,23 +41,48 @@ export const ContributionGrid = ({
   onSelectDate,
   selectedDate,
 }: ContributionGridProps) => {
-  const { getHabitsWithLogsForDate } = useHabits();
+  const { refreshTrigger } = useHabits();
+  const { user } = useAuth();
+  const [contributionLevels, setContributionLevels] = useState<
+    Map<string, number>
+  >(new Map());
 
-  const getContributionLevelForDate = async (date: Date): Promise<number> => {
-    try {
-      const habitsWithLogs = await getHabitsWithLogsForDate(date);
-      if (!habitsWithLogs) return 0;
+  // Calculate contribution levels for all days in the year
+  useEffect(() => {
+    const calculateLevels = async () => {
+      if (!user) {
+        setContributionLevels(new Map());
+        return;
+      }
 
-      const completedCount = habitsWithLogs.filter(
-        (habit) => habit.logs && habit.logs.length > 0,
-      ).length;
+      const habitLogs = await getHabitsForUser(user.id);
+      if (!habitLogs) {
+        setContributionLevels(new Map());
+        return;
+      }
 
-      return Math.min(completedCount, 4);
-    } catch (error) {
-      console.error("Error calculating contribution level:", error);
-      return 0;
-    }
-  };
+      const levels = new Map<string, number>();
+
+      // Group logs by date
+      const logsByDate = new Map<string, Set<string>>();
+      for (const log of habitLogs) {
+        const logDateStr = format(new Date(log.createdAt), "yyyy-MM-dd");
+        if (!logsByDate.has(logDateStr)) {
+          logsByDate.set(logDateStr, new Set());
+        }
+        logsByDate.get(logDateStr)!.add(log.habitId);
+      }
+
+      // Calculate level for each date (number of unique habits completed)
+      logsByDate.forEach((habitIds, dateStr) => {
+        levels.set(dateStr, Math.min(habitIds.size, 4));
+      });
+
+      setContributionLevels(levels);
+    };
+
+    calculateLevels();
+  }, [user, refreshTrigger]);
 
   const { weeks, monthLabels, allDays } = useMemo(() => {
     const yearStart = startOfYear(new Date(year, 0, 1));
@@ -183,8 +210,11 @@ export const ContributionGrid = ({
                     );
                   }
 
-                  const level = 0;
-                  const isSelected = false;
+                  const dateStr = format(day, "yyyy-MM-dd");
+                  const level = contributionLevels.get(dateStr) || 0;
+                  const isSelected =
+                    selectedDate &&
+                    format(selectedDate, "yyyy-MM-dd") === dateStr;
 
                   const isFutureEmpty = future && isInYear;
 
@@ -192,13 +222,14 @@ export const ContributionGrid = ({
                     <button
                       key={day.toISOString()}
                       onClick={() => !future && isInYear && onSelectDate(day)}
-                      disabled={true}
+                      disabled={future}
                       className={`
                         w-[11px] h-[11px] rounded-[3px] transition-all
                         ${isInYear && !future ? getContributionClass(level) : "bg-transparent"}
                         ${isFutureEmpty ? "border border-border/50" : "border-none"}
-                        outline-none ring-0
-                        cursor-default
+                        ${isSelected ? "ring-2 ring-foreground/50" : ""}
+                        outline-none
+                        ${!future && isInYear ? "cursor-pointer hover:ring-1 hover:ring-foreground/30" : "cursor-default"}
                       `}
                       title={isInYear ? format(day, "MMM d, yyyy") : ""}
                     />

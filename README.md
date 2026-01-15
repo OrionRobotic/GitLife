@@ -1,6 +1,6 @@
 <div align="center">
 
-  <h1>GitLife <img src="public/favicon.svg" alt="GitLife" width="24" height="24" style="vertical-align: middle;" /></h1>
+  <h1>GitLife <img src="public/favicon.svg" alt="GitLife" width="30" height="30" style="vertical-align: middle;" /></h1>
 
   <p>
     <strong>Commit to a better version of yourself.</strong>
@@ -22,7 +22,9 @@
 
 <br />
 
-![GitLife Cover](cover.png)
+<p align="center">
+  <img src="cover.png" alt="GitLife Cover" width="600"/>
+</p>
 
 <br />
 

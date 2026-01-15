@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { ContributionGrid } from "@/components/ContributionGrid";
@@ -7,7 +7,8 @@ import { Legend } from "@/components/Legend";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/context/AuthContext";
-import { useHabits } from "@/context/HabitsContext";
+import { useHabits } from "@/context/useHabits";
+import { getHabitsForUser } from "@/services/habits";
 import { Loader2, LogOut, User, Plus } from "lucide-react";
 
 const Index = () => {
@@ -15,19 +16,45 @@ const Index = () => {
   const currentYear = new Date().getFullYear();
   const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
-  const { getEntry } = useHabits();
+  const { visibleHabits } = useHabits();
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [totalScore, setTotalScore] = useState(0);
+  const [totalHabits, setTotalHabits] = useState(0);
 
   // Calculate completed ratio for the selected date (or today)
   const displayDate = selectedDate || new Date();
-  const entry = getEntry(displayDate);
-  const totalScore =
-    (entry?.workout ? 1 : 0) +
-    (entry?.eating ? 1 : 0) +
-    (entry?.reading ? 1 : 0) +
-    (entry?.sleep ? 1 : 0);
-  const totalHabits = 4;
+
+  useEffect(() => {
+    const calculateScore = async () => {
+      if (!user) {
+        setTotalScore(0);
+        setTotalHabits(visibleHabits.length);
+        return;
+      }
+
+      const habitLogs = await getHabitsForUser(user.id);
+      if (!habitLogs) {
+        setTotalScore(0);
+        setTotalHabits(visibleHabits.length);
+        return;
+      }
+
+      const selectedDateStr = format(displayDate, "yyyy-MM-dd");
+      const completedHabitIds = new Set<string>();
+      
+      for (const log of habitLogs) {
+        const logDateStr = format(new Date(log.createdAt), "yyyy-MM-dd");
+        if (logDateStr === selectedDateStr) {
+          completedHabitIds.add(log.habitId);
+        }
+      }
+
+      setTotalScore(completedHabitIds.size);
+      setTotalHabits(visibleHabits.length || 0);
+    };
+    calculateScore();
+  }, [displayDate, user, visibleHabits.length]);
 
   const handleSignOut = async () => {
     await signOut();
