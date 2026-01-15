@@ -199,6 +199,8 @@ export const ContributionGrid = ({
                   const dayOfWeek = getDay(day);
                   const isInYear = day.getFullYear() === year;
                   const future = isFuture(day) && !isToday(day);
+                  const past = !isToday(day) && !isFuture(day);
+                  const today = isToday(day);
 
                   // For days not in the year and not future, render invisible placeholder to maintain alignment
                   if (!isInYear && !future) {
@@ -218,20 +220,29 @@ export const ContributionGrid = ({
 
                   const isFutureEmpty = future && isInYear;
 
+                  // Only today is clickable - past and future days are not
+                  const isClickable = today && isInYear;
+
                   return (
                     <button
                       key={day.toISOString()}
-                      onClick={() => !future && isInYear && onSelectDate(day)}
-                      disabled={future}
+                      onClick={() => {
+                        if (isClickable) {
+                          onSelectDate(day);
+                        }
+                      }}
+                      disabled={!isClickable}
                       className={`
                         w-[11px] h-[11px] rounded-[3px] transition-all
                         ${isInYear && !future ? getContributionClass(level) : "bg-transparent"}
                         ${isFutureEmpty ? "border border-border/50" : "border-none"}
                         ${isSelected ? "ring-2 ring-foreground/50" : ""}
+                        ${past ? "opacity-60" : ""}
                         outline-none
-                        ${!future && isInYear ? "cursor-pointer hover:ring-1 hover:ring-foreground/30" : "cursor-default"}
+                        ${isClickable ? "cursor-pointer hover:ring-1 hover:ring-foreground/30" : "cursor-not-allowed"}
                       `}
                       title={isInYear ? format(day, "MMM d, yyyy") : ""}
+                      aria-label={isInYear ? format(day, "MMM d, yyyy") : ""}
                     />
                   );
                 })}
