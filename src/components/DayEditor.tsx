@@ -112,7 +112,7 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
   };
 
   return (
-    <div className="p-6 bg-card border border-border rounded-lg max-w-2xl w-full">
+    <div className="p-6 bg-card border border-border rounded-lg max-w-3xl w-full">
       <div className="mb-6">
         <h2 className="text-lg font-medium text-foreground">
           {format(date, "EEEE")}
@@ -135,12 +135,12 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
           ) : (
             habitsForDisplay.map(({ id, name, icon: Icon, completed }) => (
               <div key={id}>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-4">
                   <Icon className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm font-medium text-foreground">
+                  <span className="text-sm font-medium text-foreground flex-1">
                     {name}
                   </span>
-                  <div className="ml-auto flex gap-1">
+                  <div className="ml-8 flex gap-1">
                     <button
                       onClick={() => handleChange(id, name, false)}
                       className={`
@@ -172,15 +172,6 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
               </div>
             ))
           )}
-
-          <div className="pt-4 border-t border-border">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Completed</span>
-              <span className="text-lg font-medium text-foreground">
-                {completedCount}/{habitsForDisplay.length}
-              </span>
-            </div>
-          </div>
         </div>
       )}
     </div>

@@ -170,7 +170,7 @@ const Index = () => {
                 side="bottom"
                 sideOffset={8}
                 avoidCollisions={false}
-                className="w-auto p-0 border-0 shadow-lg z-50"
+                className="w-auto p-0 border-0 shadow-lg z-50 max-w-3xl"
               >
                 {(selectedDate || new Date()) && (
                   <DayEditor 
