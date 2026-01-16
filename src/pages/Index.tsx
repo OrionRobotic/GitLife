@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { ContributionGrid } from "@/components/ContributionGrid";
 import { DayEditor } from "@/components/DayEditor";
@@ -9,13 +8,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useAuth } from "@/context/AuthContext";
 import { useHabits } from "@/context/useHabits";
 import { getHabitsForUser } from "@/services/habits";
-import { Loader2, LogOut, User, Plus } from "lucide-react";
+import { MenuButton } from "@/components/MenuButton";
+import { Plus } from "lucide-react";
 
 const Index = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const currentYear = new Date().getFullYear();
-  const { user, loading: authLoading, signOut } = useAuth();
-  const navigate = useNavigate();
   const { visibleHabits } = useHabits();
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -24,6 +22,8 @@ const Index = () => {
 
   // Calculate completed ratio for the selected date (or today)
   const displayDate = selectedDate || new Date();
+
+  const { user } = useAuth();
 
   useEffect(() => {
     const calculateScore = async () => {
@@ -56,11 +56,6 @@ const Index = () => {
     calculateScore();
   }, [displayDate, user, visibleHabits.length]);
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate("/login");
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-6 py-12">
@@ -75,37 +70,8 @@ const Index = () => {
               Commit to a better version of yourself.
             </p>
           </div>
-          <div className="flex flex-col items-end gap-2">
-            {authLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-            ) : user ? (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">
-                  {user.email}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleSignOut}
-                  className="gap-2"
-                >
-                  <LogOut className="h-4 w-4" />
-                  Sign out
-                </Button>
-              </div>
-            ) : (
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" asChild>
-                  <Link to="/login">
-                    <User className="h-4 w-4 mr-2" />
-                    Sign in
-                  </Link>
-                </Button>
-                <Button size="sm" asChild>
-                  <Link to="/signup">Sign up</Link>
-                </Button>
-              </div>
-            )}
+          <div className="flex items-center">
+            <MenuButton />
           </div>
         </header>
 
