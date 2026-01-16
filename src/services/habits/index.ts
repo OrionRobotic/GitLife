@@ -4,5 +4,7 @@ export { getVisibleHabits } from "./habit/getVisibleHabits";
 export { createHabitLog } from "./log/createHabitLog";
 export { addHabitLogForToday } from "./log/addHabitLogForToday";
 export { removeHabitLogForToday } from "./log/removeHabitLogForToday";
+export { addHabitLogForDate } from "./log/addHabitLogForDate";
+export { removeHabitLogForDate } from "./log/removeHabitLogForDate";
 export type { Habit, HabitCreateInput } from "@/types/database";
 export type { HabitLog, HabitLogCreateInput } from "@/types/database";
