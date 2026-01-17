@@ -235,7 +235,8 @@ export const ContributionGrid = ({
                       className={`
                         w-[11px] h-[11px] rounded-[3px] transition-all
                         ${isInYear && !future ? getContributionClass(level) : "bg-transparent"}
-                        ${isFutureEmpty ? "border border-border/50" : "border-none"}
+                        ${isFutureEmpty ? "border border-border/50" : "border-0"}
+                        ${today ? "!border-0" : ""}
                         ${isSelected ? "ring-2 ring-foreground/50" : ""}
                         ${past ? "opacity-60" : ""}
                         outline-none
