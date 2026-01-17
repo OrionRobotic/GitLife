@@ -180,9 +180,9 @@ export const ContributionGrid = ({
         {/* Month labels */}
         <div className="flex mb-2 ml-8 relative h-4">
           {monthLabels.map(({ month, columnIndex }, i) => {
-            // Each column is 11px (cell) + 3px (gap) = 14px wide
+            // Each column is 11px (cell) + 2.5px (gap) = 13.5px wide
             // Add a small offset to the right (like GitHub) for better visual alignment
-            const leftPosition = columnIndex * 14 + 4;
+            const leftPosition = columnIndex * 13.5 + 4;
 
             return (
               <div
@@ -210,9 +210,9 @@ export const ContributionGrid = ({
           </div>
 
           {/* Grid */}
-          <div className="flex gap-[3px]">
+          <div className="flex gap-[2.5px]">
             {weeks.map((week, weekIndex) => (
-              <div key={weekIndex} className="flex flex-col gap-[3px]">
+              <div key={weekIndex} className="flex flex-col gap-[2.5px]">
                 {week.map((day, dayIndexInWeek) => {
                   const dayOfWeek = getDay(day);
                   const isInYear = day.getFullYear() === year;
