@@ -54,6 +54,10 @@ export const ContributionGrid = ({
   const [dayRatios, setDayRatios] = useState<
     Map<string, { completed: number; total: number }>
   >(new Map());
+  const [completedHabitIds, setCompletedHabitIds] = useState<
+    Map<string, Set<string>>
+  >(new Map());
+  const [isCmdPressed, setIsCmdPressed] = useState(false);
 
   // Calculate contribution levels and ratios for all days in the year
   useEffect(() => {
@@ -61,6 +65,7 @@ export const ContributionGrid = ({
       if (!user) {
         setContributionLevels(new Map());
         setDayRatios(new Map());
+        setCompletedHabitIds(new Map());
         return;
       }
 
@@ -68,11 +73,13 @@ export const ContributionGrid = ({
       if (!habitLogs) {
         setContributionLevels(new Map());
         setDayRatios(new Map());
+        setCompletedHabitIds(new Map());
         return;
       }
 
       const levels = new Map<string, number>();
       const ratios = new Map<string, { completed: number; total: number }>();
+      const completedIds = new Map<string, Set<string>>();
 
       // Group logs by date
       const logsByDate = new Map<string, Set<string>>();
@@ -93,14 +100,39 @@ export const ContributionGrid = ({
           completed: habitIds.size,
           total: totalHabits,
         });
+        completedIds.set(dateStr, new Set(habitIds));
       });
 
       setContributionLevels(levels);
       setDayRatios(ratios);
+      setCompletedHabitIds(completedIds);
     };
 
     calculateLevels();
   }, [user, refreshTrigger, visibleHabits.length]);
+
+  // Track CMD key state
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.metaKey) {
+        setIsCmdPressed(true);
+      }
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === "Meta") {
+        setIsCmdPressed(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []);
 
   const { weeks, monthLabels, allDays } = useMemo(() => {
     const yearStart = startOfYear(new Date(year, 0, 1));
@@ -236,6 +268,7 @@ export const ContributionGrid = ({
                     completed: 0,
                     total: visibleHabits.length || 0,
                   };
+                  const completedIds = completedHabitIds.get(dateStr) || new Set<string>();
                   const isSelected =
                     selectedDate &&
                     format(selectedDate, "yyyy-MM-dd") === dateStr;
@@ -263,7 +296,6 @@ export const ContributionGrid = ({
                         ${isFutureEmpty ? "border border-border/50" : "border-0"}
                         ${today ? "!border-0 !ring-0" : ""}
                         ${isSelected ? "ring-2 ring-foreground/50" : ""}
-                        ${past ? "opacity-60" : ""}
                         outline-none
                         ${isInYear ? "cursor-pointer hover:ring-1 hover:ring-foreground/30" : "cursor-not-allowed"}
                       `}
@@ -279,12 +311,44 @@ export const ContributionGrid = ({
                           side="right"
                           className="!bg-[rgba(245,240,230,0.9)] !border-[rgba(200,190,175,0.4)] text-foreground backdrop-blur-sm shadow-lg opacity-60"
                         >
-                          <div className="text-center space-y-0.5">
-                            <div className="font-medium">{formattedDate}</div>
-                            <div className="text-xs text-muted-foreground">
-                              {ratio.completed}/{ratio.total}
+                          {isCmdPressed ? (
+                            <div className="text-left space-y-1.5 min-w-[180px] max-w-[250px]">
+                              <div className="font-medium text-center border-b border-border/30 pb-1">
+                                {formattedDate}
+                              </div>
+                              <div className="space-y-0.5 max-h-[200px] overflow-y-auto">
+                                {visibleHabits.length > 0 ? (
+                                  visibleHabits.map((habit) => {
+                                    const isCompleted = completedIds.has(habit.id);
+                                    return (
+                                      <div
+                                        key={habit.id}
+                                        className={`text-sm ${
+                                          isCompleted
+                                            ? "text-foreground"
+                                            : "text-muted-foreground opacity-40"
+                                        }`}
+                                      >
+                                        {isCompleted ? "✓ " : "○ "}
+                                        {habit.name}
+                                      </div>
+                                    );
+                                  })
+                                ) : (
+                                  <div className="text-xs text-muted-foreground">
+                                    No habits
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                          </div>
+                          ) : (
+                            <div className="text-center space-y-0.5">
+                              <div className="font-medium">{formattedDate}</div>
+                              <div className="text-xs text-muted-foreground">
+                                {ratio.completed}/{ratio.total}
+                              </div>
+                            </div>
+                          )}
                         </TooltipContent>
                       </Tooltip>
                     );
