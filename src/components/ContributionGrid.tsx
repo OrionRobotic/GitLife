@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, Fragment } from "react";
 import { useHabits } from "@/context/useHabits";
 import { getHabitsForUser } from "@/services/habits";
 import { useAuth } from "@/context/AuthContext";
@@ -13,6 +13,11 @@ import {
   isToday,
   startOfMonth,
 } from "date-fns";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ContributionGridProps {
   year: number;
@@ -41,27 +46,33 @@ export const ContributionGrid = ({
   onSelectDate,
   selectedDate,
 }: ContributionGridProps) => {
-  const { refreshTrigger } = useHabits();
+  const { refreshTrigger, visibleHabits } = useHabits();
   const { user } = useAuth();
   const [contributionLevels, setContributionLevels] = useState<
     Map<string, number>
   >(new Map());
+  const [dayRatios, setDayRatios] = useState<
+    Map<string, { completed: number; total: number }>
+  >(new Map());
 
-  // Calculate contribution levels for all days in the year
+  // Calculate contribution levels and ratios for all days in the year
   useEffect(() => {
     const calculateLevels = async () => {
       if (!user) {
         setContributionLevels(new Map());
+        setDayRatios(new Map());
         return;
       }
 
       const habitLogs = await getHabitsForUser(user.id);
       if (!habitLogs) {
         setContributionLevels(new Map());
+        setDayRatios(new Map());
         return;
       }
 
       const levels = new Map<string, number>();
+      const ratios = new Map<string, { completed: number; total: number }>();
 
       // Group logs by date
       const logsByDate = new Map<string, Set<string>>();
@@ -73,16 +84,23 @@ export const ContributionGrid = ({
         logsByDate.get(logDateStr)!.add(log.habitId);
       }
 
-      // Calculate level for each date (number of unique habits completed)
+      const totalHabits = visibleHabits.length || 0;
+
+      // Calculate level and ratio for each date
       logsByDate.forEach((habitIds, dateStr) => {
         levels.set(dateStr, Math.min(habitIds.size, 4));
+        ratios.set(dateStr, {
+          completed: habitIds.size,
+          total: totalHabits,
+        });
       });
 
       setContributionLevels(levels);
+      setDayRatios(ratios);
     };
 
     calculateLevels();
-  }, [user, refreshTrigger]);
+  }, [user, refreshTrigger, visibleHabits.length]);
 
   const { weeks, monthLabels, allDays } = useMemo(() => {
     const yearStart = startOfYear(new Date(year, 0, 1));
@@ -214,6 +232,10 @@ export const ContributionGrid = ({
 
                   const dateStr = format(day, "yyyy-MM-dd");
                   const level = contributionLevels.get(dateStr) || 0;
+                  const ratio = dayRatios.get(dateStr) || {
+                    completed: 0,
+                    total: visibleHabits.length || 0,
+                  };
                   const isSelected =
                     selectedDate &&
                     format(selectedDate, "yyyy-MM-dd") === dateStr;
@@ -223,9 +245,12 @@ export const ContributionGrid = ({
                   // Only today is clickable - past and future days are not
                   const isClickable = today && isInYear;
 
-                  return (
+                  // Show tooltip for all days in the year
+                  const showTooltip = isInYear;
+                  const formattedDate = format(day, "MMM d");
+
+                  const button = (
                     <button
-                      key={day.toISOString()}
                       onClick={() => {
                         if (isClickable) {
                           onSelectDate(day);
@@ -236,15 +261,37 @@ export const ContributionGrid = ({
                         w-[11px] h-[11px] rounded-[3px] transition-all
                         ${isInYear && !future ? getContributionClass(level) : "bg-transparent"}
                         ${isFutureEmpty ? "border border-border/50" : "border-0"}
-                        ${today ? "!border-0" : ""}
+                        ${today ? "!border-0 !ring-0" : ""}
                         ${isSelected ? "ring-2 ring-foreground/50" : ""}
                         ${past ? "opacity-60" : ""}
                         outline-none
-                        ${isClickable ? "cursor-pointer hover:ring-1 hover:ring-foreground/30" : "cursor-not-allowed"}
+                        ${isInYear ? "cursor-pointer hover:ring-1 hover:ring-foreground/30" : "cursor-not-allowed"}
                       `}
-                      title={isInYear ? format(day, "MMM d, yyyy") : ""}
                       aria-label={isInYear ? format(day, "MMM d, yyyy") : ""}
                     />
+                  );
+
+                  if (showTooltip) {
+                    return (
+                      <Tooltip key={day.toISOString()}>
+                        <TooltipTrigger asChild>{button}</TooltipTrigger>
+                        <TooltipContent
+                          side="right"
+                          className="!bg-[rgba(245,240,230,0.9)] !border-[rgba(200,190,175,0.4)] text-foreground backdrop-blur-sm shadow-lg opacity-60"
+                        >
+                          <div className="text-center space-y-0.5">
+                            <div className="font-medium">{formattedDate}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {ratio.completed}/{ratio.total}
+                            </div>
+                          </div>
+                        </TooltipContent>
+                      </Tooltip>
+                    );
+                  }
+
+                  return (
+                    <Fragment key={day.toISOString()}>{button}</Fragment>
                   );
                 })}
               </div>
