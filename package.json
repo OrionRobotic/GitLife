@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "format:check": "bunx oxfmt -c .oxfmtrc.json --check .",
-    "format:write": "bunx oxfmt -c .oxfmtrc.json --write ."
+    "format:write": "bunx oxfmt -c .oxfmtrc.json --write .",
+    "ts:check": "tsc --noEmit"
   },
   "devDependencies": {
     "oxfmt": "^0.24.0",
