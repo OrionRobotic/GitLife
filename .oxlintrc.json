@@ -1,7 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["typescript", "import", "unicorn", "react", "nextjs", "vitest"],
-  "jsPlugins": ["./oxlint-plugin.mjs"],
   "env": {
     "browser": true,
     "node": true,
@@ -10,9 +9,7 @@
   "rules": {
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/no-floating-promises": "error",
-    "@next/next/no-img-element": "off",
-    "peec/no-ternary-in-jsx": "error",
-    "peec/no-fetch": "error"
+    "@next/next/no-img-element": "off"
   },
   "overrides": [
     {
@@ -27,30 +24,6 @@
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-non-null-assertion": "off"
       }
-    },
-    {
-      "files": ["shire/**/*.ts"],
-      "rules": {
-        "no-constant-condition": "off",
-        "peec/no-fetch": "off"
-      }
-    },
-    {
-      "files": [
-        "api/**/*.ts",
-        "core/**/*.ts",
-        "commons/**/*.ts",
-        "types/**/*.ts"
-      ],
-      "rules": {
-        "peec/no-ternary-in-jsx": "off"
-      }
-    },
-    {
-      "files": ["mordor/**/*.ts", "mordor/**/*.tsx"],
-      "rules": {
-        "peec/no-fetch": "off"
-      }
     }
   ],
   "ignorePatterns": [
@@ -58,8 +31,6 @@
     ".next",
     "build",
     "coverage",
-    "backend/emulator-fixtures",
-    "**/drizzle/**",
     "*.yml",
     "*.gs"
   ]

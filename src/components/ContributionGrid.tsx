@@ -182,7 +182,7 @@ export const ContributionGrid = ({
       const firstDayOfMonth = startOfMonth(new Date(year, month, 1));
 
       const dayIndex = allDays.findIndex(
-        (day) => day.getTime() === firstDayOfMonth.getTime(),
+        (day) => day.getTime() === firstDayOfMonth.getTime()
       );
 
       if (dayIndex !== -1) {
@@ -282,7 +282,8 @@ export const ContributionGrid = ({
                     completed: 0,
                     total: visibleHabits.length || 0,
                   };
-                  const completedIds = completedHabitIds.get(dateStr) || new Set<string>();
+                  const completedIds =
+                    completedHabitIds.get(dateStr) || new Set<string>();
                   const isSelected =
                     selectedDate &&
                     format(selectedDate, "yyyy-MM-dd") === dateStr;
@@ -335,7 +336,9 @@ export const ContributionGrid = ({
                               <div className="space-y-1 max-h-[200px] overflow-y-auto">
                                 {visibleHabits.length > 0 ? (
                                   visibleHabits.map((habit) => {
-                                    const isCompleted = completedIds.has(habit.id);
+                                    const isCompleted = completedIds.has(
+                                      habit.id
+                                    );
                                     return (
                                       <div
                                         key={habit.id}
@@ -369,9 +372,7 @@ export const ContributionGrid = ({
                     );
                   }
 
-                  return (
-                    <Fragment key={day.toISOString()}>{button}</Fragment>
-                  );
+                  return <Fragment key={day.toISOString()}>{button}</Fragment>;
                 })}
               </div>
             ))}

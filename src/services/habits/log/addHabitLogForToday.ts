@@ -10,7 +10,7 @@ import { dateToInteger } from "@/lib/utils/dateToInteger";
  */
 export async function addHabitLogForToday(
   habitId: string,
-  userId: string,
+  userId: string
 ): Promise<boolean> {
   try {
     const today = new Date();

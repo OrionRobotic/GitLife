@@ -27,7 +27,7 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
   const { visibleHabits, updateHabitStatus, databaseHabits } = useHabits();
   const { user } = useAuth();
   const [completedHabitIds, setCompletedHabitIds] = useState<Set<string>>(
-    new Set(),
+    new Set()
   );
 
   const future = isFuture(date) && !isToday(date);
@@ -67,7 +67,7 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
   const handleChange = async (
     habitId: string,
     habitName: string,
-    completed: boolean,
+    completed: boolean
   ) => {
     // Optimistic update - update UI immediately
     setCompletedHabitIds((prev) => {

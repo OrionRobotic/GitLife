@@ -26,18 +26,18 @@ interface HabitsContextType {
   visibleHabits: Array<{ id: string; name: string }>;
   refreshTrigger: number;
   getHabitsWithLogsForDate: (
-    date: Date,
+    date: Date
   ) => Promise<DatabaseHabitWithLogs[] | null>;
   updateHabitStatus: (
     habitName: string,
     completed: boolean,
-    date?: Date,
+    date?: Date
   ) => Promise<void>;
   refreshVisibleHabits: () => Promise<void>;
 }
 
 export const HabitsContext = createContext<HabitsContextType | undefined>(
-  undefined,
+  undefined
 );
 
 export const HabitsProvider = ({ children }: { children: ReactNode }) => {
@@ -92,7 +92,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
           (habit) => ({
             ...habit,
             logs: [],
-          }),
+          })
         );
 
         return habitsWithLogs;
@@ -101,13 +101,13 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
         return null;
       }
     },
-    [user, databaseHabits],
+    [user, databaseHabits]
   );
 
   const updateHabitStatus = async (
     habitName: string,
     completed: boolean,
-    date: Date = new Date(),
+    date: Date = new Date()
   ): Promise<void> => {
     if (!user) return;
 
@@ -117,7 +117,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       let habitId: string;
 
       const existingHabit = allHabits.find(
-        (h) => h.name.toLowerCase() === habitName.toLowerCase(),
+        (h) => h.name.toLowerCase() === habitName.toLowerCase()
       );
 
       if (existingHabit) {

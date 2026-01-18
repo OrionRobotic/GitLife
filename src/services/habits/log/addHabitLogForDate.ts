@@ -11,7 +11,7 @@ import { createHabitLog } from "./createHabitLog";
 export async function addHabitLogForDate(
   habitId: string,
   userId: string,
-  date: Date = new Date(),
+  date: Date = new Date()
 ): Promise<boolean> {
   try {
     const dateStart = date.toISOString().split("T")[0];

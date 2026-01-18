@@ -8,7 +8,7 @@ import { dateToInteger } from "@/lib/utils/dateToInteger";
  * @returns Created habit log or null if failed
  */
 export async function createHabitLog(
-  habitLogInput: HabitLogCreateInput,
+  habitLogInput: HabitLogCreateInput
 ): Promise<HabitLog | null> {
   try {
     const integerDate = habitLogInput.integerDate || dateToInteger(new Date());
