@@ -1,5 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { ContributionGrid } from "@/components/ContributionGrid";
 import { DayEditor } from "@/components/DayEditor";
@@ -12,45 +11,54 @@ import {
 } from "@/components/ui/popover";
 import { useAuth } from "@/context/AuthContext";
 import { useHabits } from "@/context/useHabits";
-import { Loader2, LogOut, User, Plus } from "lucide-react";
+import { getHabitsForUser } from "@/services/habits";
+import { MenuButton } from "@/components/MenuButton";
+import { Plus } from "lucide-react";
 
 const Index = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const currentYear = new Date().getFullYear();
-  const { user, loading: authLoading, signOut } = useAuth();
-  const navigate = useNavigate();
-  const { getHabitsWithLogsForDate } = useHabits();
+  const { visibleHabits } = useHabits();
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const [habitsWithLogs, setHabitsWithLogs] = useState<
-    { id: string; name: string; completed: boolean }[]
-  >([]);
+  const [totalScore, setTotalScore] = useState(0);
+  const [totalHabits, setTotalHabits] = useState(0);
 
-  const displayDate = useMemo(() => selectedDate || new Date(), [selectedDate]);
+  // Calculate completed ratio for the selected date (or today)
+  const displayDate = selectedDate || new Date();
+
+  const { user } = useAuth();
 
   useEffect(() => {
-    const loadHabitsForDate = async () => {
-      const habits = await getHabitsWithLogsForDate(displayDate);
-      if (habits) {
-        const habitsForDisplay = habits.map((habit) => ({
-          id: habit.id,
-          name: habit.name,
-          completed: habit.logs && habit.logs.length > 0,
-        }));
-        setHabitsWithLogs(habitsForDisplay);
+    const calculateScore = async () => {
+      if (!user) {
+        setTotalScore(0);
+        setTotalHabits(visibleHabits.length);
+        return;
       }
+
+      const habitLogs = await getHabitsForUser(user.id);
+      if (!habitLogs) {
+        setTotalScore(0);
+        setTotalHabits(visibleHabits.length);
+        return;
+      }
+
+      const selectedDateStr = format(displayDate, "yyyy-MM-dd");
+      const completedHabitIds = new Set<string>();
+
+      for (const log of habitLogs) {
+        const logDateStr = format(new Date(log.createdAt), "yyyy-MM-dd");
+        if (logDateStr === selectedDateStr) {
+          completedHabitIds.add(log.habitId);
+        }
+      }
+
+      setTotalScore(completedHabitIds.size);
+      setTotalHabits(visibleHabits.length || 0);
     };
-
-    loadHabitsForDate();
-  }, [displayDate, getHabitsWithLogsForDate]);
-
-  const totalScore = habitsWithLogs.filter((habit) => habit.completed).length;
-  const totalHabits = habitsWithLogs.length;
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate("/login");
-  };
+    calculateScore();
+  }, [displayDate, user, visibleHabits.length]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -66,42 +74,25 @@ const Index = () => {
               Commit to a better version of yourself.
             </p>
           </div>
-          <div className="flex items-center gap-4">
-            {authLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-            ) : user ? (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">
-                  {user.email}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleSignOut}
-                  className="gap-2"
-                >
-                  <LogOut className="h-4 w-4" />
-                  Sign out
-                </Button>
-              </div>
-            ) : (
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" asChild>
-                  <Link to="/login">
-                    <User className="h-4 w-4 mr-2" />
-                    Sign in
-                  </Link>
-                </Button>
-                <Button size="sm" asChild>
-                  <Link to="/signup">Sign up</Link>
-                </Button>
-              </div>
-            )}
+          <div className="flex items-center">
+            <MenuButton />
           </div>
         </header>
 
         {/* Main content */}
         <div className="space-y-8">
+          {/* Date display above grid */}
+          <div className="flex justify-start mt-4 -mb-6 pl-2">
+            <div className="flex flex-col items-start">
+              <div className="text-sm font-medium text-foreground">
+                {format(displayDate, "EEEE")}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {format(displayDate, "MMMM d, yyyy")}
+              </div>
+            </div>
+          </div>
+
           {/* Contribution grid */}
           <div className="p-6 bg-card border border-border rounded-lg">
             <div className="flex items-center justify-between mb-6">
@@ -120,22 +111,14 @@ const Index = () => {
             />
           </div>
 
-          {/* Date and Button Row - Outside the grid */}
-          <div className="flex justify-between items-start -mt-3 mb-8">
-            {/* Left side: Date and Completed info */}
-            <div className="flex flex-col">
-              <div className="text-sm text-muted-foreground">
-                {format(displayDate, "EEEE, MMMM d, yyyy")}
-              </div>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-xs text-muted-foreground">Completed</span>
-                <span className="text-sm font-medium text-foreground">
-                  {totalScore}/{totalHabits}
-                </span>
-              </div>
+          {/* Add Contribution Button - Outside the grid */}
+          <div className="flex justify-between items-center -mt-3 mb-8">
+            <div className="flex items-center gap-2 pl-2">
+              <span className="text-sm text-muted-foreground">Today's Completed</span>
+              <span className="text-sm font-medium text-foreground">
+                {totalScore}/{totalHabits}
+              </span>
             </div>
-
-            {/* Right side: Add Contribution Button */}
             <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
               <PopoverTrigger asChild>
                 <Button
@@ -157,7 +140,7 @@ const Index = () => {
                 side="bottom"
                 sideOffset={8}
                 avoidCollisions={false}
-                className="w-auto p-0 border-0 shadow-lg z-50"
+                className="w-auto p-0 border-0 shadow-lg z-50 max-w-3xl"
               >
                 {(selectedDate || new Date()) && (
                   <DayEditor
@@ -170,7 +153,7 @@ const Index = () => {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

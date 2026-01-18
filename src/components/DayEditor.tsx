@@ -68,25 +68,50 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
     habitName: string,
     completed: boolean,
   ) => {
-    try {
-      await updateHabitStatus(habitName, completed);
+    // Optimistic update - update UI immediately
+    setCompletedHabitIds((prev) => {
+      const newSet = new Set(prev);
+      if (completed) {
+        newSet.add(habitId);
+      } else {
+        newSet.delete(habitId);
+      }
+      return newSet;
+    });
 
+    try {
+      await updateHabitStatus(habitName, completed, date);
+      
+      // Reload to ensure consistency
+      const habitLogs = await getHabitsForUser(user!.id);
+      if (habitLogs) {
+        const selectedDateStr = format(date, "yyyy-MM-dd");
+        const completedIds = new Set<string>();
+        for (const log of habitLogs) {
+          const logDateStr = format(new Date(log.createdAt), "yyyy-MM-dd");
+          if (logDateStr === selectedDateStr) {
+            completedIds.add(log.habitId);
+          }
+        }
+        setCompletedHabitIds(completedIds);
+      }
+    } catch (error) {
+      console.error("Failed to update habit status:", error);
+      // Revert optimistic update on error
       setCompletedHabitIds((prev) => {
         const newSet = new Set(prev);
         if (completed) {
-          newSet.add(habitId);
-        } else {
           newSet.delete(habitId);
+        } else {
+          newSet.add(habitId);
         }
         return newSet;
       });
-    } catch (error) {
-      console.error("Failed to update habit status:", error);
     }
   };
 
   return (
-    <div className="p-6 bg-card border border-border rounded-lg max-w-sm w-full">
+    <div className="p-6 bg-card border border-border rounded-lg max-w-3xl w-full">
       <div className="mb-6">
         <h2 className="text-lg font-medium text-foreground">
           {format(date, "EEEE")}
@@ -109,12 +134,12 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
           ) : (
             habitsForDisplay.map(({ id, name, icon: Icon, completed }) => (
               <div key={id}>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-4">
                   <Icon className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm font-medium text-foreground">
+                  <span className="text-sm font-medium text-foreground flex-1">
                     {name}
                   </span>
-                  <div className="ml-auto flex gap-1">
+                  <div className="ml-8 flex gap-1">
                     <button
                       onClick={() => handleChange(id, name, false)}
                       className={`
@@ -146,15 +171,6 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
               </div>
             ))
           )}
-
-          <div className="pt-4 border-t border-border">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Completed</span>
-              <span className="text-lg font-medium text-foreground">
-                {completedCount}/{habitsForDisplay.length}
-              </span>
-            </div>
-          </div>
         </div>
       )}
     </div>

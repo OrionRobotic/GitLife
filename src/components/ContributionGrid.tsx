@@ -1,4 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useHabits } from "@/context/useHabits";
+import { getHabitsForUser } from "@/services/habits";
+import { useAuth } from "@/context/AuthContext";
 import {
   startOfYear,
   endOfYear,
@@ -38,6 +41,49 @@ export const ContributionGrid = ({
   onSelectDate,
   selectedDate,
 }: ContributionGridProps) => {
+  const { refreshTrigger } = useHabits();
+  const { user } = useAuth();
+  const [contributionLevels, setContributionLevels] = useState<
+    Map<string, number>
+  >(new Map());
+
+  // Calculate contribution levels for all days in the year
+  useEffect(() => {
+    const calculateLevels = async () => {
+      if (!user) {
+        setContributionLevels(new Map());
+        return;
+      }
+
+      const habitLogs = await getHabitsForUser(user.id);
+      if (!habitLogs) {
+        setContributionLevels(new Map());
+        return;
+      }
+
+      const levels = new Map<string, number>();
+
+      // Group logs by date
+      const logsByDate = new Map<string, Set<string>>();
+      for (const log of habitLogs) {
+        const logDateStr = format(new Date(log.createdAt), "yyyy-MM-dd");
+        if (!logsByDate.has(logDateStr)) {
+          logsByDate.set(logDateStr, new Set());
+        }
+        logsByDate.get(logDateStr)!.add(log.habitId);
+      }
+
+      // Calculate level for each date (number of unique habits completed)
+      logsByDate.forEach((habitIds, dateStr) => {
+        levels.set(dateStr, Math.min(habitIds.size, 4));
+      });
+
+      setContributionLevels(levels);
+    };
+
+    calculateLevels();
+  }, [user, refreshTrigger]);
+
   const { weeks, monthLabels, allDays } = useMemo(() => {
     const yearStart = startOfYear(new Date(year, 0, 1));
     const yearEnd = endOfYear(new Date(year, 0, 1));
@@ -153,6 +199,8 @@ export const ContributionGrid = ({
                   const dayOfWeek = getDay(day);
                   const isInYear = day.getFullYear() === year;
                   const future = isFuture(day) && !isToday(day);
+                  const past = !isToday(day) && !isFuture(day);
+                  const today = isToday(day);
 
                   // For days not in the year and not future, render invisible placeholder to maintain alignment
                   if (!isInYear && !future) {
@@ -164,25 +212,38 @@ export const ContributionGrid = ({
                     );
                   }
 
-                  const level = 0;
+                  const dateStr = format(day, "yyyy-MM-dd");
+                  const level = contributionLevels.get(dateStr) || 0;
                   const isSelected =
-                    selectedDate && day.getTime() === selectedDate.getTime();
+                    selectedDate &&
+                    format(selectedDate, "yyyy-MM-dd") === dateStr;
 
                   const isFutureEmpty = future && isInYear;
+
+                  // Only today is clickable - past and future days are not
+                  const isClickable = today && isInYear;
 
                   return (
                     <button
                       key={day.toISOString()}
-                      onClick={() => !future && isInYear && onSelectDate(day)}
-                      disabled={true}
+                      onClick={() => {
+                        if (isClickable) {
+                          onSelectDate(day);
+                        }
+                      }}
+                      disabled={!isClickable}
                       className={`
                         w-[11px] h-[11px] rounded-[3px] transition-all
                         ${isInYear && !future ? getContributionClass(level) : "bg-transparent"}
-                        ${isFutureEmpty ? "border border-border/50" : "border-none"}
-                        outline-none ring-0
-                        cursor-default
+                        ${isFutureEmpty ? "border border-border/50" : "border-0"}
+                        ${today ? "!border-0" : ""}
+                        ${isSelected ? "ring-2 ring-foreground/50" : ""}
+                        ${past ? "opacity-60" : ""}
+                        outline-none
+                        ${isClickable ? "cursor-pointer hover:ring-1 hover:ring-foreground/30" : "cursor-not-allowed"}
                       `}
                       title={isInYear ? format(day, "MMM d, yyyy") : ""}
+                      aria-label={isInYear ? format(day, "MMM d, yyyy") : ""}
                     />
                   );
                 })}

@@ -13,6 +13,8 @@ import {
   getVisibleHabits,
   addHabitLogForToday,
   removeHabitLogForToday,
+  addHabitLogForDate,
+  removeHabitLogForDate,
 } from "@/services/habits";
 import {
   Habit,
@@ -22,10 +24,15 @@ import {
 interface HabitsContextType {
   databaseHabits: Habit[];
   visibleHabits: Array<{ id: string; name: string }>;
+  refreshTrigger: number;
   getHabitsWithLogsForDate: (
     date: Date,
   ) => Promise<DatabaseHabitWithLogs[] | null>;
-  updateHabitStatus: (habitName: string, completed: boolean) => Promise<void>;
+  updateHabitStatus: (
+    habitName: string,
+    completed: boolean,
+    date?: Date,
+  ) => Promise<void>;
   refreshVisibleHabits: () => Promise<void>;
 }
 
@@ -38,6 +45,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   const [visibleHabits, setVisibleHabits] = useState<
     Array<{ id: string; name: string }>
   >([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { user } = useAuth();
 
   const loadAllHabitsFromDatabase = useCallback(async () => {
@@ -99,7 +107,10 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   const updateHabitStatus = async (
     habitName: string,
     completed: boolean,
+    date: Date = new Date(),
   ): Promise<void> => {
+    if (!user) return;
+
     try {
       const allHabits = await getVisibleHabits();
 
@@ -116,20 +127,24 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       }
 
       if (completed) {
-        const success = await addHabitLogForToday(habitId, user.id);
+        const success = await addHabitLogForDate(habitId, user.id, date);
         if (!success) {
-          throw new Error("Failed to add habit log for today");
+          throw new Error("Failed to add habit log");
         }
       } else {
-        const success = await removeHabitLogForToday(habitId, user.id);
+        const success = await removeHabitLogForDate(habitId, user.id, date);
         if (!success) {
-          throw new Error("Failed to remove habit log for today");
+          throw new Error("Failed to remove habit log");
         }
       }
 
-      await refreshVisibleHabits();
+      // Only refresh the database habits, not visible habits (they don't change)
+      await loadAllHabitsFromDatabase();
+      // Trigger a refresh for components that depend on habit changes
+      setRefreshTrigger((prev) => prev + 1);
     } catch (error) {
       console.error("Error updating habit status:", error);
+      throw error;
     }
   };
 
@@ -138,6 +153,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       value={{
         databaseHabits,
         visibleHabits,
+        refreshTrigger,
         getHabitsWithLogsForDate,
         updateHabitStatus,
         refreshVisibleHabits,
