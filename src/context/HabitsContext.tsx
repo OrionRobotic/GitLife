@@ -24,6 +24,7 @@ import {
 interface HabitsContextType {
   databaseHabits: Habit[];
   visibleHabits: Array<{ id: string; name: string }>;
+  allHabitLogs: any[];
   refreshTrigger: number;
   getHabitsWithLogsForDate: (
     date: Date
@@ -45,6 +46,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   const [visibleHabits, setVisibleHabits] = useState<
     Array<{ id: string; name: string }>
   >([]);
+  const [allHabitLogs, setAllHabitLogs] = useState<any[]>([]);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { user } = useAuth();
 
@@ -52,9 +54,16 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     if (!user) return;
 
     try {
-      const habits = await getHabitsForUser(user.id);
+      const [habits, logs] = await Promise.all([
+        getVisibleHabits(),
+        getHabitsForUser(user.id),
+      ]);
+
       if (habits) {
-        setDatabaseHabits(habits);
+        setVisibleHabits(habits);
+      }
+      if (logs) {
+        setAllHabitLogs(logs);
       }
     } catch (error) {
       console.error("Error loading all habits from database:", error);
@@ -75,9 +84,8 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (user) {
       loadAllHabitsFromDatabase();
-      refreshVisibleHabits();
     }
-  }, [user]);
+  }, [user, refreshTrigger]);
 
   const getHabitsWithLogsForDate = useCallback(
     async (date: Date): Promise<DatabaseHabitWithLogs[] | null> => {
@@ -153,6 +161,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       value={{
         databaseHabits,
         visibleHabits,
+        allHabitLogs,
         refreshTrigger,
         getHabitsWithLogsForDate,
         updateHabitStatus,
