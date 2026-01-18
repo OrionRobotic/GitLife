@@ -84,7 +84,7 @@ export const ContributionGrid = ({
       // Group logs by date
       const logsByDate = new Map<string, Set<string>>();
       for (const log of habitLogs) {
-        const logDateStr = format(new Date(log.createdAt), "yyyy-MM-dd");
+        const logDateStr = log.integerDate.toString();
         if (!logsByDate.has(logDateStr)) {
           logsByDate.set(logDateStr, new Set());
         }
@@ -276,7 +276,7 @@ export const ContributionGrid = ({
                     );
                   }
 
-                  const dateStr = format(day, "yyyy-MM-dd");
+                  const dateStr = format(day, "yyyyMMdd");
                   const level = contributionLevels.get(dateStr) || 0;
                   const ratio = dayRatios.get(dateStr) || {
                     completed: 0,
@@ -286,7 +286,7 @@ export const ContributionGrid = ({
                     completedHabitIds.get(dateStr) || new Set<string>();
                   const isSelected =
                     selectedDate &&
-                    format(selectedDate, "yyyy-MM-dd") === dateStr;
+                    format(selectedDate, "yyyyMMdd") === dateStr;
 
                   const isFutureEmpty = future && isInYear;
 
