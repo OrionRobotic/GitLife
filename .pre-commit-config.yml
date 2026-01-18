@@ -1,0 +1,16 @@
+repos:
+  - repo: local
+    hooks:
+      - id: oxfmt
+        name: oxfmt (format)
+        entry: bunx oxfmt -c .oxfmtrc.json --write
+        language: system
+        types_or: [javascript, jsx, ts, tsx]
+        pass_filenames: true
+
+      - id: oxlint
+        name: oxlint (lint)
+        entry: bunx oxlint -c .oxlintrc.json --fix
+        language: system
+        types_or: [javascript, jsx, ts, tsx]
+        pass_filenames: true

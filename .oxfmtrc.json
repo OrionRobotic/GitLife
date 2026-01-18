@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "trailingComma": "es5",
+  "printWidth": 80,
+  "ignorePatterns": [
+    "build",
+    "coverage",
+    ".next",
+    "node_modules",
+    "backend/emulator-fixtures",
+    "commons/drizzle",
+    "*.yml",
+    "*.yaml",
+    "*.gs",
+    "*.json",
+    "*.sql",
+    "*.md"
+  ]
+}

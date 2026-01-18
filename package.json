@@ -8,7 +8,10 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format:check": "bunx oxfmt -c .oxfmtrc.json --check .",
+    "format:write": "bunx oxfmt -c .oxfmtrc.json --write .",
+    "prepare": "husky"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -78,6 +81,7 @@
     "globals": "^15.15.0",
     "lovable-tagger": "^1.1.13",
     "postcss": "^8.5.6",
+    "pre-commit": "^1.2.2",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0",
