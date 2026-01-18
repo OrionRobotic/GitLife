@@ -1,8 +1,8 @@
 import { format, isToday, isFuture } from "date-fns";
 import { useState, useEffect } from "react";
 import { useHabits } from "@/context/useHabits";
-import { getHabitsForUser } from "@/services/habits";
 import { useAuth } from "@/context/AuthContext";
+import { getHabitsForUser } from "@/services/habits";
 import { Dumbbell, Utensils, BookOpen, Moon } from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
@@ -24,7 +24,7 @@ const getHabitIcon = (name: string): LucideIcon => {
 };
 
 export const DayEditor = ({ date, onClose }: DayEditorProps) => {
-  const { visibleHabits, updateHabitStatus } = useHabits();
+  const { visibleHabits, updateHabitStatus, databaseHabits } = useHabits();
   const { user } = useAuth();
   const [completedHabitIds, setCompletedHabitIds] = useState<Set<string>>(
     new Set(),
@@ -36,8 +36,8 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
     const loadCompletedHabits = async () => {
       if (!user) return;
 
-      const habitLogs = await getHabitsForUser(user.id);
-      if (!habitLogs) return;
+      const habitLogs = databaseHabits;
+      if (!habitLogs || habitLogs.length === 0) return;
 
       const selectedDateStr = format(date, "yyyy-MM-dd");
 
@@ -53,7 +53,7 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
     };
 
     loadCompletedHabits();
-  }, [user, date]);
+  }, [user, date, databaseHabits]);
 
   const habitsForDisplay = visibleHabits.map((habit) => ({
     id: habit.id,
@@ -82,7 +82,7 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
 
     try {
       await updateHabitStatus(habitName, completed, date);
-      
+
       // Reload to ensure consistency
       const habitLogs = await getHabitsForUser(user!.id);
       if (habitLogs) {

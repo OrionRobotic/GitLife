@@ -45,6 +45,7 @@ export async function getHabitsForUser(
       `,
       )
       .eq("userId", userId)
+      .order("integerDate", { ascending: false })
       .order("createdAt", { ascending: false });
 
     if (error) {

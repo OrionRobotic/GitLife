@@ -4,7 +4,11 @@ import { ContributionGrid } from "@/components/ContributionGrid";
 import { DayEditor } from "@/components/DayEditor";
 import { Legend } from "@/components/Legend";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useAuth } from "@/context/AuthContext";
 import { useHabits } from "@/context/useHabits";
 import { getHabitsForUser } from "@/services/habits";
@@ -42,7 +46,7 @@ const Index = () => {
 
       const selectedDateStr = format(displayDate, "yyyy-MM-dd");
       const completedHabitIds = new Set<string>();
-      
+
       for (const log of habitLogs) {
         const logDateStr = format(new Date(log.createdAt), "yyyy-MM-dd");
         if (logDateStr === selectedDateStr) {
@@ -88,7 +92,7 @@ const Index = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Contribution grid */}
           <div className="p-6 bg-card border border-border rounded-lg">
             <div className="flex items-center justify-between mb-6">
@@ -106,18 +110,20 @@ const Index = () => {
               selectedDate={selectedDate}
             />
           </div>
-          
+
           {/* Add Contribution Button - Outside the grid */}
           <div className="flex justify-between items-center -mt-3 mb-8">
             <div className="flex items-center gap-2 pl-2">
-              <span className="text-sm text-muted-foreground">Today's Completed</span>
+              <span className="text-sm text-muted-foreground">
+                Today's Completed
+              </span>
               <span className="text-sm font-medium text-foreground">
                 {totalScore}/{totalHabits}
               </span>
             </div>
             <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
               <PopoverTrigger asChild>
-                <Button 
+                <Button
                   variant="secondary"
                   size="sm"
                   className="gap-1.5 bg-foreground/10 hover:bg-foreground/15 text-foreground h-7 px-2.5 text-xs"
@@ -131,17 +137,17 @@ const Index = () => {
                   Add Contribution
                 </Button>
               </PopoverTrigger>
-              <PopoverContent 
-                align="end" 
+              <PopoverContent
+                align="end"
                 side="bottom"
                 sideOffset={8}
                 avoidCollisions={false}
                 className="w-auto p-0 border-0 shadow-lg z-50 max-w-3xl"
               >
                 {(selectedDate || new Date()) && (
-                  <DayEditor 
-                    date={selectedDate || new Date()} 
-                    onClose={() => setIsPopoverOpen(false)} 
+                  <DayEditor
+                    date={selectedDate || new Date()}
+                    onClose={() => setIsPopoverOpen(false)}
                   />
                 )}
               </PopoverContent>

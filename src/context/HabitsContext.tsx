@@ -77,28 +77,32 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       loadAllHabitsFromDatabase();
       refreshVisibleHabits();
     }
-  }, [user, loadAllHabitsFromDatabase, refreshVisibleHabits]);
+  }, [user]);
 
-  const getHabitsWithLogsForDate = async (
-    date: Date,
-  ): Promise<DatabaseHabitWithLogs[] | null> => {
-    if (!user) return null;
+  const getHabitsWithLogsForDate = useCallback(
+    async (date: Date): Promise<DatabaseHabitWithLogs[] | null> => {
+      if (!user) return null;
 
-    try {
-      const habits = await getHabitsForUser(user.id);
-      if (!habits) return null;
+      try {
+        if (databaseHabits.length === 0) {
+          return [];
+        }
 
-      const habitsWithLogs: DatabaseHabitWithLogs[] = habits.map((habit) => ({
-        ...habit,
-        logs: [],
-      }));
+        const habitsWithLogs: DatabaseHabitWithLogs[] = databaseHabits.map(
+          (habit) => ({
+            ...habit,
+            logs: [],
+          }),
+        );
 
-      return habitsWithLogs;
-    } catch (error) {
-      console.error("Error fetching habits with logs:", error);
-      return null;
-    }
-  };
+        return habitsWithLogs;
+      } catch (error) {
+        console.error("Error fetching habits with logs:", error);
+        return null;
+      }
+    },
+    [user, databaseHabits],
+  );
 
   const updateHabitStatus = async (
     habitName: string,
