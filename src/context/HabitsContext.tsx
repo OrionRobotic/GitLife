@@ -16,6 +16,7 @@ import {
   addHabitLogForDate,
   removeHabitLogForDate,
 } from "@/services/habits";
+import { format } from "date-fns";
 import {
   Habit,
   HabitWithLogs as DatabaseHabitWithLogs,
@@ -25,6 +26,7 @@ interface HabitsContextType {
   databaseHabits: Habit[];
   visibleHabits: Array<{ id: string; name: string }>;
   allHabitLogs: any[];
+  todaysCompletedHabitIds: Set<string>;
   refreshTrigger: number;
   getHabitsWithLogsForDate: (
     date: Date
@@ -47,6 +49,9 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     Array<{ id: string; name: string }>
   >([]);
   const [allHabitLogs, setAllHabitLogs] = useState<any[]>([]);
+  const [todaysCompletedHabitIds, setTodaysCompletedHabitIds] = useState<
+    Set<string>
+  >(new Set());
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { user } = useAuth();
 
@@ -86,6 +91,24 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       loadAllHabitsFromDatabase();
     }
   }, [user, refreshTrigger]);
+
+  // Pre-calculate today's completed habits
+  useEffect(() => {
+    if (!allHabitLogs) {
+      setTodaysCompletedHabitIds(new Set());
+      return;
+    }
+
+    const todayStr = format(new Date(), "yyyyMMdd");
+    const completedIds = new Set<string>();
+
+    for (const log of allHabitLogs) {
+      if (log.integerDate.toString() === todayStr) {
+        completedIds.add(log.habitId);
+      }
+    }
+    setTodaysCompletedHabitIds(completedIds);
+  }, [allHabitLogs]);
 
   const getHabitsWithLogsForDate = useCallback(
     async (date: Date): Promise<DatabaseHabitWithLogs[] | null> => {
@@ -146,8 +169,6 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
         }
       }
 
-      // Only refresh the database habits, not visible habits (they don't change)
-      await loadAllHabitsFromDatabase();
       // Trigger a refresh for components that depend on habit changes
       setRefreshTrigger((prev) => prev + 1);
     } catch (error) {
@@ -162,6 +183,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
         databaseHabits,
         visibleHabits,
         allHabitLogs,
+        todaysCompletedHabitIds,
         refreshTrigger,
         getHabitsWithLogsForDate,
         updateHabitStatus,

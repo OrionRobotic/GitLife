@@ -1,8 +1,6 @@
 import { format, isToday, isFuture } from "date-fns";
 import { useState, useEffect } from "react";
 import { useHabits } from "@/context/useHabits";
-import { useAuth } from "@/context/AuthContext";
-import { getHabitsForUser } from "@/services/habits";
 import { Dumbbell, Utensils, BookOpen, Moon } from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
@@ -24,8 +22,12 @@ const getHabitIcon = (name: string): LucideIcon => {
 };
 
 export const DayEditor = ({ date, onClose }: DayEditorProps) => {
-  const { visibleHabits, updateHabitStatus, databaseHabits } = useHabits();
-  const { user } = useAuth();
+  const {
+    visibleHabits,
+    updateHabitStatus,
+    allHabitLogs,
+    todaysCompletedHabitIds,
+  } = useHabits();
   const [completedHabitIds, setCompletedHabitIds] = useState<Set<string>>(
     new Set()
   );
@@ -33,27 +35,20 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
   const future = isFuture(date) && !isToday(date);
 
   useEffect(() => {
-    const loadCompletedHabits = async () => {
-      if (!user) return;
-
-      const habitLogs = databaseHabits;
-      if (!habitLogs || habitLogs.length === 0) return;
-
-      const selectedDateStr = format(date, "yyyy-MM-dd");
-
+    if (isToday(date)) {
+      setCompletedHabitIds(todaysCompletedHabitIds || new Set());
+    } else {
+      const logs = allHabitLogs || [];
+      const selectedDateStr = format(date, "yyyyMMdd");
       const completedIds = new Set<string>();
-      for (const log of habitLogs) {
-        const logDateStr = format(new Date(log.createdAt), "yyyy-MM-dd");
-        if (logDateStr === selectedDateStr) {
+      for (const log of logs) {
+        if (log.integerDate.toString() === selectedDateStr) {
           completedIds.add(log.habitId);
         }
       }
-
       setCompletedHabitIds(completedIds);
-    };
-
-    loadCompletedHabits();
-  }, [user, date, databaseHabits]);
+    }
+  }, [date, allHabitLogs, todaysCompletedHabitIds]);
 
   const habitsForDisplay = visibleHabits.map((habit) => ({
     id: habit.id,
@@ -61,8 +56,6 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
     icon: getHabitIcon(habit.name),
     completed: completedHabitIds.has(habit.id),
   }));
-
-  const completedCount = habitsForDisplay.filter((h) => h.completed).length;
 
   const handleChange = async (
     habitId: string,
@@ -82,20 +75,6 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
 
     try {
       await updateHabitStatus(habitName, completed, date);
-
-      // Reload to ensure consistency
-      const habitLogs = await getHabitsForUser(user!.id);
-      if (habitLogs) {
-        const selectedDateStr = format(date, "yyyy-MM-dd");
-        const completedIds = new Set<string>();
-        for (const log of habitLogs) {
-          const logDateStr = format(new Date(log.createdAt), "yyyy-MM-dd");
-          if (logDateStr === selectedDateStr) {
-            completedIds.add(log.habitId);
-          }
-        }
-        setCompletedHabitIds(completedIds);
-      }
     } catch (error) {
       console.error("Failed to update habit status:", error);
       // Revert optimistic update on error
