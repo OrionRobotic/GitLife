@@ -53,6 +53,9 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     Set<string>
   >(new Set());
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [lastFetchTimestamp, setLastFetchTimestamp] = useState<number | null>(
+    null
+  );
   const { user } = useAuth();
 
   const loadAllHabitsFromDatabase = useCallback(async () => {
@@ -70,6 +73,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       if (logs) {
         setAllHabitLogs(logs);
       }
+      setLastFetchTimestamp(Date.now());
     } catch (error) {
       console.error("Error loading all habits from database:", error);
     }
@@ -88,9 +92,25 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (user) {
-      loadAllHabitsFromDatabase();
+      const shouldFetch = !lastFetchTimestamp || refreshTrigger > 0;
+      if (shouldFetch) {
+        loadAllHabitsFromDatabase();
+      }
     }
-  }, [user, refreshTrigger]);
+  }, [user, refreshTrigger, loadAllHabitsFromDatabase]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (lastFetchTimestamp) {
+        const fiveMinutes = 5 * 60 * 1000;
+        if (Date.now() - lastFetchTimestamp > fiveMinutes) {
+          loadAllHabitsFromDatabase();
+        }
+      }
+    }, 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [lastFetchTimestamp, loadAllHabitsFromDatabase]);
 
   // Pre-calculate today's completed habits
   useEffect(() => {
