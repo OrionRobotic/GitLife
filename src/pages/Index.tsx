@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { format } from "date-fns";
 import { ContributionGrid } from "@/components/ContributionGrid";
 import { DayEditor } from "@/components/DayEditor";
@@ -9,56 +9,39 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useAuth } from "@/context/AuthContext";
 import { useHabits } from "@/context/useHabits";
-import { getHabitsForUser } from "@/services/habits";
 import { MenuButton } from "@/components/MenuButton";
 import { Plus } from "lucide-react";
 
 const Index = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const currentYear = new Date().getFullYear();
-  const { visibleHabits } = useHabits();
+  const { visibleHabits, allHabitLogs } = useHabits();
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const [totalScore, setTotalScore] = useState(0);
-  const [totalHabits, setTotalHabits] = useState(0);
 
   // Calculate completed ratio for the selected date (or today)
   const displayDate = selectedDate || new Date();
 
-  const { user } = useAuth();
+  const { totalScore, totalHabits } = useMemo(() => {
+    if (!allHabitLogs) {
+      return { totalScore: 0, totalHabits: visibleHabits.length };
+    }
 
-  useEffect(() => {
-    const calculateScore = async () => {
-      if (!user) {
-        setTotalScore(0);
-        setTotalHabits(visibleHabits.length);
-        return;
+    const selectedDateStr = format(displayDate, "yyyyMMdd");
+    const completedHabitIds = new Set<string>();
+
+    for (const log of allHabitLogs) {
+      if (log.integerDate.toString() === selectedDateStr) {
+        completedHabitIds.add(log.habitId);
       }
+    }
 
-      const habitLogs = await getHabitsForUser(user.id);
-      if (!habitLogs) {
-        setTotalScore(0);
-        setTotalHabits(visibleHabits.length);
-        return;
-      }
-
-      const selectedDateStr = format(displayDate, "yyyy-MM-dd");
-      const completedHabitIds = new Set<string>();
-
-      for (const log of habitLogs) {
-        const logDateStr = format(new Date(log.createdAt), "yyyy-MM-dd");
-        if (logDateStr === selectedDateStr) {
-          completedHabitIds.add(log.habitId);
-        }
-      }
-
-      setTotalScore(completedHabitIds.size);
-      setTotalHabits(visibleHabits.length || 0);
+    return {
+      totalScore: completedHabitIds.size,
+      totalHabits: visibleHabits.length || 0,
     };
-    calculateScore();
-  }, [displayDate, user, visibleHabits.length]);
+  }, [displayDate, allHabitLogs, visibleHabits.length]);
 
   return (
     <div className="min-h-screen bg-background">

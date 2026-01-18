@@ -1,7 +1,5 @@
 import { useMemo, useState, useEffect, Fragment } from "react";
 import { useHabits } from "@/context/useHabits";
-import { getHabitsForUser } from "@/services/habits";
-import { useAuth } from "@/context/AuthContext";
 import {
   startOfYear,
   endOfYear,
@@ -46,45 +44,19 @@ export const ContributionGrid = ({
   onSelectDate,
   selectedDate,
 }: ContributionGridProps) => {
-  const { refreshTrigger, visibleHabits } = useHabits();
-  const { user } = useAuth();
-  const [contributionLevels, setContributionLevels] = useState<
-    Map<string, number>
-  >(new Map());
-  const [dayRatios, setDayRatios] = useState<
-    Map<string, { completed: number; total: number }>
-  >(new Map());
-  const [completedHabitIds, setCompletedHabitIds] = useState<
-    Map<string, Set<string>>
-  >(new Map());
+  const { visibleHabits, allHabitLogs } = useHabits();
   const [isCmdPressed, setIsCmdPressed] = useState(false);
 
-  // Calculate contribution levels and ratios for all days in the year
-  useEffect(() => {
-    const calculateLevels = async () => {
-      if (!user) {
-        setContributionLevels(new Map());
-        setDayRatios(new Map());
-        setCompletedHabitIds(new Map());
-        return;
-      }
+  const { contributionLevels, dayRatios, completedHabitIds } = useMemo(() => {
+    const levels = new Map<string, number>();
+    const ratios = new Map<string, { completed: number; total: number }>();
+    const completedIds = new Map<string, Set<string>>();
 
-      const habitLogs = await getHabitsForUser(user.id);
-      if (!habitLogs) {
-        setContributionLevels(new Map());
-        setDayRatios(new Map());
-        setCompletedHabitIds(new Map());
-        return;
-      }
-
-      const levels = new Map<string, number>();
-      const ratios = new Map<string, { completed: number; total: number }>();
-      const completedIds = new Map<string, Set<string>>();
-
+    if (allHabitLogs) {
       // Group logs by date
       const logsByDate = new Map<string, Set<string>>();
-      for (const log of habitLogs) {
-        const logDateStr = format(new Date(log.createdAt), "yyyy-MM-dd");
+      for (const log of allHabitLogs) {
+        const logDateStr = log.integerDate.toString();
         if (!logsByDate.has(logDateStr)) {
           logsByDate.set(logDateStr, new Set());
         }
@@ -102,14 +74,14 @@ export const ContributionGrid = ({
         });
         completedIds.set(dateStr, new Set(habitIds));
       });
+    }
 
-      setContributionLevels(levels);
-      setDayRatios(ratios);
-      setCompletedHabitIds(completedIds);
+    return {
+      contributionLevels: levels,
+      dayRatios: ratios,
+      completedHabitIds: completedIds,
     };
-
-    calculateLevels();
-  }, [user, refreshTrigger, visibleHabits.length]);
+  }, [allHabitLogs, visibleHabits.length]);
 
   // Track CMD key state - optimized to prevent unnecessary updates
   useEffect(() => {
@@ -276,7 +248,7 @@ export const ContributionGrid = ({
                     );
                   }
 
-                  const dateStr = format(day, "yyyy-MM-dd");
+                  const dateStr = format(day, "yyyyMMdd");
                   const level = contributionLevels.get(dateStr) || 0;
                   const ratio = dayRatios.get(dateStr) || {
                     completed: 0,
@@ -286,7 +258,7 @@ export const ContributionGrid = ({
                     completedHabitIds.get(dateStr) || new Set<string>();
                   const isSelected =
                     selectedDate &&
-                    format(selectedDate, "yyyy-MM-dd") === dateStr;
+                    format(selectedDate, "yyyyMMdd") === dateStr;
 
                   const isFutureEmpty = future && isInYear;
 

@@ -16,6 +16,7 @@ import {
   addHabitLogForDate,
   removeHabitLogForDate,
 } from "@/services/habits";
+import { format } from "date-fns";
 import {
   Habit,
   HabitWithLogs as DatabaseHabitWithLogs,
@@ -24,6 +25,8 @@ import {
 interface HabitsContextType {
   databaseHabits: Habit[];
   visibleHabits: Array<{ id: string; name: string }>;
+  allHabitLogs: any[];
+  todaysCompletedHabitIds: Set<string>;
   refreshTrigger: number;
   getHabitsWithLogsForDate: (
     date: Date
@@ -45,17 +48,32 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   const [visibleHabits, setVisibleHabits] = useState<
     Array<{ id: string; name: string }>
   >([]);
+  const [allHabitLogs, setAllHabitLogs] = useState<any[]>([]);
+  const [todaysCompletedHabitIds, setTodaysCompletedHabitIds] = useState<
+    Set<string>
+  >(new Set());
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [lastFetchTimestamp, setLastFetchTimestamp] = useState<number | null>(
+    null
+  );
   const { user } = useAuth();
 
   const loadAllHabitsFromDatabase = useCallback(async () => {
     if (!user) return;
 
     try {
-      const habits = await getHabitsForUser(user.id);
+      const [habits, logs] = await Promise.all([
+        getVisibleHabits(),
+        getHabitsForUser(user.id),
+      ]);
+
       if (habits) {
-        setDatabaseHabits(habits);
+        setVisibleHabits(habits);
       }
+      if (logs) {
+        setAllHabitLogs(logs);
+      }
+      setLastFetchTimestamp(Date.now());
     } catch (error) {
       console.error("Error loading all habits from database:", error);
     }
@@ -74,10 +92,43 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (user) {
-      loadAllHabitsFromDatabase();
-      refreshVisibleHabits();
+      const shouldFetch = !lastFetchTimestamp || refreshTrigger > 0;
+      if (shouldFetch) {
+        loadAllHabitsFromDatabase();
+      }
     }
-  }, [user]);
+  }, [user, refreshTrigger, loadAllHabitsFromDatabase]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (lastFetchTimestamp) {
+        const fiveMinutes = 5 * 60 * 1000;
+        if (Date.now() - lastFetchTimestamp > fiveMinutes) {
+          loadAllHabitsFromDatabase();
+        }
+      }
+    }, 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [lastFetchTimestamp, loadAllHabitsFromDatabase]);
+
+  // Pre-calculate today's completed habits
+  useEffect(() => {
+    if (!allHabitLogs) {
+      setTodaysCompletedHabitIds(new Set());
+      return;
+    }
+
+    const todayStr = format(new Date(), "yyyyMMdd");
+    const completedIds = new Set<string>();
+
+    for (const log of allHabitLogs) {
+      if (log.integerDate.toString() === todayStr) {
+        completedIds.add(log.habitId);
+      }
+    }
+    setTodaysCompletedHabitIds(completedIds);
+  }, [allHabitLogs]);
 
   const getHabitsWithLogsForDate = useCallback(
     async (date: Date): Promise<DatabaseHabitWithLogs[] | null> => {
@@ -138,8 +189,6 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
         }
       }
 
-      // Only refresh the database habits, not visible habits (they don't change)
-      await loadAllHabitsFromDatabase();
       // Trigger a refresh for components that depend on habit changes
       setRefreshTrigger((prev) => prev + 1);
     } catch (error) {
@@ -153,6 +202,8 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       value={{
         databaseHabits,
         visibleHabits,
+        allHabitLogs,
+        todaysCompletedHabitIds,
         refreshTrigger,
         getHabitsWithLogsForDate,
         updateHabitStatus,
