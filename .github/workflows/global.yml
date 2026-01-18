@@ -23,14 +23,14 @@ jobs:
         with:
           bun-version: "1.3"
 
-      - name: Cache and Install Bun Dependencies
-        uses: ./.github/actions/cache-deps
+      - name: Install Bun Dependencies
+        run: bun install
 
       - name: Check Formatting
-        run: bun format:check
+        run: bun oxfmt -c .oxfmtrc.json --check .
 
       - name: Lint
-        run: bun lint
+        run: bun oxlint -c .oxlintrc.json
 
       - name: Check Types
         run: bun ts:check
