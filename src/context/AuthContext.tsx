@@ -13,11 +13,11 @@ interface AuthContextType {
   loading: boolean;
   signInWithEmail: (
     email: string,
-    password: string,
+    password: string
   ) => Promise<{ error: Error | null }>;
   signUpWithEmail: (
     email: string,
-    password: string,
+    password: string
   ) => Promise<{ error: Error | null }>;
   signOut: () => Promise<{ error: Error | null }>;
   sendPasswordResetEmail: (email: string) => Promise<{ error: Error | null }>;

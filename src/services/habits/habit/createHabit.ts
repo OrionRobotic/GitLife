@@ -9,7 +9,7 @@ import { Habit, HabitCreateInput } from "@/types/database";
  */
 export async function createHabit(
   habitInput: HabitCreateInput,
-  userId: string,
+  userId: string
 ): Promise<Habit | null> {
   try {
     const { data, error } = await supabase

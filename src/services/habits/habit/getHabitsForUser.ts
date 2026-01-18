@@ -25,7 +25,7 @@ interface HabitLogRaw {
  * @returns Array of habit logs with details or null if failed
  */
 export async function getHabitsForUser(
-  userId: string,
+  userId: string
 ): Promise<HabitLogWithDetails[] | null> {
   try {
     console.log("Fetching habits for user:", userId);
@@ -42,9 +42,10 @@ export async function getHabitsForUser(
         habits (
           name
         )
-      `,
+      `
       )
       .eq("userId", userId)
+      .order("integerDate", { ascending: false })
       .order("createdAt", { ascending: false });
 
     if (error) {

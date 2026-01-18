@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { dateToInteger } from "@/lib/utils/dateToInteger";
 
 /**
  * Remove a habit log for today
@@ -8,19 +9,18 @@ import { supabase } from "@/lib/supabase";
  */
 export async function removeHabitLogForToday(
   habitId: string,
-  userId: string,
+  userId: string
 ): Promise<boolean> {
   try {
     const today = new Date();
-    const dateStart = today.toISOString().split("T")[0];
+    const integerDate = dateToInteger(today);
 
     const { error } = await supabase
       .from("habitsLogs")
       .delete()
       .eq("habitId", habitId)
       .eq("userId", userId)
-      .gte("createdAt", `${dateStart}T00:00:00Z`)
-      .lt("createdAt", `${dateStart}T23:59:59Z`);
+      .eq("integerDate", integerDate);
 
     if (error) {
       console.error("Error removing habit log for today:", error);

@@ -1,6 +1,12 @@
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { User, Mail, ArrowLeft, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
@@ -26,9 +32,7 @@ export default function Account() {
               <User className="h-5 w-5" />
               Account
             </CardTitle>
-            <CardDescription>
-              Manage your account information
-            </CardDescription>
+            <CardDescription>Manage your account information</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {user && (
@@ -37,7 +41,9 @@ export default function Account() {
                   <Mail className="h-5 w-5 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-medium">Email</p>
-                    <p className="text-sm text-muted-foreground">{user.email}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {user.email}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-4 border rounded-lg">

@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { createHabitLog } from "./createHabitLog";
+import { dateToInteger } from "@/lib/utils/dateToInteger";
 
 /**
  * Add a habit log for today
@@ -9,19 +10,18 @@ import { createHabitLog } from "./createHabitLog";
  */
 export async function addHabitLogForToday(
   habitId: string,
-  userId: string,
+  userId: string
 ): Promise<boolean> {
   try {
     const today = new Date();
-    const dateStart = today.toISOString().split("T")[0];
+    const integerDate = dateToInteger(today);
 
     const { data: existingLogs, error: checkError } = await supabase
       .from("habitsLogs")
       .select("id")
       .eq("habitId", habitId)
       .eq("userId", userId)
-      .gte("createdAt", `${dateStart}T00:00:00Z`)
-      .lt("createdAt", `${dateStart}T23:59:59Z`);
+      .eq("integerDate", integerDate);
 
     if (checkError) {
       console.error("Error checking existing habit log:", checkError);
@@ -29,7 +29,7 @@ export async function addHabitLogForToday(
     }
 
     if (!existingLogs || existingLogs.length === 0) {
-      const result = await createHabitLog({ habitId, userId });
+      const result = await createHabitLog({ habitId, userId, integerDate });
       return result !== null;
     }
 

@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, Fragment } from "react";
 import { useHabits } from "@/context/useHabits";
 import { getHabitsForUser } from "@/services/habits";
 import { useAuth } from "@/context/AuthContext";
@@ -13,6 +13,11 @@ import {
   isToday,
   startOfMonth,
 } from "date-fns";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ContributionGridProps {
   year: number;
@@ -41,27 +46,40 @@ export const ContributionGrid = ({
   onSelectDate,
   selectedDate,
 }: ContributionGridProps) => {
-  const { refreshTrigger } = useHabits();
+  const { refreshTrigger, visibleHabits } = useHabits();
   const { user } = useAuth();
   const [contributionLevels, setContributionLevels] = useState<
     Map<string, number>
   >(new Map());
+  const [dayRatios, setDayRatios] = useState<
+    Map<string, { completed: number; total: number }>
+  >(new Map());
+  const [completedHabitIds, setCompletedHabitIds] = useState<
+    Map<string, Set<string>>
+  >(new Map());
+  const [isCmdPressed, setIsCmdPressed] = useState(false);
 
-  // Calculate contribution levels for all days in the year
+  // Calculate contribution levels and ratios for all days in the year
   useEffect(() => {
     const calculateLevels = async () => {
       if (!user) {
         setContributionLevels(new Map());
+        setDayRatios(new Map());
+        setCompletedHabitIds(new Map());
         return;
       }
 
       const habitLogs = await getHabitsForUser(user.id);
       if (!habitLogs) {
         setContributionLevels(new Map());
+        setDayRatios(new Map());
+        setCompletedHabitIds(new Map());
         return;
       }
 
       const levels = new Map<string, number>();
+      const ratios = new Map<string, { completed: number; total: number }>();
+      const completedIds = new Map<string, Set<string>>();
 
       // Group logs by date
       const logsByDate = new Map<string, Set<string>>();
@@ -73,16 +91,62 @@ export const ContributionGrid = ({
         logsByDate.get(logDateStr)!.add(log.habitId);
       }
 
-      // Calculate level for each date (number of unique habits completed)
+      const totalHabits = visibleHabits.length || 0;
+
+      // Calculate level and ratio for each date
       logsByDate.forEach((habitIds, dateStr) => {
         levels.set(dateStr, Math.min(habitIds.size, 4));
+        ratios.set(dateStr, {
+          completed: habitIds.size,
+          total: totalHabits,
+        });
+        completedIds.set(dateStr, new Set(habitIds));
       });
 
       setContributionLevels(levels);
+      setDayRatios(ratios);
+      setCompletedHabitIds(completedIds);
     };
 
     calculateLevels();
-  }, [user, refreshTrigger]);
+  }, [user, refreshTrigger, visibleHabits.length]);
+
+  // Track CMD key state - optimized to prevent unnecessary updates
+  useEffect(() => {
+    let cmdPressed = false;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.key === "Meta") && !cmdPressed) {
+        cmdPressed = true;
+        setIsCmdPressed(true);
+      }
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === "Meta" && cmdPressed) {
+        cmdPressed = false;
+        setIsCmdPressed(false);
+      }
+    };
+
+    // Handle blur event to reset CMD state when window loses focus
+    const handleBlur = () => {
+      if (cmdPressed) {
+        cmdPressed = false;
+        setIsCmdPressed(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown, { passive: true });
+    window.addEventListener("keyup", handleKeyUp, { passive: true });
+    window.addEventListener("blur", handleBlur);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("blur", handleBlur);
+    };
+  }, []);
 
   const { weeks, monthLabels, allDays } = useMemo(() => {
     const yearStart = startOfYear(new Date(year, 0, 1));
@@ -118,7 +182,7 @@ export const ContributionGrid = ({
       const firstDayOfMonth = startOfMonth(new Date(year, month, 1));
 
       const dayIndex = allDays.findIndex(
-        (day) => day.getTime() === firstDayOfMonth.getTime(),
+        (day) => day.getTime() === firstDayOfMonth.getTime()
       );
 
       if (dayIndex !== -1) {
@@ -162,9 +226,9 @@ export const ContributionGrid = ({
         {/* Month labels */}
         <div className="flex mb-2 ml-8 relative h-4">
           {monthLabels.map(({ month, columnIndex }, i) => {
-            // Each column is 11px (cell) + 3px (gap) = 14px wide
+            // Each column is 11px (cell) + 2.5px (gap) = 13.5px wide
             // Add a small offset to the right (like GitHub) for better visual alignment
-            const leftPosition = columnIndex * 14 + 4;
+            const leftPosition = columnIndex * 13.5 + 4;
 
             return (
               <div
@@ -192,9 +256,9 @@ export const ContributionGrid = ({
           </div>
 
           {/* Grid */}
-          <div className="flex gap-[3px]">
+          <div className="flex gap-[2.5px]">
             {weeks.map((week, weekIndex) => (
-              <div key={weekIndex} className="flex flex-col gap-[3px]">
+              <div key={weekIndex} className="flex flex-col gap-[2.5px]">
                 {week.map((day, dayIndexInWeek) => {
                   const dayOfWeek = getDay(day);
                   const isInYear = day.getFullYear() === year;
@@ -214,6 +278,12 @@ export const ContributionGrid = ({
 
                   const dateStr = format(day, "yyyy-MM-dd");
                   const level = contributionLevels.get(dateStr) || 0;
+                  const ratio = dayRatios.get(dateStr) || {
+                    completed: 0,
+                    total: visibleHabits.length || 0,
+                  };
+                  const completedIds =
+                    completedHabitIds.get(dateStr) || new Set<string>();
                   const isSelected =
                     selectedDate &&
                     format(selectedDate, "yyyy-MM-dd") === dateStr;
@@ -223,9 +293,12 @@ export const ContributionGrid = ({
                   // Only today is clickable - past and future days are not
                   const isClickable = today && isInYear;
 
-                  return (
+                  // Show tooltip for all days in the year
+                  const showTooltip = isInYear;
+                  const formattedDate = format(day, "MMM d");
+
+                  const button = (
                     <button
-                      key={day.toISOString()}
                       onClick={() => {
                         if (isClickable) {
                           onSelectDate(day);
@@ -236,16 +309,70 @@ export const ContributionGrid = ({
                         w-[11px] h-[11px] rounded-[3px] transition-all
                         ${isInYear && !future ? getContributionClass(level) : "bg-transparent"}
                         ${isFutureEmpty ? "border border-border/50" : "border-0"}
-                        ${today ? "!border-0" : ""}
+                        ${today ? "!border-0 !ring-0" : ""}
                         ${isSelected ? "ring-2 ring-foreground/50" : ""}
-                        ${past ? "opacity-60" : ""}
                         outline-none
-                        ${isClickable ? "cursor-pointer hover:ring-1 hover:ring-foreground/30" : "cursor-not-allowed"}
+                        ${isInYear ? "cursor-pointer hover:ring-1 hover:ring-foreground/30" : "cursor-not-allowed"}
                       `}
-                      title={isInYear ? format(day, "MMM d, yyyy") : ""}
                       aria-label={isInYear ? format(day, "MMM d, yyyy") : ""}
                     />
                   );
+
+                  if (showTooltip) {
+                    return (
+                      <Tooltip key={day.toISOString()}>
+                        <TooltipTrigger asChild>{button}</TooltipTrigger>
+                        <TooltipContent
+                          side="right"
+                          className={`!bg-[rgba(245,240,230,0.9)] !border-[rgba(200,190,175,0.4)] text-foreground backdrop-blur-sm shadow-lg transition-opacity duration-150 ${
+                            isCmdPressed ? "" : "opacity-60"
+                          }`}
+                        >
+                          {isCmdPressed ? (
+                            <div className="text-left space-y-1.5 min-w-[180px] max-w-[250px]">
+                              <div className="font-medium text-center border-b border-border/30 pb-1 mb-1">
+                                {formattedDate}
+                              </div>
+                              <div className="space-y-1 max-h-[200px] overflow-y-auto">
+                                {visibleHabits.length > 0 ? (
+                                  visibleHabits.map((habit) => {
+                                    const isCompleted = completedIds.has(
+                                      habit.id
+                                    );
+                                    return (
+                                      <div
+                                        key={habit.id}
+                                        className={`text-sm transition-opacity duration-100 ${
+                                          isCompleted
+                                            ? "text-foreground font-normal"
+                                            : "text-muted-foreground opacity-30"
+                                        }`}
+                                      >
+                                        {habit.name}
+                                      </div>
+                                    );
+                                  })
+                                ) : (
+                                  <div className="text-xs text-muted-foreground">
+                                    No habits
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="text-center space-y-0.5">
+                              <div className="font-medium">{formattedDate}</div>
+                              <div className="text-xs text-muted-foreground">
+                                {ratio.completed}/{ratio.total}
+                              </div>
+                            </div>
+                          )}
+                        </TooltipContent>
+                      </Tooltip>
+                    );
+                  }
+
+                  return <Fragment key={day.toISOString()}>{button}</Fragment>;
                 })}
               </div>
             ))}
