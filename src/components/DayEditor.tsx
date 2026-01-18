@@ -28,26 +28,30 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
     allHabitLogs,
     todaysCompletedHabitIds,
   } = useHabits();
-  const [completedHabitIds, setCompletedHabitIds] = useState<Set<string>>(
-    new Set()
+
+  const getInitialCompletedIds = () => {
+    if (isToday(date)) {
+      return todaysCompletedHabitIds || new Set();
+    }
+    const logs = allHabitLogs || [];
+    const selectedDateStr = format(date, "yyyyMMdd");
+    const completedIds = new Set<string>();
+    for (const log of logs) {
+      if (log.integerDate.toString() === selectedDateStr) {
+        completedIds.add(log.habitId);
+      }
+    }
+    return completedIds;
+  };
+
+  const [completedHabitIds, setCompletedHabitIds] = useState(
+    getInitialCompletedIds
   );
 
   const future = isFuture(date) && !isToday(date);
 
   useEffect(() => {
-    if (isToday(date)) {
-      setCompletedHabitIds(todaysCompletedHabitIds || new Set());
-    } else {
-      const logs = allHabitLogs || [];
-      const selectedDateStr = format(date, "yyyyMMdd");
-      const completedIds = new Set<string>();
-      for (const log of logs) {
-        if (log.integerDate.toString() === selectedDateStr) {
-          completedIds.add(log.habitId);
-        }
-      }
-      setCompletedHabitIds(completedIds);
-    }
+    setCompletedHabitIds(getInitialCompletedIds());
   }, [date, allHabitLogs, todaysCompletedHabitIds]);
 
   const habitsForDisplay = visibleHabits.map((habit) => ({
