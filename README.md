@@ -55,7 +55,7 @@ $$Score = Workout_{(1-5)} + Nutrition_{(1-5)} + Reading_{(1-5)}$$
 ### Prerequisites
 
 - Node.js (v18 or higher recommended)
-- npm or bun package manager
+- bun package manager
 - Supabase account (for authentication)
 
 ### Installation
@@ -68,12 +68,6 @@ $$Score = Workout_{(1-5)} + Nutrition_{(1-5)} + Reading_{(1-5)}$$
    ```
 
 2. Install dependencies:
-
-   ```bash
-   npm install
-   ```
-
-   or if using bun:
 
    ```bash
    bun install
@@ -107,16 +101,20 @@ $$Score = Workout_{(1-5)} + Nutrition_{(1-5)} + Reading_{(1-5)}$$
 Start the development server:
 
 ```bash
-npm run dev
+bun run dev
 ```
 
 The app will be available at `http://localhost:5173` (or another port if 5173 is in use).
 
 ### Other Available Commands
 
-- `npm run build` - Build for production
-- `npm run preview` - Preview the production build
-- `npm run lint` - Run the linter
+- `bun run build` - Build for production
+- `bun run build:dev` - Build for development
+- `bun run preview` - Preview the production build
+- `bun run lint` - Run the linter
+- `bun run format:check` - Check code formatting
+- `bun run format:write` - Apply code formatting
+- `bun run ts:check` - Run TypeScript type checks
 
 ## 🤝 Contributing
 
