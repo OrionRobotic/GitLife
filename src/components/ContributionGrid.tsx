@@ -111,26 +111,40 @@ export const ContributionGrid = ({
     calculateLevels();
   }, [user, refreshTrigger, visibleHabits.length]);
 
-  // Track CMD key state
+  // Track CMD key state - optimized to prevent unnecessary updates
   useEffect(() => {
+    let cmdPressed = false;
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.metaKey) {
+      if ((e.metaKey || e.key === "Meta") && !cmdPressed) {
+        cmdPressed = true;
         setIsCmdPressed(true);
       }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.key === "Meta") {
+      if (e.key === "Meta" && cmdPressed) {
+        cmdPressed = false;
         setIsCmdPressed(false);
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
+    // Handle blur event to reset CMD state when window loses focus
+    const handleBlur = () => {
+      if (cmdPressed) {
+        cmdPressed = false;
+        setIsCmdPressed(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown, { passive: true });
+    window.addEventListener("keyup", handleKeyUp, { passive: true });
+    window.addEventListener("blur", handleBlur);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("blur", handleBlur);
     };
   }, []);
 
@@ -309,27 +323,28 @@ export const ContributionGrid = ({
                         <TooltipTrigger asChild>{button}</TooltipTrigger>
                         <TooltipContent
                           side="right"
-                          className="!bg-[rgba(245,240,230,0.9)] !border-[rgba(200,190,175,0.4)] text-foreground backdrop-blur-sm shadow-lg opacity-60"
+                          className={`!bg-[rgba(245,240,230,0.9)] !border-[rgba(200,190,175,0.4)] text-foreground backdrop-blur-sm shadow-lg transition-opacity duration-150 ${
+                            isCmdPressed ? "" : "opacity-60"
+                          }`}
                         >
                           {isCmdPressed ? (
                             <div className="text-left space-y-1.5 min-w-[180px] max-w-[250px]">
-                              <div className="font-medium text-center border-b border-border/30 pb-1">
+                              <div className="font-medium text-center border-b border-border/30 pb-1 mb-1">
                                 {formattedDate}
                               </div>
-                              <div className="space-y-0.5 max-h-[200px] overflow-y-auto">
+                              <div className="space-y-1 max-h-[200px] overflow-y-auto">
                                 {visibleHabits.length > 0 ? (
                                   visibleHabits.map((habit) => {
                                     const isCompleted = completedIds.has(habit.id);
                                     return (
                                       <div
                                         key={habit.id}
-                                        className={`text-sm ${
+                                        className={`text-sm transition-opacity duration-100 ${
                                           isCompleted
-                                            ? "text-foreground"
-                                            : "text-muted-foreground opacity-40"
+                                            ? "text-foreground font-normal"
+                                            : "text-muted-foreground opacity-30"
                                         }`}
                                       >
-                                        {isCompleted ? "✓ " : "○ "}
                                         {habit.name}
                                       </div>
                                     );
