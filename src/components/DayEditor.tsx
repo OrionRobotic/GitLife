@@ -82,7 +82,7 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
 
     try {
       await updateHabitStatus(habitName, completed, date);
-      
+
       // Reload to ensure consistency
       const habitLogs = await getHabitsForUser(user!.id);
       if (habitLogs) {

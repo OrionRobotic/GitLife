@@ -1,5 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { BookOpen, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -31,14 +37,16 @@ export default function HowToUse() {
               <div className="flex gap-4">
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span className="text-sm font-semibold text-primary">1</span>
+                    <span className="text-sm font-semibold text-primary">
+                      1
+                    </span>
                   </div>
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1">Track Your Habits</h3>
                   <p className="text-sm text-muted-foreground">
-                    Click on today's date in the contribution grid or use the "Add Contribution"
-                    button to log your daily habits.
+                    Click on today's date in the contribution grid or use the
+                    "Add Contribution" button to log your daily habits.
                   </p>
                 </div>
               </div>
@@ -46,14 +54,16 @@ export default function HowToUse() {
               <div className="flex gap-4">
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span className="text-sm font-semibold text-primary">2</span>
+                    <span className="text-sm font-semibold text-primary">
+                      2
+                    </span>
                   </div>
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1">Mark Habits Complete</h3>
                   <p className="text-sm text-muted-foreground">
-                    For each habit (Workout, Eating, Reading, Sleep), click "Yes" if you completed
-                    it today, or "No" if you didn't.
+                    For each habit (Workout, Eating, Reading, Sleep), click
+                    "Yes" if you completed it today, or "No" if you didn't.
                   </p>
                 </div>
               </div>
@@ -61,14 +71,17 @@ export default function HowToUse() {
               <div className="flex gap-4">
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span className="text-sm font-semibold text-primary">3</span>
+                    <span className="text-sm font-semibold text-primary">
+                      3
+                    </span>
                   </div>
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1">Watch Your Progress</h3>
                   <p className="text-sm text-muted-foreground">
-                    The contribution grid will update with colors based on how many habits you
-                    completed each day. Darker colors mean more habits completed!
+                    The contribution grid will update with colors based on how
+                    many habits you completed each day. Darker colors mean more
+                    habits completed!
                   </p>
                 </div>
               </div>
@@ -76,14 +89,16 @@ export default function HowToUse() {
               <div className="flex gap-4">
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span className="text-sm font-semibold text-primary">4</span>
+                    <span className="text-sm font-semibold text-primary">
+                      4
+                    </span>
                   </div>
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1">Build Consistency</h3>
                   <p className="text-sm text-muted-foreground">
-                    Try to maintain a streak! The visual representation of your progress helps you
-                    stay motivated and build lasting habits.
+                    Try to maintain a streak! The visual representation of your
+                    progress helps you stay motivated and build lasting habits.
                   </p>
                 </div>
               </div>
@@ -95,8 +110,8 @@ export default function HowToUse() {
                 <div>
                   <p className="text-sm font-medium mb-1">Tip</p>
                   <p className="text-sm text-muted-foreground">
-                    You can only edit today's habits. Past days are view-only to maintain the
-                    integrity of your habit tracking.
+                    You can only edit today's habits. Past days are view-only to
+                    maintain the integrity of your habit tracking.
                   </p>
                 </div>
               </div>

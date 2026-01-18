@@ -19,9 +19,7 @@ export default function OurMission() {
           <h1 className="text-3xl font-semibold text-foreground mb-2">
             Our Mission
           </h1>
-          <p className="text-sm text-muted-foreground">
-            In what we believe
-          </p>
+          <p className="text-sm text-muted-foreground">In what we believe</p>
         </div>
       </div>
     </div>
