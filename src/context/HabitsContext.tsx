@@ -28,6 +28,7 @@ interface HabitsContextType {
   allHabitLogs: any[];
   todaysCompletedHabitIds: Set<string>;
   refreshTrigger: number;
+  isLoading: boolean;
   getHabitsWithLogsForDate: (
     date: Date
   ) => Promise<DatabaseHabitWithLogs[] | null>;
@@ -53,6 +54,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     Set<string>
   >(new Set());
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const [lastFetchTimestamp, setLastFetchTimestamp] = useState<number | null>(
     null
   );
@@ -61,6 +63,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   const loadAllHabitsFromDatabase = useCallback(async () => {
     if (!user) return;
 
+    setIsLoading(true);
     try {
       const [habits, logs] = await Promise.all([
         getVisibleHabits(),
@@ -76,6 +79,8 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       setLastFetchTimestamp(Date.now());
     } catch (error) {
       console.error("Error loading all habits from database:", error);
+    } finally {
+      setIsLoading(false);
     }
   }, [user]);
 
@@ -205,6 +210,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
         allHabitLogs,
         todaysCompletedHabitIds,
         refreshTrigger,
+        isLoading,
         getHabitsWithLogsForDate,
         updateHabitStatus,
         refreshVisibleHabits,

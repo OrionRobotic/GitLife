@@ -1,0 +1,71 @@
+{
+  "languages": {
+    "JavaScript": {
+      "formatter": {
+        "external": {
+          "command": "bunx",
+          "arguments": ["oxfmt", "--stdin-filepath", "{buffer_path}"],
+        },
+      },
+      "language_servers": [
+        "oxlint",
+        "eslint",
+        "vtsls",
+        "!typescript-language-server",
+      ],
+    },
+    "TypeScript": {
+      "formatter": {
+        "external": {
+          "command": "bunx",
+          "arguments": ["oxfmt", "--stdin-filepath", "{buffer_path}"],
+        },
+      },
+      "language_servers": [
+        "oxlint",
+        "eslint",
+        "vtsls",
+        "!typescript-language-server",
+      ],
+    },
+    "TSX": {
+      "formatter": {
+        "external": {
+          "command": "bunx",
+          "arguments": ["oxfmt", "--stdin-filepath", "{buffer_path}"],
+        },
+      },
+      "language_servers": [
+        "oxlint",
+        "eslint",
+        "vtsls",
+        "!typescript-language-server",
+      ],
+    },
+    "JSX": {
+      "formatter": {
+        "external": {
+          "command": "bunx",
+          "arguments": ["oxfmt", "--stdin-filepath", "{buffer_path}"],
+        },
+      },
+      "language_servers": [
+        "oxlint",
+        "eslint",
+        "vtsls",
+        "!typescript-language-server",
+      ],
+    },
+  },
+  "lsp": {
+    "oxlint": {
+      "binary": {
+        "path": "bunx",
+        "arguments": ["oxlint", "--lsp"],
+      },
+    },
+  },
+  "file_types": {
+    "TSX": ["tsx"],
+  },
+}
