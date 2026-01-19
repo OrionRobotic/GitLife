@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect, Fragment } from "react";
 import { useHabits } from "@/context/useHabits";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   startOfYear,
   endOfYear,
@@ -44,7 +45,7 @@ export const ContributionGrid = ({
   onSelectDate,
   selectedDate,
 }: ContributionGridProps) => {
-  const { visibleHabits, allHabitLogs } = useHabits();
+  const { visibleHabits, allHabitLogs, isLoading } = useHabits();
   const [isCmdPressed, setIsCmdPressed] = useState(false);
 
   const { contributionLevels, dayRatios, completedHabitIds } = useMemo(() => {
@@ -229,55 +230,61 @@ export const ContributionGrid = ({
 
           {/* Grid */}
           <div className="flex gap-[2.5px]">
-            {weeks.map((week, weekIndex) => (
-              <div key={weekIndex} className="flex flex-col gap-[2.5px]">
-                {week.map((day, dayIndexInWeek) => {
-                  const dayOfWeek = getDay(day);
-                  const isInYear = day.getFullYear() === year;
-                  const future = isFuture(day) && !isToday(day);
-                  const past = !isToday(day) && !isFuture(day);
-                  const today = isToday(day);
+            {isLoading ? (
+              <Skeleton
+                className="h-[92px] rounded-[3px]"
+                style={{ width: `${weeks.length * 13.5 - 2.5}px` }}
+              />
+            ) : (
+              weeks.map((week, weekIndex) => (
+                <div key={weekIndex} className="flex flex-col gap-[2.5px]">
+                  {week.map((day, dayIndexInWeek) => {
+                    const dayOfWeek = getDay(day);
+                    const isInYear = day.getFullYear() === year;
+                    const future = isFuture(day) && !isToday(day);
+                    const past = !isToday(day) && !isFuture(day);
+                    const today = isToday(day);
 
-                  // For days not in the year and not future, render invisible placeholder to maintain alignment
-                  if (!isInYear && !future) {
-                    return (
-                      <div
-                        key={day.toISOString()}
-                        className="w-[11px] h-[11px] invisible"
-                      />
-                    );
-                  }
+                    // For days not in the year and not future, render invisible placeholder to maintain alignment
+                    if (!isInYear && !future) {
+                      return (
+                        <div
+                          key={day.toISOString()}
+                          className="w-[11px] h-[11px] invisible"
+                        />
+                      );
+                    }
 
-                  const dateStr = format(day, "yyyyMMdd");
-                  const level = contributionLevels.get(dateStr) || 0;
-                  const ratio = dayRatios.get(dateStr) || {
-                    completed: 0,
-                    total: visibleHabits.length || 0,
-                  };
-                  const completedIds =
-                    completedHabitIds.get(dateStr) || new Set<string>();
-                  const isSelected =
-                    selectedDate &&
-                    format(selectedDate, "yyyyMMdd") === dateStr;
+                    const dateStr = format(day, "yyyyMMdd");
+                    const level = contributionLevels.get(dateStr) || 0;
+                    const ratio = dayRatios.get(dateStr) || {
+                      completed: 0,
+                      total: visibleHabits.length || 0,
+                    };
+                    const completedIds =
+                      completedHabitIds.get(dateStr) || new Set<string>();
+                    const isSelected =
+                      selectedDate &&
+                      format(selectedDate, "yyyyMMdd") === dateStr;
 
-                  const isFutureEmpty = future && isInYear;
+                    const isFutureEmpty = future && isInYear;
 
-                  // Only today is clickable - past and future days are not
-                  const isClickable = today && isInYear;
+                    // Only today is clickable - past and future days are not
+                    const isClickable = today && isInYear;
 
-                  // Show tooltip for all days in the year
-                  const showTooltip = isInYear;
-                  const formattedDate = format(day, "MMM d");
+                    // Show tooltip for all days in the year
+                    const showTooltip = isInYear;
+                    const formattedDate = format(day, "MMM d");
 
-                  const button = (
-                    <button
-                      onClick={() => {
-                        if (isClickable) {
-                          onSelectDate(day);
-                        }
-                      }}
-                      disabled={!isClickable}
-                      className={`
+                    const button = (
+                      <button
+                        onClick={() => {
+                          if (isClickable) {
+                            onSelectDate(day);
+                          }
+                        }}
+                        disabled={!isClickable}
+                        className={`
                         w-[11px] h-[11px] rounded-[3px] transition-all
                         ${isInYear && !future ? getContributionClass(level) : "bg-transparent"}
                         ${isFutureEmpty ? "border border-border/50" : "border-0"}
@@ -286,68 +293,73 @@ export const ContributionGrid = ({
                         outline-none
                         ${isInYear ? "cursor-pointer hover:ring-1 hover:ring-foreground/30" : "cursor-not-allowed"}
                       `}
-                      aria-label={isInYear ? format(day, "MMM d, yyyy") : ""}
-                    />
-                  );
-
-                  if (showTooltip) {
-                    return (
-                      <Tooltip key={day.toISOString()}>
-                        <TooltipTrigger asChild>{button}</TooltipTrigger>
-                        <TooltipContent
-                          side="right"
-                          className={`!bg-[rgba(245,240,230,0.9)] !border-[rgba(200,190,175,0.4)] text-foreground backdrop-blur-sm shadow-lg transition-opacity duration-150 ${
-                            isCmdPressed ? "" : "opacity-60"
-                          }`}
-                        >
-                          {isCmdPressed ? (
-                            <div className="text-left space-y-1.5 min-w-[180px] max-w-[250px]">
-                              <div className="font-medium text-center border-b border-border/30 pb-1 mb-1">
-                                {formattedDate}
-                              </div>
-                              <div className="space-y-1 max-h-[200px] overflow-y-auto">
-                                {visibleHabits.length > 0 ? (
-                                  visibleHabits.map((habit) => {
-                                    const isCompleted = completedIds.has(
-                                      habit.id
-                                    );
-                                    return (
-                                      <div
-                                        key={habit.id}
-                                        className={`text-sm transition-opacity duration-100 ${
-                                          isCompleted
-                                            ? "text-foreground font-normal"
-                                            : "text-muted-foreground opacity-30"
-                                        }`}
-                                      >
-                                        {habit.name}
-                                      </div>
-                                    );
-                                  })
-                                ) : (
-                                  <div className="text-xs text-muted-foreground">
-                                    No habits
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="text-center space-y-0.5">
-                              <div className="font-medium">{formattedDate}</div>
-                              <div className="text-xs text-muted-foreground">
-                                {ratio.completed}/{ratio.total}
-                              </div>
-                            </div>
-                          )}
-                        </TooltipContent>
-                      </Tooltip>
+                        aria-label={isInYear ? format(day, "MMM d, yyyy") : ""}
+                      />
                     );
-                  }
 
-                  return <Fragment key={day.toISOString()}>{button}</Fragment>;
-                })}
-              </div>
-            ))}
+                    if (showTooltip) {
+                      return (
+                        <Tooltip key={day.toISOString()}>
+                          <TooltipTrigger asChild>{button}</TooltipTrigger>
+                          <TooltipContent
+                            side="right"
+                            className={`!bg-[rgba(245,240,230,0.9)] !border-[rgba(200,190,175,0.4)] text-foreground backdrop-blur-sm shadow-lg transition-opacity duration-150 ${
+                              isCmdPressed ? "" : "opacity-60"
+                            }`}
+                          >
+                            {isCmdPressed ? (
+                              <div className="text-left space-y-1.5 min-w-[180px] max-w-[250px]">
+                                <div className="font-medium text-center border-b border-border/30 pb-1 mb-1">
+                                  {formattedDate}
+                                </div>
+                                <div className="space-y-1 max-h-[200px] overflow-y-auto">
+                                  {visibleHabits.length > 0 ? (
+                                    visibleHabits.map((habit) => {
+                                      const isCompleted = completedIds.has(
+                                        habit.id
+                                      );
+                                      return (
+                                        <div
+                                          key={habit.id}
+                                          className={`text-sm transition-opacity duration-100 ${
+                                            isCompleted
+                                              ? "text-foreground font-normal"
+                                              : "text-muted-foreground opacity-30"
+                                          }`}
+                                        >
+                                          {habit.name}
+                                        </div>
+                                      );
+                                    })
+                                  ) : (
+                                    <div className="text-xs text-muted-foreground">
+                                      No habits
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="text-center space-y-0.5">
+                                <div className="font-medium">
+                                  {formattedDate}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {ratio.completed}/{ratio.total}
+                                </div>
+                              </div>
+                            )}
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    }
+
+                    return (
+                      <Fragment key={day.toISOString()}>{button}</Fragment>
+                    );
+                  })}
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

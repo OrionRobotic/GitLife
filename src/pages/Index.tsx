@@ -12,11 +12,12 @@ import {
 import { useHabits } from "@/context/useHabits";
 import { MenuButton } from "@/components/MenuButton";
 import { Plus } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Index = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const currentYear = new Date().getFullYear();
-  const { visibleHabits, allHabitLogs } = useHabits();
+  const { visibleHabits, allHabitLogs, isLoading } = useHabits();
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
@@ -100,9 +101,13 @@ const Index = () => {
               <span className="text-sm text-muted-foreground">
                 Today's Completed
               </span>
-              <span className="text-sm font-medium text-foreground">
-                {totalScore}/{totalHabits}
-              </span>
+              {isLoading ? (
+                <Skeleton className="h-4 w-6" />
+              ) : (
+                <span className="text-sm font-medium text-foreground">
+                  {totalScore}/{totalHabits}
+                </span>
+              )}
             </div>
             <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
               <PopoverTrigger asChild>
