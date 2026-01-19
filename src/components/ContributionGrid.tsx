@@ -232,7 +232,7 @@ export const ContributionGrid = ({
           <div className="flex gap-[2.5px]">
             {isLoading ? (
               <Skeleton
-                className="h-[92px] rounded-[3px]"
+                className="h-[92px] rounded-md"
                 style={{ width: `${weeks.length * 13.5 - 2.5}px` }}
               />
             ) : (
