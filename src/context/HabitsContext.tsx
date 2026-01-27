@@ -128,7 +128,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     const completedIds = new Set<string>();
 
     for (const log of allHabitLogs) {
-      if (log.integerDate.toString() === todayStr) {
+      if (log.integerDate && log.integerDate.toString() === todayStr) {
         completedIds.add(log.habitId);
       }
     }

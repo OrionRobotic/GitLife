@@ -37,7 +37,7 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
     const selectedDateStr = format(date, "yyyyMMdd");
     const completedIds = new Set<string>();
     for (const log of logs) {
-      if (log.integerDate.toString() === selectedDateStr) {
+      if (log.integerDate && log.integerDate.toString() === selectedDateStr) {
         completedIds.add(log.habitId);
       }
     }
