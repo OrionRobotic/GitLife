@@ -57,6 +57,7 @@ export const ContributionGrid = ({
       // Group logs by date
       const logsByDate = new Map<string, Set<string>>();
       for (const log of allHabitLogs) {
+        if (!log.integerDate) continue; // Skip logs with null integerDate
         const logDateStr = log.integerDate.toString();
         if (!logsByDate.has(logDateStr)) {
           logsByDate.set(logDateStr, new Set());

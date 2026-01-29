@@ -33,7 +33,7 @@ const Index = () => {
     const completedHabitIds = new Set<string>();
 
     for (const log of allHabitLogs) {
-      if (log.integerDate.toString() === selectedDateStr) {
+      if (log.integerDate && log.integerDate.toString() === selectedDateStr) {
         completedHabitIds.add(log.habitId);
       }
     }
