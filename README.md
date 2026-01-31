@@ -129,4 +129,4 @@ Contributions are always welcome! Please create a PR to merge your changes.
 
 ## 📄 License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Distributed under the MIT License. See `LICENSE` for further information.
