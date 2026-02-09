@@ -46,24 +46,24 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto px-6 py-12">
-        {/* Header */}
-        <header className="mb-12 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-medium text-foreground tracking-tight flex items-center gap-2">
-              <img src="/favicon.svg" alt="GitLife" className="w-6 h-6" />
-              GitLife
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Commit to a better version of yourself.
-            </p>
-          </div>
-          <div className="flex items-center">
-            <MenuButton />
-          </div>
-        </header>
+      {/* Header - full width */}
+      <header className="w-full px-6 py-6 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-medium text-foreground tracking-tight flex items-center gap-2">
+            <img src="/favicon.svg" alt="GitLife" className="w-6 h-6" />
+            GitLife
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Commit to a better version of yourself.
+          </p>
+        </div>
+        <div className="flex items-center">
+          <MenuButton />
+        </div>
+      </header>
 
-        {/* Main content */}
+      {/* Main content - centered */}
+      <div className="max-w-4xl mx-auto px-6 py-6">
         <div className="space-y-8">
           {/* Date display above grid */}
           <div className="flex justify-start mt-4 -mb-6 pl-2">
