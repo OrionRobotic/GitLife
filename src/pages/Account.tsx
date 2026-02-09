@@ -16,16 +16,16 @@ export default function Account() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto px-6 py-12">
-        <div className="mb-8">
-          <Link to="/">
-            <Button variant="ghost" size="sm" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </Button>
-          </Link>
-        </div>
+      <div className="w-full px-6 py-6">
+        <Link to="/">
+          <Button variant="ghost" size="sm" className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+        </Link>
+      </div>
 
+      <div className="max-w-4xl mx-auto px-6 pb-12">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
