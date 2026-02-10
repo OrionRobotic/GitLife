@@ -9,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu, LogOut, User, Target, BookOpen } from "lucide-react";
+import { Menu, LogOut, User, BookOpen } from "lucide-react";
 
 export const MenuButton = () => {
   const [open, setOpen] = useState(false);
@@ -49,27 +49,27 @@ export const MenuButton = () => {
         <div className="mt-8 flex flex-col gap-2 flex-1">
           <Button
             variant="ghost"
-            className="w-full justify-start gap-3 h-12"
-            onClick={() => handleNavigate("/account")}
-          >
-            <User className="h-5 w-5" />
-            <span>Account</span>
-          </Button>
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-3 h-12"
+            className="w-full justify-start gap-3 h-12 text-base"
             onClick={() => handleNavigate("/our-mission")}
           >
-            <Target className="h-5 w-5" />
+            <div className="h-3.5 w-3.5 rounded-sm bg-[hsl(22,95%,50%)]" />
             <span>Our Mission</span>
           </Button>
           <Button
             variant="ghost"
-            className="w-full justify-start gap-3 h-12"
+            className="w-full justify-start gap-3 h-12 text-base"
             onClick={() => handleNavigate("/how-to-use")}
           >
             <BookOpen className="h-5 w-5" />
             <span>How to use it</span>
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3 h-12 text-base"
+            onClick={() => handleNavigate("/account")}
+          >
+            <User className="h-5 w-5" />
+            <span>Account</span>
           </Button>
         </div>
         <div className="mt-auto pt-8 border-t">
@@ -80,7 +80,7 @@ export const MenuButton = () => {
           )}
           <Button
             variant="ghost"
-            className="w-full justify-start gap-3 h-12 text-foreground hover:bg-muted"
+            className="w-full justify-start gap-3 h-12 text-base text-foreground hover:bg-muted"
             onClick={handleSignOut}
           >
             <LogOut className="h-5 w-5" />

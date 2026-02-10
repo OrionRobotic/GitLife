@@ -195,7 +195,7 @@ export const ContributionGrid = ({
   };
 
   return (
-    <div className="w-full overflow-x-auto">
+    <div className="w-full overflow-x-auto font-dm">
       <div className="inline-block min-w-max">
         {/* Month labels */}
         <div className="flex mb-2 ml-8 relative h-4">
