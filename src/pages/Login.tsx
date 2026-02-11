@@ -124,6 +124,9 @@ export default function Login() {
           </p>
         </CardFooter>
       </Card>
+      <p className="mt-16 text-sm text-muted-foreground text-center">
+        GitLife
+      </p>
     </div>
   );
 }

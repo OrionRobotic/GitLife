@@ -11,8 +11,13 @@ import {
 } from "@/components/ui/popover";
 import { useHabits } from "@/context/useHabits";
 import { MenuButton } from "@/components/MenuButton";
+import { ActivityOverview } from "@/components/ActivityOverview";
 import { Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useDashboards } from "@/hooks/useDashboards";
+import { DashboardTabs } from "@/components/DashboardTabs";
+import { DashboardDialog } from "@/components/DashboardDialog";
+import type { Dashboard } from "@/types/dashboard";
 
 const Index = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -20,6 +25,35 @@ const Index = () => {
   const { visibleHabits, allHabitLogs, isLoading } = useHabits();
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
+  // Dashboard state
+  const {
+    dashboards,
+    activeDashboardId,
+    activeDashboard,
+    setActiveDashboardId,
+    createDashboard,
+    updateDashboard,
+    deleteDashboard,
+    defaultTab,
+    updateDefaultTab,
+  } = useDashboards();
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingDashboard, setEditingDashboard] = useState<Dashboard | null>(
+    null
+  );
+  const [editingDefault, setEditingDefault] = useState<{
+    name: string;
+    color: string;
+    habitIds: string[];
+  } | null>(null);
+
+  const filteredHabitIds = activeDashboard
+    ? activeDashboard.habitIds
+    : defaultTab.habitIds.length > 0
+      ? defaultTab.habitIds
+      : null;
 
   // Calculate completed ratio for the selected date (or today)
   const displayDate = selectedDate || new Date();
@@ -29,20 +63,46 @@ const Index = () => {
       return { totalScore: 0, totalHabits: visibleHabits.length };
     }
 
+    const filterSet = filteredHabitIds
+      ? new Set(filteredHabitIds)
+      : null;
+
+    const relevantHabits = filterSet
+      ? visibleHabits.filter((h) => filterSet.has(h.id))
+      : visibleHabits;
+
     const selectedDateStr = format(displayDate, "yyyyMMdd");
     const completedHabitIds = new Set<string>();
 
     for (const log of allHabitLogs) {
       if (log.integerDate && log.integerDate.toString() === selectedDateStr) {
-        completedHabitIds.add(log.habitId);
+        if (!filterSet || filterSet.has(log.habitId)) {
+          completedHabitIds.add(log.habitId);
+        }
       }
     }
 
     return {
       totalScore: completedHabitIds.size,
-      totalHabits: visibleHabits.length || 0,
+      totalHabits: relevantHabits.length || 0,
     };
-  }, [displayDate, allHabitLogs, visibleHabits.length]);
+  }, [displayDate, allHabitLogs, visibleHabits, filteredHabitIds]);
+
+  const handleDialogSave = (name: string, habitIds: string[], color: string) => {
+    if (editingDashboard) {
+      updateDashboard(editingDashboard.id, name, habitIds, color);
+    } else {
+      createDashboard(name, habitIds, color);
+    }
+  };
+
+  const handleSaveDefault = (name: string, color: string, habitIds: string[]) => {
+    updateDefaultTab(name, color, habitIds);
+  };
+
+  const gridHeading = activeDashboard
+    ? `${activeDashboard.name} — ${currentYear} contributions`
+    : `${currentYear} contributions`;
 
   return (
     <div className="min-h-screen bg-background">
@@ -64,10 +124,10 @@ const Index = () => {
 
       {/* Main content - centered */}
       <div className="max-w-4xl mx-auto px-6 py-6">
-        <div className="space-y-8 font-dm">
-          {/* Date display above grid */}
-          <div className="flex justify-start mt-4 -mb-6 pl-2">
-            <div className="flex flex-col items-start">
+        <div className="flex flex-col gap-4 font-dm">
+          {/* Date display */}
+          <div className="flex justify-end pr-2">
+            <div className="flex flex-col items-end">
               <div className="text-sm font-medium text-foreground">
                 {format(displayDate, "EEEE")}
               </div>
@@ -77,26 +137,51 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Contribution grid */}
-          <div className="p-6 bg-card border border-border rounded-lg">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-sm font-medium text-foreground">
-                {currentYear} contributions
-              </h2>
-              <Legend />
-            </div>
-            <ContributionGrid
-              year={currentYear}
-              onSelectDate={(date) => {
-                setSelectedDate(date);
-                setIsPopoverOpen(true);
+          {/* Dashboard tabs + Contribution grid */}
+          <div>
+            <DashboardTabs
+              dashboards={dashboards}
+              activeDashboardId={activeDashboardId}
+              defaultTab={defaultTab}
+              onSelect={setActiveDashboardId}
+              onDelete={deleteDashboard}
+              onEdit={(dashboard) => {
+                setEditingDefault(null);
+                setEditingDashboard(dashboard);
+                setDialogOpen(true);
               }}
-              selectedDate={selectedDate}
+              onEditDefault={() => {
+                setEditingDashboard(null);
+                setEditingDefault(defaultTab);
+                setDialogOpen(true);
+              }}
+              onCreate={() => {
+                setEditingDefault(null);
+                setEditingDashboard(null);
+                setDialogOpen(true);
+              }}
             />
+            <div className="p-6 bg-card border border-border rounded-lg rounded-tl-none">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-sm font-medium text-foreground">
+                  {gridHeading}
+                </h2>
+                <Legend />
+              </div>
+              <ContributionGrid
+                year={currentYear}
+                onSelectDate={(date) => {
+                  setSelectedDate(date);
+                  setIsPopoverOpen(true);
+                }}
+                selectedDate={selectedDate}
+                filteredHabitIds={filteredHabitIds}
+              />
+            </div>
           </div>
 
-          {/* Add Contribution Button - Outside the grid */}
-          <div className="flex justify-between items-center -mt-3 mb-8">
+          {/* Today's Completed + Add Contribution */}
+          <div className="flex justify-between items-center">
             <div className="flex items-center gap-2 pl-2">
               <span className="text-sm text-muted-foreground">
                 Today's Completed
@@ -136,13 +221,33 @@ const Index = () => {
                   <DayEditor
                     date={selectedDate || new Date()}
                     onClose={() => setIsPopoverOpen(false)}
+                    filteredHabitIds={filteredHabitIds}
                   />
                 )}
               </PopoverContent>
             </Popover>
           </div>
+
+          {/* Activity Overview */}
+          <div className="mt-4">
+            <ActivityOverview filteredHabitIds={filteredHabitIds} />
+          </div>
+
+          <p className="mt-16 text-sm text-muted-foreground text-center">
+            GitLife
+          </p>
         </div>
       </div>
+
+      {/* Dashboard create/edit dialog */}
+      <DashboardDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        editingDashboard={editingDashboard}
+        editingDefault={editingDefault}
+        onSave={handleDialogSave}
+        onSaveDefault={handleSaveDefault}
+      />
     </div>
   );
 };

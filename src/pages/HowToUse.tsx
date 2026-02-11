@@ -118,6 +118,9 @@ export default function HowToUse() {
             </div>
           </CardContent>
         </Card>
+        <p className="mt-16 text-sm text-muted-foreground text-center">
+          GitLife
+        </p>
       </div>
     </div>
   );

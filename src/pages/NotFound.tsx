@@ -21,6 +21,9 @@ const NotFound = () => {
         <a href="/" className="text-primary underline hover:text-primary/90">
           Return to Home
         </a>
+        <p className="mt-16 text-sm text-muted-foreground text-center">
+          GitLife
+        </p>
       </div>
     </div>
   );
