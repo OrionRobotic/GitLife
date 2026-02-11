@@ -123,34 +123,19 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
                   <span className="text-sm font-medium text-foreground flex-1">
                     {name}
                   </span>
-                  <div className="ml-8 flex gap-1">
-                    <button
-                      onClick={() => handleChange(id, name, false)}
-                      className={`
-                        h-8 px-3 rounded text-sm font-medium transition-all
-                        ${
-                          !completed
-                            ? "bg-foreground text-background"
-                            : "bg-muted hover:bg-muted-foreground/20 text-foreground"
-                        }
-                      `}
-                    >
-                      No
-                    </button>
-                    <button
-                      onClick={() => handleChange(id, name, true)}
-                      className={`
-                        h-8 px-3 rounded text-sm font-medium transition-all
-                        ${
-                          completed
-                            ? "bg-foreground text-background"
-                            : "bg-muted hover:bg-muted-foreground/20 text-foreground"
-                        }
-                      `}
-                    >
-                      Yes
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => handleChange(id, name, !completed)}
+                    className={`
+                      ml-8 w-3.5 h-3.5 rounded-[2px] transition-all border
+                      ${
+                        completed
+                          ? "bg-contribution-3 border-contribution-3"
+                          : "bg-background border-border hover:border-foreground/30"
+                      }
+                    `}
+                    aria-label={completed ? "Mark incomplete" : "Mark complete"}
+                  >
+                  </button>
                 </div>
               </div>
             ))
