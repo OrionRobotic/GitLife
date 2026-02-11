@@ -7,6 +7,7 @@ import { LucideIcon } from "lucide-react";
 interface DayEditorProps {
   date: Date;
   onClose: () => void;
+  filteredHabitIds?: string[] | null;
 }
 
 const HABIT_ICONS: Record<string, LucideIcon> = {
@@ -21,13 +22,17 @@ const getHabitIcon = (name: string): LucideIcon => {
   return HABIT_ICONS[normalizedName] || BookOpen;
 };
 
-export const DayEditor = ({ date, onClose }: DayEditorProps) => {
+export const DayEditor = ({ date, onClose, filteredHabitIds }: DayEditorProps) => {
   const {
-    visibleHabits,
+    visibleHabits: allVisibleHabits,
     updateHabitStatus,
     allHabitLogs,
     todaysCompletedHabitIds,
   } = useHabits();
+
+  const visibleHabits = filteredHabitIds
+    ? allVisibleHabits.filter((h) => new Set(filteredHabitIds).has(h.id))
+    : allVisibleHabits;
 
   const getInitialCompletedIds = () => {
     if (isToday(date)) {

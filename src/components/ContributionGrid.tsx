@@ -22,6 +22,7 @@ interface ContributionGridProps {
   year: number;
   onSelectDate: (date: Date) => void;
   selectedDate: Date | null;
+  filteredHabitIds?: string[] | null;
 }
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -44,8 +45,34 @@ export const ContributionGrid = ({
   year,
   onSelectDate,
   selectedDate,
+  filteredHabitIds,
 }: ContributionGridProps) => {
-  const { visibleHabits, allHabitLogs, isLoading } = useHabits();
+  const {
+    visibleHabits: allVisibleHabits,
+    allHabitLogs: allLogs,
+    isLoading,
+  } = useHabits();
+
+  const filteredSet = useMemo(
+    () => (filteredHabitIds ? new Set(filteredHabitIds) : null),
+    [filteredHabitIds]
+  );
+
+  const visibleHabits = useMemo(
+    () =>
+      filteredSet
+        ? allVisibleHabits.filter((h) => filteredSet.has(h.id))
+        : allVisibleHabits,
+    [allVisibleHabits, filteredSet]
+  );
+
+  const allHabitLogs = useMemo(
+    () =>
+      filteredSet
+        ? allLogs.filter((log) => filteredSet.has(log.habitId))
+        : allLogs,
+    [allLogs, filteredSet]
+  );
   const [isCmdPressed, setIsCmdPressed] = useState(false);
 
   const { contributionLevels, dayRatios, completedHabitIds } = useMemo(() => {
@@ -65,14 +92,18 @@ export const ContributionGrid = ({
         logsByDate.get(logDateStr)!.add(log.habitId);
       }
 
-      const totalHabits = visibleHabits.length || 0;
+      const totalHabits = visibleHabits.length || 1;
 
       // Calculate level and ratio for each date
+      // Level is ratio-based: 0% → 0, 1-25% → 1, 26-50% → 2, 51-75% → 3, 76-100% → 4
       logsByDate.forEach((habitIds, dateStr) => {
-        levels.set(dateStr, Math.min(habitIds.size, 4));
+        const ratio = habitIds.size / totalHabits;
+        const level =
+          ratio <= 0 ? 0 : ratio <= 0.25 ? 1 : ratio <= 0.5 ? 2 : ratio <= 0.75 ? 3 : 4;
+        levels.set(dateStr, level);
         ratios.set(dateStr, {
           completed: habitIds.size,
-          total: totalHabits,
+          total: visibleHabits.length || 0,
         });
         completedIds.set(dateStr, new Set(habitIds));
       });
