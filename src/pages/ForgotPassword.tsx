@@ -75,6 +75,9 @@ export default function ForgotPassword() {
             </Button>
           </CardFooter>
         </Card>
+        <p className="mt-16 text-sm text-muted-foreground text-center">
+          GitLife
+        </p>
       </div>
     );
   }
@@ -135,6 +138,9 @@ export default function ForgotPassword() {
           </p>
         </CardFooter>
       </Card>
+      <p className="mt-16 text-sm text-muted-foreground text-center">
+        GitLife
+      </p>
     </div>
   );
 }
