@@ -16,7 +16,7 @@
   "devDependencies": {
     "@vitejs/plugin-react-swc": "^4.2.2",
     "lovable-tagger": "^1.1.13",
-    "oxfmt": "^0.24.0",
+    "oxfmt": "^0.25.0",
     "oxlint": "^1.39.0",
     "vite": "^7.3.1"
   },
