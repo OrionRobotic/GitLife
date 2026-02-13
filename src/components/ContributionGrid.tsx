@@ -1,6 +1,5 @@
 import { useMemo, useState, useEffect, Fragment } from "react";
 import { useHabits } from "@/context/useHabits";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   startOfYear,
   endOfYear,
@@ -260,15 +259,9 @@ export const ContributionGrid = ({
             ))}
           </div>
 
-          {/* Grid */}
+          {/* Grid - when loading, all in-year cells start at lightest orange (level 1) then transition to designated level */}
           <div className="flex gap-[2.5px]">
-            {isLoading ? (
-              <Skeleton
-                className="h-[92px] rounded-md"
-                style={{ width: `${weeks.length * 13.5 - 2.5}px` }}
-              />
-            ) : (
-              weeks.map((week, weekIndex) => (
+              {weeks.map((week, weekIndex) => (
                 <div key={weekIndex} className="flex flex-col gap-[2.5px]">
                   {week.map((day, dayIndexInWeek) => {
                     const dayOfWeek = getDay(day);
@@ -288,7 +281,12 @@ export const ContributionGrid = ({
                     }
 
                     const dateStr = format(day, "yyyyMMdd");
-                    const level = contributionLevels.get(dateStr) || 0;
+                    const actualLevel = contributionLevels.get(dateStr) || 0;
+                    // When loading: start from gray (0) so cells with no contribution stay gray; others animate to their level
+                    const level =
+                      isLoading && isInYear && !future
+                        ? 0
+                        : actualLevel;
                     const ratio = dayRatios.get(dateStr) || {
                       completed: 0,
                       total: visibleHabits.length || 0,
@@ -308,6 +306,7 @@ export const ContributionGrid = ({
                     const showTooltip = isInYear;
                     const formattedDate = format(day, "MMM d");
 
+                    const inYearPastOrToday = isInYear && !future;
                     const button = (
                       <button
                         onClick={() => {
@@ -316,9 +315,17 @@ export const ContributionGrid = ({
                           }
                         }}
                         disabled={!isClickable}
+                        style={
+                          inYearPastOrToday
+                            ? {
+                                backgroundColor: `hsl(var(--contribution-${level}))`,
+                                transition: "background-color 2000ms ease-out",
+                              }
+                            : undefined
+                        }
                         className={`
-                        w-[11px] h-[11px] rounded-[3px] transition-all
-                        ${isInYear && !future ? getContributionClass(level) : "bg-transparent"}
+                        w-[11px] h-[11px] rounded-[3px]
+                        ${!inYearPastOrToday ? "bg-transparent" : ""}
                         ${isFutureEmpty ? "border border-border/50" : "border-0"}
                         ${today ? "!border-0 !ring-0" : ""}
                         ${isSelected ? "ring-2 ring-foreground/50" : ""}
@@ -390,8 +397,7 @@ export const ContributionGrid = ({
                     );
                   })}
                 </div>
-              ))
-            )}
+              ))}
           </div>
         </div>
       </div>
