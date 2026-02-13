@@ -162,7 +162,33 @@ export const ActivityOverview = ({
               fill="#FB8C00"
               fillOpacity={0.3}
               stroke="#F57C00"
-              strokeWidth={data.length === 1 ? 5 : 2}
+              strokeWidth={data.length === 1 ? 2 : 1}
+              dot={(props) => {
+                const { cx, cy } = props;
+                return (
+                  <circle
+                    cx={cx}
+                    cy={cy}
+                    r={3}
+                    fill={chartConfig.percentage.color}
+                    fillOpacity={1}
+                    stroke="none"
+                  />
+                );
+              }}
+              activeDot={(props) => {
+                const { cx, cy } = props;
+                return (
+                  <circle
+                    cx={cx}
+                    cy={cy}
+                    r={4}
+                    fill={chartConfig.percentage.color}
+                    fillOpacity={1}
+                    stroke="none"
+                  />
+                );
+              }}
             />
           </RadarChart>
         </ChartContainer>
