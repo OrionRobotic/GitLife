@@ -2,17 +2,19 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import ContributionPattern from "@/components/ContributionPattern";
+import { MenuButton } from "@/components/MenuButton";
 
 export default function OurMission() {
   return (
     <div className="min-h-screen bg-background">
-      <div className="w-full px-6 py-6">
+      <div className="w-full px-6 py-6 flex items-center justify-between">
         <Link to="/">
           <Button variant="ghost" size="sm" className="gap-2">
             <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
         </Link>
+        <MenuButton />
       </div>
 
       <div className="max-w-4xl mx-auto px-6 pb-12">
