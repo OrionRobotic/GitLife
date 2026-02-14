@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, memo } from "react";
 import { format } from "date-fns";
 import { ContributionGrid } from "@/components/ContributionGrid";
 import { DayEditor } from "@/components/DayEditor";
@@ -18,6 +18,25 @@ import { useDashboards } from "@/hooks/useDashboards";
 import { DashboardTabs } from "@/components/DashboardTabs";
 import { DashboardDialog } from "@/components/DashboardDialog";
 import type { Dashboard } from "@/types/dashboard";
+
+const PageHeader = memo(function PageHeader() {
+  return (
+    <header className="w-full px-6 py-6 flex justify-between items-center">
+      <div className="min-w-0">
+        <h1 className="text-2xl font-normal text-foreground tracking-tight flex items-center gap-2">
+          <img src="/favicon.svg" alt="GitLife" className="w-6 h-6 shrink-0" />
+          <span className="truncate">GitLife</span>
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Commit to a better version of yourself.
+        </p>
+      </div>
+      <div className="flex items-center shrink-0">
+        <MenuButton />
+      </div>
+    </header>
+  );
+});
 
 const Index = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -106,21 +125,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header - full width */}
-      <header className="w-full px-6 py-6 flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-normal text-foreground tracking-tight flex items-center gap-2">
-            <img src="/favicon.svg" alt="GitLife" className="w-6 h-6" />
-            GitLife
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Commit to a better version of yourself.
-          </p>
-        </div>
-        <div className="flex items-center">
-          <MenuButton />
-        </div>
-      </header>
+      {/* Header - isolated so it doesn't re-render when habits data updates (avoids title/subtitle flicker) */}
+      <PageHeader />
 
       {/* Main content - centered */}
       <div className="max-w-4xl mx-auto px-6 py-6">

@@ -49,7 +49,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
@@ -124,7 +124,7 @@ export default function Login() {
           </p>
         </CardFooter>
       </Card>
-      <p className="mt-16 text-sm text-muted-foreground text-center">
+      <p className="mt-8 text-sm text-muted-foreground text-center">
         GitLife
       </p>
     </div>

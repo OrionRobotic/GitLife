@@ -54,35 +54,43 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     Set<string>
   >(new Set());
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [lastFetchTimestamp, setLastFetchTimestamp] = useState<number | null>(
     null
   );
   const { user } = useAuth();
 
-  const loadAllHabitsFromDatabase = useCallback(async () => {
-    if (!user) return;
+  const loadAllHabitsFromDatabase = useCallback(
+    async (silent = false) => {
+      if (!user) return;
 
-    setIsLoading(true);
-    try {
-      const [habits, logs] = await Promise.all([
-        getVisibleHabits(),
-        getHabitsForUser(user.id),
-      ]);
+      // Only show loading skeleton on initial load; avoid flicker when refreshing after add/remove contribution
+      if (!silent) {
+        setIsLoading(true);
+      }
+      try {
+        const [habits, logs] = await Promise.all([
+          getVisibleHabits(),
+          getHabitsForUser(user.id),
+        ]);
 
-      if (habits) {
-        setVisibleHabits(habits);
+        if (habits) {
+          setVisibleHabits(habits);
+        }
+        if (logs) {
+          setAllHabitLogs(logs);
+        }
+        setLastFetchTimestamp(Date.now());
+      } catch (error) {
+        console.error("Error loading all habits from database:", error);
+      } finally {
+        if (!silent) {
+          setIsLoading(false);
+        }
       }
-      if (logs) {
-        setAllHabitLogs(logs);
-      }
-      setLastFetchTimestamp(Date.now());
-    } catch (error) {
-      console.error("Error loading all habits from database:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user]);
+    },
+    [user]
+  );
 
   const refreshVisibleHabits = useCallback(async () => {
     if (!user) return;
@@ -99,7 +107,9 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     if (user) {
       const shouldFetch = !lastFetchTimestamp || refreshTrigger > 0;
       if (shouldFetch) {
-        loadAllHabitsFromDatabase();
+        // First load: non-silent so grid can show light-orange → real level transition
+        const isFirstLoad = lastFetchTimestamp === null;
+        loadAllHabitsFromDatabase(!isFirstLoad);
       }
     }
   }, [user, refreshTrigger, loadAllHabitsFromDatabase]);
@@ -109,7 +119,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       if (lastFetchTimestamp) {
         const fiveMinutes = 5 * 60 * 1000;
         if (Date.now() - lastFetchTimestamp > fiveMinutes) {
-          loadAllHabitsFromDatabase();
+          loadAllHabitsFromDatabase(true); // silent to avoid grid flicker
         }
       }
     }, 60 * 1000);
