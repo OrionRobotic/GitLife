@@ -189,3 +189,41 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Bookshelf */
+.bookshelf-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 2rem 0;
+}
+
+.book-item {
+  width: 64px;
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: filter 0.2s ease;
+}
+
+.book-item:hover {
+  filter: brightness(0.95);
+}
+
+.book-item-title {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  color: rgba(60, 45, 30, 0.7);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-height: calc(100% - 24px);
+  padding: 12px 0;
+}
