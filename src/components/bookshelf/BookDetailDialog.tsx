@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
@@ -44,24 +45,50 @@ export function BookDetailDialog({
   onDelete,
 }: BookDetailDialogProps) {
   const [view, setView] = useState<"main" | "appearance">("main");
+  const [title, setTitle] = useState(book?.title ?? "");
+  const [author, setAuthor] = useState(book?.author ?? "");
   const [notes, setNotes] = useState(book?.notes ?? "");
   const [status, setStatus] = useState(book?.status ?? "reading");
+  const [rating, setRating] = useState<number | null>(book?.rating ?? null);
   const [color, setColor] = useState(book?.color ?? BORDER_SHADES[2].value);
   const [height, setHeight] = useState(book?.height ?? 172);
   const [width, setWidth] = useState(book?.width ?? 64);
   const [borderWidth, setBorderWidth] = useState(book?.borderWidth ?? 1);
+  const [isEditingMeta, setIsEditingMeta] = useState(false);
 
   useEffect(() => {
     if (book) {
+      setTitle(book.title);
+      setAuthor(book.author);
       setNotes(book.notes ?? "");
       setStatus(book.status);
+      setRating(book.rating ?? null);
       setColor(book.color);
       setHeight(book.height);
       setWidth(book.width);
       setBorderWidth(book.borderWidth);
       setView("main");
+      setIsEditingMeta(false);
     }
   }, [book?.id]);
+
+  const handleTitleBlur = () => {
+    const trimmed = title.trim();
+    if (book && trimmed && trimmed !== book.title) {
+      onUpdate(book.id, { title: trimmed });
+    } else if (book && !trimmed) {
+      setTitle(book.title);
+    }
+  };
+
+  const handleAuthorBlur = () => {
+    const trimmed = author.trim();
+    if (book && trimmed !== book.author) {
+      onUpdate(book.id, { author: trimmed });
+    } else if (book && !trimmed) {
+      setAuthor(book.author);
+    }
+  };
 
   const handleNotesBlur = () => {
     if (book && notes !== (book.notes ?? "")) {
@@ -73,6 +100,13 @@ export function BookDetailDialog({
     setStatus(newStatus as "reading" | "read");
     if (book) {
       onUpdate(book.id, { status: newStatus as "reading" | "read" });
+    }
+  };
+
+  const handleRatingChange = (value: number | null) => {
+    setRating(value);
+    if (book) {
+      onUpdate(book.id, { rating: value });
     }
   };
 
@@ -101,6 +135,28 @@ export function BookDetailDialog({
     }
   };
 
+  const startEditingMeta = () => {
+    if (book) {
+      setTitle(book.title);
+      setAuthor(book.author);
+    }
+    setIsEditingMeta(true);
+  };
+
+  const handleMetaCancel = () => {
+    if (book) {
+      setTitle(book.title);
+      setAuthor(book.author);
+    }
+    setIsEditingMeta(false);
+  };
+
+  const handleMetaSave = () => {
+    handleTitleBlur();
+    handleAuthorBlur();
+    setIsEditingMeta(false);
+  };
+
   const handleDelete = () => {
     if (book) {
       onDelete(book.id);
@@ -115,10 +171,13 @@ export function BookDetailDialog({
       open={open}
       onOpenChange={(isOpen) => {
         if (!isOpen) {
+          handleTitleBlur();
+          handleAuthorBlur();
           handleNotesBlur();
           handleHeightCommit();
           handleWidthCommit();
           handleBorderWidthCommit();
+          setIsEditingMeta(false);
         }
         onOpenChange(isOpen);
       }}
@@ -127,15 +186,75 @@ export function BookDetailDialog({
         {view === "main" ? (
           <>
             <DialogHeader>
-              <DialogTitle className="text-xl">{book.title}</DialogTitle>
+              <DialogTitle className="text-xl">{title}</DialogTitle>
             </DialogHeader>
             <div className="flex flex-col gap-4 mt-2">
-              <div className="flex items-center justify-between">
-                <p className="text-muted-foreground">{book.author}</p>
-                <Badge variant={status === "read" ? "default" : "secondary"}>
-                  {status === "read" ? "Read" : "Reading"}
-                </Badge>
-              </div>
+              {isEditingMeta ? (
+                <>
+                  <div className="flex flex-col gap-2">
+                    <Label className="text-sm font-medium">Title</Label>
+                    <Input
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      onBlur={handleTitleBlur}
+                      placeholder="Book title"
+                      className="text-base font-medium"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Label className="text-sm font-medium">Author</Label>
+                    <Input
+                      value={author}
+                      onChange={(e) => setAuthor(e.target.value)}
+                      onBlur={handleAuthorBlur}
+                      placeholder="Author"
+                      className="text-muted-foreground"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-8 px-3 text-xs"
+                        onClick={handleMetaCancel}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="h-8 px-3 text-xs"
+                        onClick={handleMetaSave}
+                      >
+                        Save
+                      </Button>
+                    </div>
+                    <Badge variant={status === "read" ? "default" : "secondary"}>
+                      {status === "read" ? "Read" : "Reading"}
+                    </Badge>
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <p className="text-muted-foreground">{author}</p>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
+                      onClick={startEditingMeta}
+                    >
+                      Edit
+                    </Button>
+                    <Badge variant={status === "read" ? "default" : "secondary"}>
+                      {status === "read" ? "Read" : "Reading"}
+                    </Badge>
+                  </div>
+                </div>
+              )}
               <p className="text-sm text-muted-foreground">
                 Added {format(new Date(book.createdAt), "MMMM d, yyyy")}
               </p>
@@ -150,6 +269,42 @@ export function BookDetailDialog({
                     <SelectItem value="read">Read</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium">Rating</label>
+                <div className="flex items-center gap-1.5">
+                  {[1, 2, 3, 4, 5].map((value) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() =>
+                        handleRatingChange(rating === value ? null : value)
+                      }
+                      className="rounded-full transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 p-0.5"
+                      title={`${value} of 5`}
+                      aria-label={`Rate ${value} of 5`}
+                    >
+                      <span
+                        className="block w-2 h-2 rounded-full transition-colors"
+                        style={{
+                          backgroundColor:
+                            rating !== null && value <= rating
+                              ? "hsl(var(--chart-1))"
+                              : "hsl(var(--muted-foreground) / 0.35)",
+                        }}
+                      />
+                    </button>
+                  ))}
+                  {rating !== null && (
+                    <button
+                      type="button"
+                      onClick={() => handleRatingChange(null)}
+                      className="text-xs text-muted-foreground hover:text-foreground ml-2 underline underline-offset-2"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium">Notes</label>
