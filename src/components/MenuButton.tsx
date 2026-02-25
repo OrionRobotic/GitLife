@@ -9,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu, LogOut, User, BookOpen } from "lucide-react";
+import { Menu, LogOut, User, BookOpen, Library } from "lucide-react";
 
 export const MenuButton = () => {
   const [open, setOpen] = useState(false);
@@ -44,7 +44,13 @@ export const MenuButton = () => {
         className="w-[300px] sm:w-[400px] flex flex-col"
       >
         <SheetHeader>
-          <SheetTitle>Menu</SheetTitle>
+          <SheetTitle
+            className="text-2xl font-normal tracking-tight cursor-pointer hover:opacity-70 transition-opacity flex items-center gap-2"
+            onClick={() => handleNavigate("/")}
+          >
+            <img src="/favicon.svg" alt="GitLife" className="w-6 h-6 shrink-0" />
+            GitLife
+          </SheetTitle>
         </SheetHeader>
         <div className="mt-8 flex flex-col gap-2 flex-1">
           <Button
@@ -54,6 +60,14 @@ export const MenuButton = () => {
           >
             <div className="h-3.5 w-3.5 rounded-sm bg-[hsl(22,95%,50%)]" />
             <span>Our Mission</span>
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3 h-12 text-base"
+            onClick={() => handleNavigate("/bookshelf")}
+          >
+            <Library className="h-5 w-5" />
+            <span>Bookshelf</span>
           </Button>
           <Button
             variant="ghost"

@@ -55,9 +55,8 @@ const ContributionPattern = () => {
     function animate() {
       time += 0.008;
 
-      // Background — matches the app background hsl(40, 33%, 96%)
-      ctx!.fillStyle = "hsl(40, 33%, 96%)";
-      ctx!.fillRect(0, 0, size, size);
+      // Clear to transparent (no background)
+      ctx!.clearRect(0, 0, size, size);
 
       const cx = size / 2;
       const cy = size / 2;

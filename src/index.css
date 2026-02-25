@@ -10,7 +10,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 40 33% 96%;
+    --background: 60 33% 98%; /* #FDFDF7 */
     --foreground: 30 10% 20%;
 
     --card: 40 30% 98%;
@@ -188,4 +188,71 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Bookshelf */
+.bookshelf-viewport {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 28rem; /* ~6 books visible (64px + 6px gap each) */
+  padding: 2rem 0;
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
+}
+
+.bookshelf-viewport::-webkit-scrollbar {
+  height: 8px;
+}
+
+.bookshelf-viewport::-webkit-scrollbar-track {
+  background: hsl(var(--muted) / 0.5);
+  border-radius: 4px;
+}
+
+.bookshelf-viewport::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
+}
+
+.bookshelf-viewport::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.45);
+}
+
+.bookshelf-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  width: max-content;
+  min-width: 100%;
+}
+
+.book-item {
+  width: 64px;
+  border-radius: 5px;
+  border: 1px solid #ABBFB8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: filter 0.2s ease;
+}
+
+.book-item:hover {
+  filter: brightness(0.97);
+}
+
+.book-item-title {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  color: hsl(var(--muted-foreground));
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-height: calc(100% - 24px);
+  padding: 12px 0;
 }

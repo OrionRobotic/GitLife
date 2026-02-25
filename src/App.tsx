@@ -11,6 +11,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import Account from "./pages/Account";
 import OurMission from "./pages/OurMission";
 import HowToUse from "./pages/HowToUse";
+import Bookshelf from "./pages/Bookshelf";
 import { HabitsProvider } from "@/context/HabitsContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -58,6 +59,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <HowToUse />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/bookshelf"
+                element={
+                  <ProtectedRoute>
+                    <Bookshelf />
                   </ProtectedRoute>
                 }
               />
