@@ -12,6 +12,8 @@ import Account from "./pages/Account";
 import OurMission from "./pages/OurMission";
 import HowToUse from "./pages/HowToUse";
 import Bookshelf from "./pages/Bookshelf";
+import Blogs from "./pages/Blogs";
+import BlogEditor from "./pages/BlogEditor";
 import { HabitsProvider } from "@/context/HabitsContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -67,6 +69,22 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Bookshelf />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/blogs"
+                element={
+                  <ProtectedRoute>
+                    <Blogs />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/blogs/:id"
+                element={
+                  <ProtectedRoute>
+                    <BlogEditor />
                   </ProtectedRoute>
                 }
               />

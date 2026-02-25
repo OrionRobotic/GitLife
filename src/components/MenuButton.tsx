@@ -9,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu, LogOut, User, BookOpen, Library } from "lucide-react";
+import { Menu, LogOut, User, BookOpen, Library, PenLine } from "lucide-react";
 
 export const MenuButton = () => {
   const [open, setOpen] = useState(false);
@@ -68,6 +68,14 @@ export const MenuButton = () => {
           >
             <Library className="h-5 w-5" />
             <span>Bookshelf</span>
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3 h-12 text-base"
+            onClick={() => handleNavigate("/blogs")}
+          >
+            <PenLine className="h-5 w-5" />
+            <span>Blogs</span>
           </Button>
           <Button
             variant="ghost"

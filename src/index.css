@@ -242,6 +242,116 @@ All colors MUST be HSL.
   filter: brightness(0.97);
 }
 
+/* ── TipTap blog editor ─────────────────────────────────────── */
+.blog-editor .ProseMirror {
+  outline: none;
+  min-height: 60vh;
+  font-size: 1.125rem; /* text-lg */
+  line-height: 1.75;
+  color: hsl(var(--foreground) / 0.9);
+}
+
+.blog-editor .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: hsl(var(--muted-foreground) / 0.4);
+  pointer-events: none;
+  float: left;
+  height: 0;
+}
+
+.blog-editor .ProseMirror h2 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: 1.5rem 0 0.5rem;
+  color: hsl(var(--foreground));
+}
+
+.blog-editor .ProseMirror h3 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin: 1.25rem 0 0.4rem;
+  color: hsl(var(--foreground));
+}
+
+.blog-editor .ProseMirror p {
+  margin: 0.5rem 0;
+}
+
+.blog-editor .ProseMirror strong {
+  font-weight: 600;
+}
+
+.blog-editor .ProseMirror ul,
+.blog-editor .ProseMirror ol {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.blog-editor .ProseMirror li {
+  margin: 0.2rem 0;
+}
+
+.blog-editor .ProseMirror mark {
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+/* ── Blog content (view mode) ───────────────────────────────── */
+.blog-content {
+  font-size: 1.125rem;
+  line-height: 1.75;
+  color: hsl(var(--foreground) / 0.9);
+}
+
+.blog-content p {
+  margin: 0.5rem 0;
+}
+
+.blog-content h2 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: 1.5rem 0 0.5rem;
+  color: hsl(var(--foreground));
+}
+
+.blog-content h3 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin: 1.25rem 0 0.4rem;
+  color: hsl(var(--foreground));
+}
+
+.blog-content strong {
+  font-weight: 600;
+}
+
+.blog-content ul,
+.blog-content ol {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.blog-content li {
+  margin: 0.2rem 0;
+}
+
+.blog-content img {
+  max-width: 100%;
+  border-radius: 6px;
+  margin: 1.25rem auto;
+  display: block;
+}
+
+.blog-content mark {
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+.blog-content .empty-hint {
+  color: hsl(var(--muted-foreground) / 0.4);
+}
+
+/* ── Bookshelf ──────────────────────────────────────────────── */
 .book-item-title {
   writing-mode: vertical-rl;
   text-orientation: mixed;
