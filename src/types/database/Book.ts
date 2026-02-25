@@ -8,6 +8,8 @@ export interface Book extends BaseTable {
   notes: string | null;
   color: string;
   height: number;
+  width: number;
+  borderWidth: number;
 }
 
 export interface BookCreateInput {
@@ -16,6 +18,8 @@ export interface BookCreateInput {
   status: "reading" | "read";
   color?: string;
   height?: number;
+  width?: number;
+  borderWidth?: number;
 }
 
 export interface BookUpdateInput extends Partial<Omit<Book, "id" | "createdAt" | "userId">> {

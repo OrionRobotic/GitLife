@@ -16,16 +16,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Trash2 } from "lucide-react";
+import { Trash2, Palette, ChevronLeft } from "lucide-react";
 import { format } from "date-fns";
 import { Book } from "@/types/database";
 
-const CREAM_SHADES = [
-  { value: "#F5EDE0", label: "Lightest" },
-  { value: "#E8DFD0", label: "Light" },
-  { value: "#D8CCBA", label: "Medium" },
-  { value: "#C5B8A0", label: "Warm" },
-  { value: "#B0A088", label: "Dark" },
+const BORDER_SHADES = [
+  { value: "#D5E3DF", label: "Lightest" },
+  { value: "#C3D4D0", label: "Light" },
+  { value: "#ABBFB8", label: "Medium" },
+  { value: "#8EA8A1", label: "Dark" },
+  { value: "#708F88", label: "Darkest" },
 ];
 
 interface BookDetailDialogProps {
@@ -43,10 +43,13 @@ export function BookDetailDialog({
   onUpdate,
   onDelete,
 }: BookDetailDialogProps) {
+  const [view, setView] = useState<"main" | "appearance">("main");
   const [notes, setNotes] = useState(book?.notes ?? "");
   const [status, setStatus] = useState(book?.status ?? "reading");
-  const [color, setColor] = useState(book?.color ?? CREAM_SHADES[2].value);
-  const [height, setHeight] = useState(book?.height ?? 220);
+  const [color, setColor] = useState(book?.color ?? BORDER_SHADES[2].value);
+  const [height, setHeight] = useState(book?.height ?? 172);
+  const [width, setWidth] = useState(book?.width ?? 64);
+  const [borderWidth, setBorderWidth] = useState(book?.borderWidth ?? 1);
 
   useEffect(() => {
     if (book) {
@@ -54,8 +57,11 @@ export function BookDetailDialog({
       setStatus(book.status);
       setColor(book.color);
       setHeight(book.height);
+      setWidth(book.width);
+      setBorderWidth(book.borderWidth);
+      setView("main");
     }
-  }, [book?.id, book?.notes, book?.status, book?.color, book?.height]);
+  }, [book?.id]);
 
   const handleNotesBlur = () => {
     if (book && notes !== (book.notes ?? "")) {
@@ -77,13 +83,21 @@ export function BookDetailDialog({
     }
   };
 
-  const handleHeightChange = (newHeight: number) => {
-    setHeight(newHeight);
-  };
-
   const handleHeightCommit = () => {
     if (book && height !== book.height) {
       onUpdate(book.id, { height });
+    }
+  };
+
+  const handleWidthCommit = () => {
+    if (book && width !== book.width) {
+      onUpdate(book.id, { width });
+    }
+  };
+
+  const handleBorderWidthCommit = () => {
+    if (book && borderWidth !== book.borderWidth) {
+      onUpdate(book.id, { borderWidth });
     }
   };
 
@@ -103,93 +117,164 @@ export function BookDetailDialog({
         if (!isOpen) {
           handleNotesBlur();
           handleHeightCommit();
+          handleWidthCommit();
+          handleBorderWidthCommit();
         }
         onOpenChange(isOpen);
       }}
     >
       <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle className="text-xl">{book.title}</DialogTitle>
-        </DialogHeader>
-        <div className="flex flex-col gap-4 mt-2">
-          <div className="flex items-center justify-between">
-            <p className="text-muted-foreground">{book.author}</p>
-            <Badge variant={status === "read" ? "default" : "secondary"}>
-              {status === "read" ? "Read" : "Reading"}
-            </Badge>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Added {format(new Date(book.createdAt), "MMMM d, yyyy")}
-          </p>
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Status</label>
-            <Select value={status} onValueChange={handleStatusChange}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="reading">Reading</SelectItem>
-                <SelectItem value="read">Read</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label>Color</Label>
-            <div className="flex gap-2">
-              {CREAM_SHADES.map((shade) => (
-                <button
-                  key={shade.value}
-                  type="button"
-                  className="w-10 h-10 rounded-md border-2 transition-all"
-                  style={{
-                    backgroundColor: shade.value,
-                    borderColor: color === shade.value ? "rgba(60,45,30,0.6)" : "rgba(0,0,0,0.1)",
-                    transform: color === shade.value ? "scale(1.1)" : "scale(1)",
-                  }}
-                  onClick={() => handleColorChange(shade.value)}
-                  title={shade.label}
+        {view === "main" ? (
+          <>
+            <DialogHeader>
+              <DialogTitle className="text-xl">{book.title}</DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col gap-4 mt-2">
+              <div className="flex items-center justify-between">
+                <p className="text-muted-foreground">{book.author}</p>
+                <Badge variant={status === "read" ? "default" : "secondary"}>
+                  {status === "read" ? "Read" : "Reading"}
+                </Badge>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Added {format(new Date(book.createdAt), "MMMM d, yyyy")}
+              </p>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium">Status</label>
+                <Select value={status} onValueChange={handleStatusChange}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="reading">Reading</SelectItem>
+                    <SelectItem value="read">Read</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium">Notes</label>
+                <Textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  onBlur={handleNotesBlur}
+                  placeholder="Add your thoughts about this book..."
+                  rows={8}
                 />
-              ))}
+              </div>
+              <div className="flex items-center justify-between mt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-muted-foreground border-muted-foreground/30 hover:bg-muted gap-2"
+                  onClick={() => setView("appearance")}
+                >
+                  <Palette className="h-4 w-4" />
+                  Appearance
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-muted-foreground border-muted-foreground/30 hover:bg-muted"
+                  onClick={handleDelete}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Book
+                </Button>
+              </div>
             </div>
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label>Height — {height}px</Label>
-            <input
-              type="range"
-              min={140}
-              max={200}
-              step={10}
-              value={height}
-              onChange={(e) => handleHeightChange(Number(e.target.value))}
-              onMouseUp={handleHeightCommit}
-              onTouchEnd={handleHeightCommit}
-              className="w-full accent-[#B0A088]"
-            />
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Short</span>
-              <span>Tall</span>
+          </>
+        ) : (
+          <>
+            <DialogHeader>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setView("main")}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+                <DialogTitle className="text-xl">Appearance</DialogTitle>
+              </div>
+            </DialogHeader>
+            <div className="flex flex-col gap-6 mt-2">
+              <div className="flex flex-col gap-2">
+                <Label>Border Color</Label>
+                <div className="flex gap-2">
+                  {BORDER_SHADES.map((shade) => (
+                    <button
+                      key={shade.value}
+                      type="button"
+                      className="w-10 h-10 rounded-md transition-all"
+                      style={{
+                        backgroundColor: "#FAF9F6",
+                        border: `3px solid ${shade.value}`,
+                        outline: color === shade.value ? `2px solid ${shade.value}` : "2px solid transparent",
+                        outlineOffset: "2px",
+                        transform: color === shade.value ? "scale(1.1)" : "scale(1)",
+                      }}
+                      onClick={() => handleColorChange(shade.value)}
+                      title={shade.label}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label>Height — {height}px</Label>
+                <input
+                  type="range"
+                  min={140}
+                  max={250}
+                  step={4}
+                  value={height}
+                  onChange={(e) => setHeight(Number(e.target.value))}
+                  onMouseUp={handleHeightCommit}
+                  onTouchEnd={handleHeightCommit}
+                  className="w-full accent-[#ABBFB8]"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Short</span>
+                  <span>Tall</span>
+                </div>
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label>Width — {width}px</Label>
+                <input
+                  type="range"
+                  min={48}
+                  max={95}
+                  step={1}
+                  value={width}
+                  onChange={(e) => setWidth(Number(e.target.value))}
+                  onMouseUp={handleWidthCommit}
+                  onTouchEnd={handleWidthCommit}
+                  className="w-full accent-[#ABBFB8]"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Narrow</span>
+                  <span>Wide</span>
+                </div>
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label>Border — {borderWidth}px</Label>
+                <input
+                  type="range"
+                  min={1}
+                  max={4}
+                  step={1}
+                  value={borderWidth}
+                  onChange={(e) => setBorderWidth(Number(e.target.value))}
+                  onMouseUp={handleBorderWidthCommit}
+                  onTouchEnd={handleBorderWidthCommit}
+                  className="w-full accent-[#ABBFB8]"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Thin</span>
+                  <span>Thick</span>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Notes</label>
-            <Textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              onBlur={handleNotesBlur}
-              placeholder="Add your thoughts about this book..."
-              rows={4}
-            />
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-fit mt-2 text-muted-foreground border-muted-foreground/30 hover:bg-muted"
-            onClick={handleDelete}
-          >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Delete Book
-          </Button>
-        </div>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );

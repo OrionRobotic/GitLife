@@ -16,7 +16,7 @@ export function Book3D({ book, onClick }: Book3DProps) {
       <TooltipTrigger asChild>
         <div
           className="book-item"
-          style={{ backgroundColor: book.color, height: book.height }}
+          style={{ backgroundColor: "#FAF9F6", borderColor: book.color, borderWidth: book.borderWidth, width: book.width, height: book.height }}
           onClick={() => onClick(book)}
         >
           <span className="book-item-title">{book.title}</span>
@@ -24,7 +24,7 @@ export function Book3D({ book, onClick }: Book3DProps) {
       </TooltipTrigger>
       <TooltipContent
         side="top"
-        className="!bg-[rgba(245,240,230,0.9)] !border-[rgba(200,190,175,0.4)] text-foreground backdrop-blur-sm shadow-lg"
+        className="!bg-card/95 !border-border text-card-foreground backdrop-blur-sm shadow-lg"
       >
         <p className="font-medium text-sm">{book.title}</p>
         {book.author && (

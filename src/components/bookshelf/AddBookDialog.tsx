@@ -17,14 +17,6 @@ import {
 } from "@/components/ui/select";
 import { BookCreateInput } from "@/types/database";
 
-const CREAM_SHADES = [
-  { value: "#F5EDE0", label: "Lightest" },
-  { value: "#E8DFD0", label: "Light" },
-  { value: "#D8CCBA", label: "Medium" },
-  { value: "#C5B8A0", label: "Warm" },
-  { value: "#B0A088", label: "Dark" },
-];
-
 interface AddBookDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -35,18 +27,14 @@ export function AddBookDialog({ open, onOpenChange, onSubmit }: AddBookDialogPro
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [status, setStatus] = useState<"reading" | "read">("reading");
-  const [color, setColor] = useState(CREAM_SHADES[2].value);
-  const [height, setHeight] = useState(220);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !author.trim()) return;
-    onSubmit({ title: title.trim(), author: author.trim(), status, color, height });
+    onSubmit({ title: title.trim(), author: author.trim(), status });
     setTitle("");
     setAuthor("");
     setStatus("reading");
-    setColor(CREAM_SHADES[2].value);
-    setHeight(220);
     onOpenChange(false);
   };
 
@@ -88,41 +76,6 @@ export function AddBookDialog({ open, onOpenChange, onSubmit }: AddBookDialogPro
                 <SelectItem value="read">Read</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label>Color</Label>
-            <div className="flex gap-2">
-              {CREAM_SHADES.map((shade) => (
-                <button
-                  key={shade.value}
-                  type="button"
-                  className="w-10 h-10 rounded-md border-2 transition-all"
-                  style={{
-                    backgroundColor: shade.value,
-                    borderColor: color === shade.value ? "rgba(60,45,30,0.6)" : "rgba(0,0,0,0.1)",
-                    transform: color === shade.value ? "scale(1.1)" : "scale(1)",
-                  }}
-                  onClick={() => setColor(shade.value)}
-                  title={shade.label}
-                />
-              ))}
-            </div>
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label>Height — {height}px</Label>
-            <input
-              type="range"
-              min={140}
-              max={200}
-              step={10}
-              value={height}
-              onChange={(e) => setHeight(Number(e.target.value))}
-              className="w-full accent-[#B0A088]"
-            />
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Short</span>
-              <span>Tall</span>
-            </div>
           </div>
           <Button type="submit" className="mt-2">
             Add Book

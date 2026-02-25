@@ -8,12 +8,14 @@ interface BookShelfProps {
 
 export function BookShelf({ books, onBookClick }: BookShelfProps) {
   return (
-    <div className="bookshelf-row">
-      {books.map((book) => (
-        <Book3D key={book.id} book={book} onClick={onBookClick} />
-      ))}
+    <div className="bookshelf-viewport">
+      <div className="bookshelf-row">
+        {books.map((book) => (
+          <Book3D key={book.id} book={book} onClick={onBookClick} />
+        ))}
+      </div>
       {books.length === 0 && (
-        <p className="text-muted-foreground text-sm italic">
+        <p className="text-muted-foreground text-sm italic py-8">
           No books yet. Add your first book!
         </p>
       )}

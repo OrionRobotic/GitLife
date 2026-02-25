@@ -1,10 +1,8 @@
 import { supabase } from "@/lib/supabase";
 import { Book, BookCreateInput } from "@/types/database";
 
-const BOOK_COLORS = [
-  "#C2B59B", "#A89880", "#B5A48A", "#9E8E74", "#BEB09A",
-  "#A09078", "#B8A890", "#C5B8A0", "#8E8068", "#B0A088",
-  "#ADA08A", "#C0B298", "#978A72", "#BAA990", "#A69882",
+const BORDER_SHADES = [
+  "#D5E3DF", "#C3D4D0", "#ABBFB8", "#8EA8A1", "#708F88",
 ];
 
 /**
@@ -18,8 +16,10 @@ export async function createBook(
   userId: string
 ): Promise<Book | null> {
   try {
-    const color = bookInput.color ?? BOOK_COLORS[Math.floor(Math.random() * BOOK_COLORS.length)];
-    const height = bookInput.height ?? Math.floor(Math.random() * 40) + 140;
+    const color = bookInput.color ?? BORDER_SHADES[Math.floor(Math.random() * BORDER_SHADES.length)];
+    const height = bookInput.height ?? Math.floor(Math.random() * 14) * 4 + 140;
+    const width = bookInput.width ?? Math.floor(Math.random() * 48) + 48;
+    const borderWidth = bookInput.borderWidth ?? 1;
 
     const { data, error } = await supabase
       .from("books")
@@ -31,6 +31,8 @@ export async function createBook(
           userId: userId,
           color: color,
           height: height,
+          width: width,
+          borderWidth: borderWidth,
         },
       ])
       .select()

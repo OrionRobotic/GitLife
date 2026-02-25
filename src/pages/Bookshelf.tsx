@@ -99,6 +99,13 @@ export default function Bookshelf() {
         )}
       </div>
 
+      <div className="max-w-4xl mx-auto px-6 py-8">
+        <p className="text-sm italic text-muted-foreground/70 text-right">
+          "A reader lives a thousand lives before he dies. The man who never reads lives only one."
+        </p>
+        <p className="text-xs text-muted-foreground/50 text-right mt-1">— George R.R. Martin</p>
+      </div>
+
       <div className="max-w-4xl mx-auto px-6 flex justify-end gap-2 items-start">
         <div className="relative">
           {searchOpen ? (
@@ -145,14 +152,19 @@ export default function Bookshelf() {
             <Button
               variant="outline"
               size="icon"
-              className="h-9 w-9"
+              className="h-9 w-9 border-[#D97757] hover:border-[#D97757] hover:bg-background"
               onClick={() => setSearchOpen(true)}
             >
               <Search className="h-4 w-4" />
             </Button>
           )}
         </div>
-        <Button variant="outline" size="sm" onClick={() => setAddOpen(true)}>
+        <Button
+          variant="outline"
+          size="sm"
+          className="border-[#D97757] hover:border-[#D97757] hover:bg-background"
+          onClick={() => setAddOpen(true)}
+        >
           <Plus className="h-4 w-4 mr-2" />
           Add Book
         </Button>
