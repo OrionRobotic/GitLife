@@ -6,6 +6,8 @@ export interface Book extends BaseTable {
   author: string;
   status: "reading" | "read";
   notes: string | null;
+  /** User rating 1–5, null if not rated */
+  rating: number | null;
   color: string;
   height: number;
   width: number;
@@ -16,6 +18,7 @@ export interface BookCreateInput {
   title: string;
   author: string;
   status: "reading" | "read";
+  rating?: number | null;
   color?: string;
   height?: number;
   width?: number;

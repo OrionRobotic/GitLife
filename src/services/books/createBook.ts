@@ -29,6 +29,7 @@ export async function createBook(
           author: bookInput.author,
           status: bookInput.status,
           userId: userId,
+          rating: bookInput.rating ?? null,
           color: color,
           height: height,
           width: width,
