@@ -1,6 +1,7 @@
 export type { BaseTable } from "./BaseTable";
 export type { Habit, HabitCreateInput, HabitUpdateInput } from "./Habit";
 export type { Book, BookCreateInput, BookUpdateInput } from "./Book";
+export type { Blog, BlogCreateInput, BlogUpdateInput } from "./Blog";
 export type {
   HabitLog,
   HabitLogCreateInput,
