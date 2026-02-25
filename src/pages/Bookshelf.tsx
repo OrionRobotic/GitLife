@@ -8,6 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Book, BookCreateInput } from "@/types/database";
 import { getBooks, createBook, updateBook, deleteBook } from "@/services/books";
 import { BookShelf } from "@/components/bookshelf/BookShelf";
+import { BookshelfMetrics } from "@/components/bookshelf/BookshelfMetrics";
 import { AddBookDialog } from "@/components/bookshelf/AddBookDialog";
 import { BookDetailDialog } from "@/components/bookshelf/BookDetailDialog";
 
@@ -95,7 +96,12 @@ export default function Bookshelf() {
         {loading ? (
           <p className="text-muted-foreground text-center py-12">Loading...</p>
         ) : (
-          <BookShelf books={books} onBookClick={handleBookClick} />
+          <div className="flex gap-8 items-start">
+            <div className="min-w-0 flex-1">
+              <BookShelf books={books} onBookClick={handleBookClick} />
+            </div>
+            <BookshelfMetrics books={books} onBookClick={handleBookClick} />
+          </div>
         )}
       </div>
 

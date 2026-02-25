@@ -227,6 +227,7 @@ All colors MUST be HSL.
 }
 
 .book-item {
+  width: 64px;
   border-radius: 5px;
   border: 1px solid #ABBFB8;
   cursor: pointer;
@@ -247,8 +248,8 @@ All colors MUST be HSL.
   color: hsl(var(--muted-foreground));
   font-size: 13px;
   font-weight: 500;
-  letter-spacing: 0.5px;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
