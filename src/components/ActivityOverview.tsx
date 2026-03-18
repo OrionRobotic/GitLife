@@ -47,12 +47,12 @@ export const ActivityOverview = ({
   filteredHabitIds,
 }: ActivityOverviewProps) => {
   const [period, setPeriod] = useState<PeriodKey>("week");
+  const [showTotal, setShowTotal] = useState(false);
   const { visibleHabits, allHabitLogs } = useHabits();
 
   const data = useMemo(() => {
-    const filterSet = filteredHabitIds
-      ? new Set(filteredHabitIds)
-      : null;
+    const activeFilter = showTotal ? null : filteredHabitIds;
+    const filterSet = activeFilter ? new Set(activeFilter) : null;
 
     const habits = filterSet
       ? visibleHabits.filter((h) => filterSet.has(h.id))
@@ -94,7 +94,7 @@ export const ActivityOverview = ({
         ((habitDayCounts.get(habit.id)?.size ?? 0) / totalDays) * 100
       ),
     }));
-  }, [visibleHabits, allHabitLogs, filteredHabitIds, period]);
+  }, [visibleHabits, allHabitLogs, filteredHabitIds, showTotal, period]);
 
   const radarData = useMemo(() => {
     if (data.length === 1) {
@@ -108,11 +108,17 @@ export const ActivityOverview = ({
 
   const dummyCount = radarData.length - data.length;
 
+  // Only draw grid spokes for real data axes — exclude dummy padding entries.
+  // Recharts places n points starting at 90° going clockwise: angle_i = 90 - (i/n)*360
+  const visiblePolarAngles = dummyCount > 0
+    ? Array.from({ length: data.length }, (_, i) => 90 - (i / radarData.length) * 360)
+    : undefined;
+
   if (!data.length) return null;
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-3">
+      <div className={`flex items-center justify-between ${filteredHabitIds ? "mb-1" : "mb-3"}`}>
         <h3 className="text-lg font-normal text-foreground font-serif tracking-tight">
           Activity Overview
         </h3>
@@ -132,12 +138,26 @@ export const ActivityOverview = ({
           ))}
         </div>
       </div>
+      {filteredHabitIds && (
+        <div className="mb-3">
+          <button
+            onClick={() => setShowTotal((v) => !v)}
+            className={`px-2 py-0.5 text-xs rounded transition-colors ${
+              showTotal
+                ? "bg-foreground/20 text-foreground"
+                : "bg-foreground/10 text-muted-foreground hover:bg-foreground/15"
+            }`}
+          >
+            Total
+          </button>
+        </div>
+      )}
       <ChartContainer
           config={chartConfig}
-          className={`mx-auto aspect-square max-h-[250px] w-full [&_.recharts-polar-grid-concentric-polygon]:hidden [&_.recharts-polar-grid-concentric-circle]:hidden ${dummyCount === 1 ? "[&_.recharts-polar-grid-angle_line:last-child]:hidden" : ""} ${dummyCount === 2 ? "[&_.recharts-polar-grid-angle_line:nth-last-child(-n+2)]:hidden" : ""}`}
+          className="mx-auto aspect-square max-h-[250px] w-full [&_.recharts-polar-grid-concentric-polygon]:hidden [&_.recharts-polar-grid-concentric-circle]:hidden"
         >
           <RadarChart data={radarData}>
-            <PolarGrid />
+            <PolarGrid {...(visiblePolarAngles ? { polarAngles: visiblePolarAngles } : {})} />
             <PolarAngleAxis
               dataKey="habit"
               tick={({ x, y, payload, textAnchor }: any) => {
@@ -163,8 +183,9 @@ export const ActivityOverview = ({
               fillOpacity={0.3}
               stroke="#F57C00"
               strokeWidth={data.length === 1 ? 2 : 1}
-              dot={(props) => {
-                const { cx, cy } = props;
+              dot={(props: any) => {
+                const { cx, cy, payload } = props;
+                if (payload?.habit === "\u200B" || payload?.habit === "\u200C") return <g />;
                 return (
                   <circle
                     cx={cx}
@@ -176,8 +197,9 @@ export const ActivityOverview = ({
                   />
                 );
               }}
-              activeDot={(props) => {
-                const { cx, cy } = props;
+              activeDot={(props: any) => {
+                const { cx, cy, payload } = props;
+                if (payload?.habit === "\u200B" || payload?.habit === "\u200C") return <g />;
                 return (
                   <circle
                     cx={cx}

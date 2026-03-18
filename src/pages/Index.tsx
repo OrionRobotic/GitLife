@@ -12,6 +12,7 @@ import {
 import { useHabits } from "@/context/useHabits";
 import { MenuButton } from "@/components/MenuButton";
 import { ActivityOverview } from "@/components/ActivityOverview";
+import { GoalsSection } from "@/components/GoalsSection";
 import { Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDashboards } from "@/hooks/useDashboards";
@@ -227,7 +228,6 @@ const Index = () => {
                   <DayEditor
                     date={selectedDate || new Date()}
                     onClose={() => setIsPopoverOpen(false)}
-                    filteredHabitIds={filteredHabitIds}
                   />
                 )}
               </PopoverContent>
@@ -238,6 +238,9 @@ const Index = () => {
           <div className="mt-4">
             <ActivityOverview filteredHabitIds={filteredHabitIds} />
           </div>
+
+          {/* Goals */}
+          <GoalsSection />
 
           <p className="mt-16 text-sm text-muted-foreground text-center">
             GitLife

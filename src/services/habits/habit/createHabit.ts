@@ -18,6 +18,7 @@ export async function createHabit(
         {
           name: habitInput.name,
           userId: userId,
+          icon: habitInput.icon || "BookOpen",
         },
       ])
       .select()

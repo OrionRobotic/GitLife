@@ -1,6 +1,5 @@
 import {
   createContext,
-  useContext,
   useState,
   useEffect,
   useCallback,
@@ -9,10 +8,9 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import {
   createHabit,
+  deleteHabit,
   getHabitsForUser,
   getVisibleHabits,
-  addHabitLogForToday,
-  removeHabitLogForToday,
   addHabitLogForDate,
   removeHabitLogForDate,
 } from "@/services/habits";
@@ -24,7 +22,7 @@ import {
 
 interface HabitsContextType {
   databaseHabits: Habit[];
-  visibleHabits: Array<{ id: string; name: string }>;
+  visibleHabits: Array<{ id: string; name: string; icon?: string }>;
   allHabitLogs: any[];
   todaysCompletedHabitIds: Set<string>;
   refreshTrigger: number;
@@ -38,6 +36,8 @@ interface HabitsContextType {
     date?: Date
   ) => Promise<void>;
   refreshVisibleHabits: () => Promise<void>;
+  createNewHabit: (name: string, icon?: string) => Promise<boolean>;
+  removeHabit: (habitId: string) => Promise<boolean>;
 }
 
 export const HabitsContext = createContext<HabitsContextType | undefined>(
@@ -47,7 +47,7 @@ export const HabitsContext = createContext<HabitsContextType | undefined>(
 export const HabitsProvider = ({ children }: { children: ReactNode }) => {
   const [databaseHabits, setDatabaseHabits] = useState<Habit[]>([]);
   const [visibleHabits, setVisibleHabits] = useState<
-    Array<{ id: string; name: string }>
+    Array<{ id: string; name: string; icon?: string }>
   >([]);
   const [allHabitLogs, setAllHabitLogs] = useState<any[]>([]);
   const [todaysCompletedHabitIds, setTodaysCompletedHabitIds] = useState<
@@ -64,7 +64,6 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     async (silent = false) => {
       if (!user) return;
 
-      // Only show loading skeleton on initial load; avoid flicker when refreshing after add/remove contribution
       if (!silent) {
         setIsLoading(true);
       }
@@ -107,7 +106,6 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     if (user) {
       const shouldFetch = !lastFetchTimestamp || refreshTrigger > 0;
       if (shouldFetch) {
-        // First load: non-silent so grid can show light-orange → real level transition
         const isFirstLoad = lastFetchTimestamp === null;
         loadAllHabitsFromDatabase(!isFirstLoad);
       }
@@ -119,7 +117,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       if (lastFetchTimestamp) {
         const fiveMinutes = 5 * 60 * 1000;
         if (Date.now() - lastFetchTimestamp > fiveMinutes) {
-          loadAllHabitsFromDatabase(true); // silent to avoid grid flicker
+          loadAllHabitsFromDatabase(true);
         }
       }
     }, 60 * 1000);
@@ -180,35 +178,61 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     try {
       const allHabits = await getVisibleHabits();
 
-      let habitId: string;
-
       const existingHabit = allHabits.find(
         (h) => h.name.toLowerCase() === habitName.toLowerCase()
       );
 
-      if (existingHabit) {
-        habitId = existingHabit.id;
-      } else {
+      if (!existingHabit) {
         throw new Error(`Habit "${habitName}" does not exist`);
       }
 
       if (completed) {
-        const success = await addHabitLogForDate(habitId, user.id, date);
-        if (!success) {
-          throw new Error("Failed to add habit log");
-        }
+        const success = await addHabitLogForDate(existingHabit.id, user.id, date);
+        if (!success) throw new Error("Failed to add habit log");
       } else {
-        const success = await removeHabitLogForDate(habitId, user.id, date);
-        if (!success) {
-          throw new Error("Failed to remove habit log");
-        }
+        const success = await removeHabitLogForDate(existingHabit.id, user.id, date);
+        if (!success) throw new Error("Failed to remove habit log");
       }
 
-      // Trigger a refresh for components that depend on habit changes
       setRefreshTrigger((prev) => prev + 1);
     } catch (error) {
       console.error("Error updating habit status:", error);
       throw error;
+    }
+  };
+
+  const createNewHabit = async (name: string, icon?: string): Promise<boolean> => {
+    if (!user) return false;
+    try {
+      const result = await createHabit({ name, icon }, user.id);
+      if (result) {
+        const capitalizedName =
+          result.name.charAt(0).toUpperCase() + result.name.slice(1).toLowerCase();
+        setVisibleHabits((prev) => [
+          ...prev,
+          { id: result.id, name: capitalizedName, icon: result.icon },
+        ]);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Error creating habit:", error);
+      return false;
+    }
+  };
+
+  const removeHabit = async (habitId: string): Promise<boolean> => {
+    if (!user) return false;
+    try {
+      const success = await deleteHabit(habitId, user.id);
+      if (success) {
+        setVisibleHabits((prev) => prev.filter((h) => h.id !== habitId));
+        setAllHabitLogs((prev) => prev.filter((log) => log.habitId !== habitId));
+      }
+      return success;
+    } catch (error) {
+      console.error("Error deleting habit:", error);
+      return false;
     }
   };
 
@@ -224,6 +248,8 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
         getHabitsWithLogsForDate,
         updateHabitStatus,
         refreshVisibleHabits,
+        createNewHabit,
+        removeHabit,
       }}
     >
       {children}
