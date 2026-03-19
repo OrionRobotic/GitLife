@@ -12,22 +12,26 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useHabits } from "@/context/useHabits";
 import type { Dashboard } from "@/types/dashboard";
 
-const ORANGE_PALETTE = [
-  "#FFF3E0",
-  "#FFE0B2",
-  "#FFCC80",
-  "#FFB74D",
-  "#FFA726",
-  "#FF9800",
-  "#FB8C00",
-  "#F57C00",
-  "#EF6C00",
-  "#E65100",
-  "#D84315",
-  "#BF360C",
+// 4 orange × 4 azure × 4 purple = 12 colours
+const COLOR_PALETTE = [
+  // Orange
+  "#F2C4A0",
+  "#E8956A",
+  "#D4683A",
+  "#A8431C",
+  // Azure
+  "#C2DCE8",
+  "#7EBAD4",
+  "#3F8EB5",
+  "#1E6488",
+  // Purple
+  "#D8C0E4",
+  "#B088CC",
+  "#7C52A8",
+  "#553084",
 ];
 
-const DEFAULT_COLOR = "#FB8C00";
+const DEFAULT_COLOR = "#E8956A";
 
 interface DefaultTabEdit {
   name: string;
@@ -132,7 +136,7 @@ export function DashboardDialog({
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">Color</label>
             <div className="flex items-center gap-1.5 flex-wrap">
-              {ORANGE_PALETTE.map((c) => (
+              {COLOR_PALETTE.map((c) => (
                 <button
                   key={c}
                   type="button"

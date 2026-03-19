@@ -52,7 +52,11 @@ function isInCurrentPeriod(goal: Goal): boolean {
   );
 }
 
-function findPeriodTitle(goalPeriods: GoalPeriod[], type: GoalType): string {
+function findPeriodField<K extends keyof GoalPeriod>(
+  goalPeriods: GoalPeriod[],
+  type: GoalType,
+  field: K
+): GoalPeriod[K] | string {
   const period = getCurrentPeriod(type);
   const found = goalPeriods.find(
     (p) =>
@@ -60,7 +64,7 @@ function findPeriodTitle(goalPeriods: GoalPeriod[], type: GoalType): string {
       p.periodStart === period.periodStart &&
       p.periodEnd === period.periodEnd
   );
-  return found?.title ?? "";
+  return found?.[field] ?? "";
 }
 
 interface GoalsContextType {
@@ -75,7 +79,10 @@ interface GoalsContextType {
   weeklyPeriodTitle: string;
   monthlyPeriodTitle: string;
   semesterPeriodTitle: string;
-  updatePeriodTitle: (type: GoalType, title: string) => Promise<void>;
+  weeklyPeriodDescription: string;
+  monthlyPeriodDescription: string;
+  semesterPeriodDescription: string;
+  updatePeriod: (type: GoalType, updates: { title: string; description: string }) => Promise<void>;
 }
 
 export const GoalsContext = createContext<GoalsContextType | undefined>(
@@ -116,9 +123,12 @@ export const GoalsProvider = ({ children }: { children: ReactNode }) => {
     (g) => g.type === "semester" && isInCurrentPeriod(g)
   );
 
-  const weeklyPeriodTitle = findPeriodTitle(goalPeriods, "weekly");
-  const monthlyPeriodTitle = findPeriodTitle(goalPeriods, "monthly");
-  const semesterPeriodTitle = findPeriodTitle(goalPeriods, "semester");
+  const weeklyPeriodTitle = findPeriodField(goalPeriods, "weekly", "title") as string;
+  const monthlyPeriodTitle = findPeriodField(goalPeriods, "monthly", "title") as string;
+  const semesterPeriodTitle = findPeriodField(goalPeriods, "semester", "title") as string;
+  const weeklyPeriodDescription = findPeriodField(goalPeriods, "weekly", "description") as string;
+  const monthlyPeriodDescription = findPeriodField(goalPeriods, "monthly", "description") as string;
+  const semesterPeriodDescription = findPeriodField(goalPeriods, "semester", "description") as string;
 
   const addGoal = async (title: string, type: GoalType) => {
     if (!user) return;
@@ -149,10 +159,10 @@ export const GoalsProvider = ({ children }: { children: ReactNode }) => {
     if (success) setGoals((prev) => prev.filter((g) => g.id !== id));
   };
 
-  const updatePeriodTitle = async (type: GoalType, title: string) => {
+  const updatePeriod = async (type: GoalType, updates: { title: string; description: string }) => {
     if (!user) return;
     const period = getCurrentPeriod(type);
-    const updated = await upsertGoalPeriod({ type, ...period, title }, user.id);
+    const updated = await upsertGoalPeriod({ type, ...period, ...updates }, user.id);
     if (updated) {
       setGoalPeriods((prev) => {
         const idx = prev.findIndex(
@@ -185,7 +195,10 @@ export const GoalsProvider = ({ children }: { children: ReactNode }) => {
         weeklyPeriodTitle,
         monthlyPeriodTitle,
         semesterPeriodTitle,
-        updatePeriodTitle,
+        weeklyPeriodDescription,
+        monthlyPeriodDescription,
+        semesterPeriodDescription,
+        updatePeriod,
       }}
     >
       {children}

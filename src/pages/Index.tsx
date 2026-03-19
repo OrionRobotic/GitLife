@@ -234,13 +234,14 @@ const Index = () => {
             </Popover>
           </div>
 
-          {/* Activity Overview */}
-          <div className="mt-4">
-            <ActivityOverview filteredHabitIds={filteredHabitIds} />
+          {/* Activity Overview + Goals side by side */}
+          <div className="grid grid-cols-2 gap-8 mt-4 items-start">
+            <ActivityOverview
+              filteredHabitIds={filteredHabitIds}
+              color={activeDashboard?.color ?? defaultTab.color}
+            />
+            <GoalsSection />
           </div>
-
-          {/* Goals */}
-          <GoalsSection />
 
           <p className="mt-16 text-sm text-muted-foreground text-center">
             GitLife

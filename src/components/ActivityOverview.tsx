@@ -6,7 +6,6 @@ import {
   subYears,
   eachDayOfInterval,
   format,
-  isAfter,
   startOfDay,
 } from "date-fns";
 import {
@@ -32,23 +31,22 @@ const PERIODS = [
 
 type PeriodKey = (typeof PERIODS)[number]["key"];
 
-const chartConfig = {
-  percentage: {
-    label: "Completion",
-    color: "#FB8C00",
-  },
-} satisfies ChartConfig;
-
 interface ActivityOverviewProps {
   filteredHabitIds: string[] | null;
+  color: string;
 }
 
 export const ActivityOverview = ({
   filteredHabitIds,
+  color,
 }: ActivityOverviewProps) => {
   const [period, setPeriod] = useState<PeriodKey>("week");
   const [showTotal, setShowTotal] = useState(false);
   const { visibleHabits, allHabitLogs } = useHabits();
+
+  const chartConfig = {
+    percentage: { label: "Completion", color },
+  } satisfies ChartConfig;
 
   const data = useMemo(() => {
     const activeFilter = showTotal ? null : filteredHabitIds;
@@ -69,10 +67,8 @@ export const ActivityOverview = ({
 
     if (totalDays === 0) return [];
 
-    // Build set of date strings in range for quick lookup
     const rangeDateStrs = new Set(allDays.map((d) => format(d, "yyyyMMdd")));
 
-    // Count distinct logged days per habit in range
     const habitDayCounts = new Map<string, Set<string>>();
     for (const habit of habits) {
       habitDayCounts.set(habit.id, new Set());
@@ -83,9 +79,7 @@ export const ActivityOverview = ({
       const dateStr = log.integerDate.toString();
       if (!rangeDateStrs.has(dateStr)) continue;
       const daySet = habitDayCounts.get(log.habitId);
-      if (daySet) {
-        daySet.add(dateStr);
-      }
+      if (daySet) daySet.add(dateStr);
     }
 
     return habits.map((habit) => ({
@@ -108,112 +102,93 @@ export const ActivityOverview = ({
 
   const dummyCount = radarData.length - data.length;
 
-  // Only draw grid spokes for real data axes — exclude dummy padding entries.
-  // Recharts places n points starting at 90° going clockwise: angle_i = 90 - (i/n)*360
   const visiblePolarAngles = dummyCount > 0
     ? Array.from({ length: data.length }, (_, i) => 90 - (i / radarData.length) * 360)
     : undefined;
 
   if (!data.length) return null;
 
+  const creamyBase = "bg-background border border-border/50 text-foreground";
+
   return (
     <div>
-      <div className={`flex items-center justify-between ${filteredHabitIds ? "mb-1" : "mb-3"}`}>
-        <h3 className="text-lg font-normal text-foreground font-serif tracking-tight">
-          Activity Overview
-        </h3>
-        <div className="flex gap-1">
+      <h3 className="text-lg font-normal text-foreground font-serif tracking-tight mb-3">
+        Activity Overview
+      </h3>
+
+      {/* Controls row: period dropdown + Total toggle */}
+      <div className="flex items-center gap-2 mb-3">
+        <select
+          value={period}
+          onChange={(e) => setPeriod(e.target.value as PeriodKey)}
+          className={`text-xs rounded px-2 py-0.5 outline-none cursor-pointer transition-colors ${creamyBase}`}
+        >
           {PERIODS.map((p) => (
-            <button
-              key={p.key}
-              onClick={() => setPeriod(p.key)}
-              className={`px-2 py-0.5 text-xs rounded transition-colors ${
-                period === p.key
-                  ? "bg-foreground/20 text-foreground"
-                  : "bg-foreground/10 text-muted-foreground hover:bg-foreground/15"
-              }`}
-            >
-              {p.label}
-            </button>
+            <option key={p.key} value={p.key}>{p.label}</option>
           ))}
-        </div>
-      </div>
-      {filteredHabitIds && (
-        <div className="mb-3">
+        </select>
+        {filteredHabitIds && (
           <button
             onClick={() => setShowTotal((v) => !v)}
-            className={`px-2 py-0.5 text-xs rounded transition-colors ${
+            className={`px-2 py-0.5 text-xs rounded border transition-colors ${
               showTotal
-                ? "bg-foreground/20 text-foreground"
-                : "bg-foreground/10 text-muted-foreground hover:bg-foreground/15"
+                ? "bg-foreground/10 border-border/60 text-foreground"
+                : creamyBase
             }`}
           >
             Total
           </button>
-        </div>
-      )}
+        )}
+      </div>
+
       <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px] w-full [&_.recharts-polar-grid-concentric-polygon]:hidden [&_.recharts-polar-grid-concentric-circle]:hidden"
-        >
-          <RadarChart data={radarData}>
-            <PolarGrid {...(visiblePolarAngles ? { polarAngles: visiblePolarAngles } : {})} />
-            <PolarAngleAxis
-              dataKey="habit"
-              tick={({ x, y, payload, textAnchor }: any) => {
-                if (payload.value === "\u200B" || payload.value === "\u200C") return <g />;
-                return (
-                  <text x={x} y={y} textAnchor={textAnchor} fontSize={13} fill="var(--foreground)" fontFamily="serif">
-                    {payload.value}
-                  </text>
-                );
-              }}
-            />
-            <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
-            <ChartTooltip
-              content={
-                <ChartTooltipContent
-                  formatter={(value) => [`${value}%`, "Completion"]}
-                />
-              }
-            />
-            <Radar
-              dataKey="percentage"
-              fill="#FB8C00"
-              fillOpacity={0.3}
-              stroke="#F57C00"
-              strokeWidth={data.length === 1 ? 2 : 1}
-              dot={(props: any) => {
-                const { cx, cy, payload } = props;
-                if (payload?.habit === "\u200B" || payload?.habit === "\u200C") return <g />;
-                return (
-                  <circle
-                    cx={cx}
-                    cy={cy}
-                    r={3}
-                    fill={chartConfig.percentage.color}
-                    fillOpacity={1}
-                    stroke="none"
-                  />
-                );
-              }}
-              activeDot={(props: any) => {
-                const { cx, cy, payload } = props;
-                if (payload?.habit === "\u200B" || payload?.habit === "\u200C") return <g />;
-                return (
-                  <circle
-                    cx={cx}
-                    cy={cy}
-                    r={4}
-                    fill={chartConfig.percentage.color}
-                    fillOpacity={1}
-                    stroke="none"
-                  />
-                );
-              }}
-            />
-          </RadarChart>
-        </ChartContainer>
+        config={chartConfig}
+        className="mx-auto aspect-square max-h-[250px] w-full [&_.recharts-polar-grid-concentric-polygon]:hidden [&_.recharts-polar-grid-concentric-circle]:hidden"
+      >
+        <RadarChart data={radarData}>
+          <PolarGrid {...(visiblePolarAngles ? { polarAngles: visiblePolarAngles } : {})} />
+          <PolarAngleAxis
+            dataKey="habit"
+            tick={({ x, y, payload, textAnchor }: any) => {
+              if (payload.value === "\u200B" || payload.value === "\u200C") return <g />;
+              return (
+                <text x={x} y={y} textAnchor={textAnchor} fontSize={13} fill="var(--foreground)" fontFamily="serif">
+                  {payload.value}
+                </text>
+              );
+            }}
+          />
+          <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
+          <ChartTooltip
+            content={
+              <ChartTooltipContent
+                formatter={(value) => [`${value}%`, "Completion"]}
+              />
+            }
+          />
+          <Radar
+            dataKey="percentage"
+            fill={color}
+            fillOpacity={0.3}
+            stroke={color}
+            strokeWidth={data.length === 1 ? 2 : 1}
+            dot={(props: any) => {
+              const { cx, cy, payload } = props;
+              if (payload?.habit === "\u200B" || payload?.habit === "\u200C") return <g />;
+              return (
+                <circle cx={cx} cy={cy} r={3} fill={color} fillOpacity={1} stroke="none" />
+              );
+            }}
+            activeDot={(props: any) => {
+              const { cx, cy, payload } = props;
+              if (payload?.habit === "\u200B" || payload?.habit === "\u200C") return <g />;
+              return (
+                <circle cx={cx} cy={cy} r={4} fill={color} fillOpacity={1} stroke="none" />
+              );
+            }}
+          />
+        </RadarChart>
+      </ChartContainer>
     </div>
   );
 };

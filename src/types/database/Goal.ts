@@ -33,6 +33,7 @@ export interface GoalPeriod extends BaseTable {
   periodStart: string;
   periodEnd: string;
   title: string;
+  description: string;
   updatedAt: string;
 }
 
@@ -41,4 +42,5 @@ export interface GoalPeriodUpsertInput {
   periodStart: string;
   periodEnd: string;
   title: string;
+  description: string;
 }

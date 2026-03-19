@@ -15,6 +15,7 @@ export async function upsertGoalPeriod(
           periodStart: input.periodStart,
           periodEnd: input.periodEnd,
           title: input.title,
+          description: input.description,
           updatedAt: new Date().toISOString(),
         },
         { onConflict: "userId,type,periodStart,periodEnd" }
