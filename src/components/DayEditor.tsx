@@ -157,6 +157,7 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
     todaysCompletedHabitIds,
     createNewHabit,
     removeHabit,
+    changeHabitIcon,
   } = useHabits();
 
   const { dashboards } = useDashboards();
@@ -167,6 +168,7 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
   const [selectedIcon, setSelectedIcon] = useState("BookOpen");
   const [isCreating, setIsCreating] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
+  const [iconPickerHabitId, setIconPickerHabitId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const visibleHabits = (() => {
@@ -303,8 +305,16 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
           )}
 
           {habitsForDisplay.map(({ id, name, icon: Icon, completed }) => (
-            <div key={id} className="group flex items-center gap-4">
-              <Icon className="w-4 h-4 text-muted-foreground shrink-0" />
+            <div key={id} className="flex flex-col gap-1">
+            <div className="group flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => setIconPickerHabitId((prev) => prev === id ? null : id)}
+                className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Change icon"
+              >
+                <Icon className="w-4 h-4" />
+              </button>
               <span className="text-sm font-medium text-foreground flex-1">{name}</span>
               <button
                 onClick={() => handleDelete(id)}
@@ -322,6 +332,25 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
                 }`}
                 aria-label={completed ? "Mark incomplete" : "Mark complete"}
               />
+            </div>
+            {iconPickerHabitId === id && (
+              <div className="flex flex-wrap gap-1 pl-8 max-h-24 overflow-y-auto pr-1">
+                {ICON_OPTIONS.map((iconName) => {
+                  const IconOption = ICON_MAP[iconName];
+                  return (
+                    <button
+                      key={iconName}
+                      type="button"
+                      onClick={() => { changeHabitIcon(id, iconName); setIconPickerHabitId(null); }}
+                      className="p-1.5 rounded text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-colors"
+                      aria-label={iconName}
+                    >
+                      <IconOption className="w-3.5 h-3.5" />
+                    </button>
+                  );
+                })}
+              </div>
+            )}
             </div>
           ))}
 

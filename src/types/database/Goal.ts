@@ -12,6 +12,7 @@ export interface Goal extends BaseTable {
   completed: boolean;
   sortOrder: number;
   updatedAt: string;
+  linkedGoalId?: string;
 }
 
 export interface GoalCreateInput {
@@ -25,6 +26,7 @@ export interface GoalUpdateInput {
   title?: string;
   completed?: boolean;
   sortOrder?: number;
+  linkedGoalId?: string | null;
 }
 
 export interface GoalPeriod extends BaseTable {

@@ -13,6 +13,8 @@ import { useHabits } from "@/context/useHabits";
 import { MenuButton } from "@/components/MenuButton";
 import { ActivityOverview } from "@/components/ActivityOverview";
 import { GoalsSection } from "@/components/GoalsSection";
+import { QuarterBarChart } from "@/components/QuarterBarChart";
+import { useGoals } from "@/context/useGoals";
 import { Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDashboards } from "@/hooks/useDashboards";
@@ -43,6 +45,9 @@ const Index = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const currentYear = new Date().getFullYear();
   const { visibleHabits, allHabitLogs, isLoading } = useHabits();
+  const { monthlyGoals, quarterEffort, quarterWeeklyGoals, monthlyPeriodTitle, monthlyPeriodDescription, monthlyPeriodStart, monthlyPeriodEnd } = useGoals();
+  const [goalsDialogOpen, setGoalsDialogOpen] = useState(false);
+  const [goalsDialogTab, setGoalsDialogTab] = useState<"weekly" | "monthly" | "semester">("weekly");
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
@@ -132,8 +137,14 @@ const Index = () => {
       {/* Main content - centered */}
       <div className="max-w-4xl mx-auto px-6 py-6">
         <div className="flex flex-col gap-4 font-dm">
-          {/* Date display */}
-          <div className="flex justify-end pr-2">
+          {/* Sit, Think and Write Down + Date on same row */}
+          <div className="flex items-center justify-between pr-2">
+            <button
+              onClick={() => setGoalsDialogOpen(true)}
+              className="w-2/5 py-2.5 text-sm text-foreground italic border border-orange-800 rounded-lg"
+            >
+              Sit, Think and Write Down.
+            </button>
             <div className="flex flex-col items-end">
               <div className="text-sm font-medium text-foreground">
                 {format(displayDate, "EEEE")}
@@ -235,15 +246,33 @@ const Index = () => {
           </div>
 
           {/* Activity Overview + Goals side by side */}
-          <div className="grid grid-cols-2 gap-8 mt-4 items-start">
-            <ActivityOverview
-              filteredHabitIds={filteredHabitIds}
-              color={activeDashboard?.color ?? defaultTab.color}
-            />
-            <GoalsSection />
+          <div className="grid grid-cols-3 gap-8 mt-4 items-start">
+            <div className="col-span-1">
+              <ActivityOverview
+                filteredHabitIds={filteredHabitIds}
+                color={activeDashboard?.color ?? defaultTab.color}
+              />
+            </div>
+            <div className="col-span-2">
+              <GoalsSection open={goalsDialogOpen} onOpenChange={setGoalsDialogOpen} initialTab={goalsDialogTab} />
+            </div>
           </div>
 
-          <p className="mt-16 text-sm text-muted-foreground text-center">
+          {/* Quarter effort bar chart — below the activity + goals grid */}
+          {monthlyGoals.length > 0 && (
+            <QuarterBarChart
+              monthlyGoals={monthlyGoals}
+              effort={quarterEffort}
+              quarterWeeklyGoals={quarterWeeklyGoals}
+              periodTitle={monthlyPeriodTitle}
+              periodDescription={monthlyPeriodDescription}
+              periodStart={monthlyPeriodStart}
+              periodEnd={monthlyPeriodEnd}
+              onOpenGoals={() => { setGoalsDialogTab("monthly"); setGoalsDialogOpen(true); }}
+            />
+          )}
+
+          <p className="mt-8 text-sm text-muted-foreground text-center">
             GitLife
           </p>
         </div>

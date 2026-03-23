@@ -11,6 +11,7 @@ import {
   deleteHabit,
   getHabitsForUser,
   getVisibleHabits,
+  updateHabitIcon,
   addHabitLogForDate,
   removeHabitLogForDate,
 } from "@/services/habits";
@@ -38,6 +39,7 @@ interface HabitsContextType {
   refreshVisibleHabits: () => Promise<void>;
   createNewHabit: (name: string, icon?: string) => Promise<boolean>;
   removeHabit: (habitId: string) => Promise<boolean>;
+  changeHabitIcon: (habitId: string, icon: string) => Promise<boolean>;
 }
 
 export const HabitsContext = createContext<HabitsContextType | undefined>(
@@ -236,6 +238,14 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const changeHabitIcon = async (habitId: string, icon: string): Promise<boolean> => {
+    const success = await updateHabitIcon(habitId, icon);
+    if (success) {
+      setVisibleHabits((prev) => prev.map((h) => h.id === habitId ? { ...h, icon } : h));
+    }
+    return success;
+  };
+
   return (
     <HabitsContext.Provider
       value={{
@@ -250,6 +260,7 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
         refreshVisibleHabits,
         createNewHabit,
         removeHabit,
+        changeHabitIcon,
       }}
     >
       {children}

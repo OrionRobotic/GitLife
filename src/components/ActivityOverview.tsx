@@ -112,7 +112,7 @@ export const ActivityOverview = ({
 
   return (
     <div>
-      <h3 className="text-lg font-normal text-foreground font-serif tracking-tight mb-3">
+      <h3 className="text-xl font-normal text-foreground font-serif tracking-tight mb-3">
         Activity Overview
       </h3>
 
@@ -145,7 +145,7 @@ export const ActivityOverview = ({
         config={chartConfig}
         className="mx-auto aspect-square max-h-[250px] w-full [&_.recharts-polar-grid-concentric-polygon]:hidden [&_.recharts-polar-grid-concentric-circle]:hidden"
       >
-        <RadarChart data={radarData}>
+        <RadarChart data={radarData} outerRadius="62%">
           <PolarGrid {...(visiblePolarAngles ? { polarAngles: visiblePolarAngles } : {})} />
           <PolarAngleAxis
             dataKey="habit"
@@ -176,14 +176,14 @@ export const ActivityOverview = ({
               const { cx, cy, payload } = props;
               if (payload?.habit === "\u200B" || payload?.habit === "\u200C") return <g />;
               return (
-                <circle cx={cx} cy={cy} r={3} fill={color} fillOpacity={1} stroke="none" />
+                <circle cx={cx} cy={cy} r={2} fill={color} fillOpacity={1} stroke="none" />
               );
             }}
             activeDot={(props: any) => {
               const { cx, cy, payload } = props;
               if (payload?.habit === "\u200B" || payload?.habit === "\u200C") return <g />;
               return (
-                <circle cx={cx} cy={cy} r={4} fill={color} fillOpacity={1} stroke="none" />
+                <circle cx={cx} cy={cy} r={3} fill={color} fillOpacity={1} stroke="none" />
               );
             }}
           />
