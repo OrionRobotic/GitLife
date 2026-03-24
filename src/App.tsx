@@ -15,6 +15,7 @@ import Bookshelf from "./pages/Bookshelf";
 import Blogs from "./pages/Blogs";
 import BlogEditor from "./pages/BlogEditor";
 import { HabitsProvider } from "@/context/HabitsContext";
+import { GoalsProvider } from "@/context/GoalsContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
@@ -24,75 +25,77 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <HabitsProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <Index />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route
-                path="/account"
-                element={
-                  <ProtectedRoute>
-                    <Account />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/our-mission"
-                element={
-                  <ProtectedRoute>
-                    <OurMission />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/how-to-use"
-                element={
-                  <ProtectedRoute>
-                    <HowToUse />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/bookshelf"
-                element={
-                  <ProtectedRoute>
-                    <Bookshelf />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/blogs"
-                element={
-                  <ProtectedRoute>
-                    <Blogs />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/blogs/:id"
-                element={
-                  <ProtectedRoute>
-                    <BlogEditor />
-                  </ProtectedRoute>
-                }
-              />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
+        <GoalsProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <Index />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route
+                  path="/account"
+                  element={
+                    <ProtectedRoute>
+                      <Account />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/our-mission"
+                  element={
+                    <ProtectedRoute>
+                      <OurMission />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/how-to-use"
+                  element={
+                    <ProtectedRoute>
+                      <HowToUse />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/bookshelf"
+                  element={
+                    <ProtectedRoute>
+                      <Bookshelf />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/blogs"
+                  element={
+                    <ProtectedRoute>
+                      <Blogs />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/blogs/:id"
+                  element={
+                    <ProtectedRoute>
+                      <BlogEditor />
+                    </ProtectedRoute>
+                  }
+                />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </GoalsProvider>
       </HabitsProvider>
     </AuthProvider>
   </QueryClientProvider>

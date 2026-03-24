@@ -5,12 +5,12 @@ import { supabase } from "@/lib/supabase";
  * @returns Array of all habits
  */
 export async function getVisibleHabits(): Promise<
-  Array<{ id: string; name: string }>
+  Array<{ id: string; name: string; icon?: string }>
 > {
   try {
     const { data, error } = await supabase
       .from("habits")
-      .select("id, name")
+      .select("id, name, icon")
       .order("createdAt", { ascending: true });
 
     if (error) {

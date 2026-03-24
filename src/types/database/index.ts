@@ -1,4 +1,5 @@
 export type { BaseTable } from "./BaseTable";
+export type { Goal, GoalCreateInput, GoalUpdateInput, GoalType, GoalPeriod, GoalPeriodUpsertInput } from "./Goal";
 export type { Habit, HabitCreateInput, HabitUpdateInput } from "./Habit";
 export type { Book, BookCreateInput, BookUpdateInput } from "./Book";
 export type { Blog, BlogCreateInput, BlogUpdateInput } from "./Blog";

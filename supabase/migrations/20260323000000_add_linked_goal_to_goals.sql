@@ -1,0 +1,2 @@
+ALTER TABLE goals
+  ADD COLUMN "linkedGoalId" UUID REFERENCES goals(id) ON DELETE SET NULL;

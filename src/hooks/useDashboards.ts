@@ -13,7 +13,7 @@ interface DefaultTabConfig {
 
 const DEFAULT_TAB_DEFAULTS: DefaultTabConfig = {
   name: "GitLife",
-  color: "#fb923c", // orange-400
+  color: "#E8956A",
   habitIds: [],
 };
 

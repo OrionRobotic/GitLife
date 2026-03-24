@@ -1,4 +1,6 @@
 export { createHabit } from "./habit/createHabit";
+export { updateHabitIcon } from "./habit/updateHabitIcon";
+export { deleteHabit } from "./habit/deleteHabit";
 export { getHabitsForUser } from "./habit/getHabitsForUser";
 export { getVisibleHabits } from "./habit/getVisibleHabits";
 export { createHabitLog } from "./log/createHabitLog";
