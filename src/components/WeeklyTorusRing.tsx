@@ -188,6 +188,12 @@ interface Props {
   onHoverChange: (hovering: boolean, mouseX: number, mouseY: number) => void;
 }
 
+export function getWeeklyRingSegments(goals: Pick<Goal, "title" | "completed">[]) {
+  return goals.length > 0
+    ? goals
+    : Array.from({ length: 4 }, () => ({ title: "", completed: false }));
+}
+
 export function WeeklyTorusRing({ goals, onHoverChange }: Props) {
   const mountRef = useRef<HTMLDivElement>(null);
   const onHoverChangeRef = useRef(onHoverChange);
@@ -207,11 +213,10 @@ export function WeeklyTorusRing({ goals, onHoverChange }: Props) {
 
   useEffect(() => {
     const el = mountRef.current;
-    const total = goalsRef.current.length;
-    if (!el || total === 0) return;
+    if (!el) return;
 
-    const currentGoals = goalsRef.current;
-    const completedCount = currentGoals.filter((g) => g.completed).length;
+    const currentGoals = getWeeklyRingSegments(goalsRef.current);
+    const total = currentGoals.length;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
@@ -235,25 +240,10 @@ export function WeeklyTorusRing({ goals, onHoverChange }: Props) {
     };
     resize();
 
-    const matDim = new THREE.LineBasicMaterial({
-      color: 0xc4a898,
-      transparent: true,
-      opacity: 0.3,
-    });
-    const matBright = new THREE.LineBasicMaterial({
-      color: 0xe8a882,
-      transparent: true,
-      opacity: 0.85,
-      linewidth: 2,
-    });
-    const matDots = new THREE.PointsMaterial({
-      vertexColors: true,
-      size: DOT_SIZE,
-      sizeAttenuation: true,
-      transparent: true,
-      opacity: 0.55,
-    });
-    const hitMat = new THREE.MeshBasicMaterial({ visible: false });
+    const matDim    = new THREE.LineBasicMaterial({ color: 0xc4a898, transparent: true, opacity: 0.65 });
+    const matBright = new THREE.LineBasicMaterial({ color: 0xe8a882, transparent: true, opacity: 0.85, linewidth: 2 });
+    const matDots   = new THREE.PointsMaterial({ vertexColors: true, size: DOT_SIZE, sizeAttenuation: true, transparent: true, opacity: 0.55 });
+    const hitMat    = new THREE.MeshBasicMaterial({ visible: false });
 
     const group = new THREE.Group();
     group.rotation.x = (20 * Math.PI) / 180;
@@ -266,9 +256,9 @@ export function WeeklyTorusRing({ goals, onHoverChange }: Props) {
     const spriteTexes: THREE.CanvasTexture[] = [];
 
     for (let i = 0; i < total; i++) {
-      const start = (i / total) * Math.PI * 2 + GAP_HALF;
-      const end = ((i + 1) / total) * Math.PI * 2 - GAP_HALF;
-      const completed = i < completedCount;
+      const start     = (i / total) * Math.PI * 2 + GAP_HALF;
+      const end       = ((i + 1) / total) * Math.PI * 2 - GAP_HALF;
+      const completed = currentGoals[i].completed;
 
       // Wireframe cage
       const cageGeo = buildCage(start, end);
@@ -403,12 +393,5 @@ export function WeeklyTorusRing({ goals, onHoverChange }: Props) {
     };
   }, [goalsKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (goals.length === 0) return null;
-  return (
-    <div
-      ref={mountRef}
-      className="w-full"
-      style={{ height: "320px", marginTop: "20px", marginBottom: "8px" }}
-    />
-  );
+  return <div ref={mountRef} role="img" aria-label={`Weekly goal ring with ${getWeeklyRingSegments(goals).length} segments, ${goals.filter((goal) => goal.completed).length} completed`} className="w-full" style={{ height: "320px", marginTop: "20px", marginBottom: "8px" }} />;
 }

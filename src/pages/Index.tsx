@@ -11,10 +11,7 @@ import {
 } from "@/components/ui/popover";
 import { useHabits } from "@/context/useHabits";
 import { MenuButton } from "@/components/MenuButton";
-import { ActivityOverview } from "@/components/ActivityOverview";
 import { GoalsSection } from "@/components/GoalsSection";
-import { QuarterBarChart } from "@/components/QuarterBarChart";
-import { useGoals } from "@/context/useGoals";
 import { Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDashboards } from "@/hooks/useDashboards";
@@ -49,19 +46,7 @@ const Index = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const currentYear = new Date().getFullYear();
   const { visibleHabits, allHabitLogs, isLoading } = useHabits();
-  const {
-    monthlyGoals,
-    quarterEffort,
-    quarterWeeklyGoals,
-    monthlyPeriodTitle,
-    monthlyPeriodDescription,
-    monthlyPeriodStart,
-    monthlyPeriodEnd,
-  } = useGoals();
   const [goalsDialogOpen, setGoalsDialogOpen] = useState(false);
-  const [goalsDialogTab, setGoalsDialogTab] = useState<
-    "weekly" | "monthly" | "semester"
-  >("weekly");
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
@@ -265,39 +250,9 @@ const Index = () => {
             </Popover>
           </div>
 
-          {/* Activity Overview + Goals side by side */}
-          <div className="grid grid-cols-3 gap-8 mt-4 items-start">
-            <div className="col-span-1">
-              <ActivityOverview
-                filteredHabitIds={filteredHabitIds}
-                color={activeDashboard?.color ?? defaultTab.color}
-              />
-            </div>
-            <div className="col-span-2">
-              <GoalsSection
-                open={goalsDialogOpen}
-                onOpenChange={setGoalsDialogOpen}
-                initialTab={goalsDialogTab}
-              />
-            </div>
+          <div className="mt-4">
+            <GoalsSection open={goalsDialogOpen} onOpenChange={setGoalsDialogOpen} />
           </div>
-
-          {/* Quarter effort bar chart — below the activity + goals grid */}
-          {monthlyGoals.length > 0 && (
-            <QuarterBarChart
-              monthlyGoals={monthlyGoals}
-              effort={quarterEffort}
-              quarterWeeklyGoals={quarterWeeklyGoals}
-              periodTitle={monthlyPeriodTitle}
-              periodDescription={monthlyPeriodDescription}
-              periodStart={monthlyPeriodStart}
-              periodEnd={monthlyPeriodEnd}
-              onOpenGoals={() => {
-                setGoalsDialogTab("monthly");
-                setGoalsDialogOpen(true);
-              }}
-            />
-          )}
 
           <p className="mt-8 text-sm text-muted-foreground text-center">
             GitLife

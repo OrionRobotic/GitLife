@@ -3,7 +3,6 @@ import { format, parseISO } from "date-fns";
 import { Check } from "lucide-react";
 import type { Goal } from "@/types/database/Goal";
 import type { QuarterEffortEntry } from "@/context/GoalsContext";
-import { QuarterCityView } from "@/components/QuarterCityView";
 
 interface Props {
   monthlyGoals: Goal[];
@@ -79,61 +78,35 @@ export function QuarterBarChart({
         </div>
       )}
 
-      {/* 3D city + summary side by side */}
-      <div className="flex gap-4 items-stretch">
-        {/* City view — takes most of the width */}
-        <div className="flex-1 overflow-hidden" style={{ height: 340 }}>
-          <QuarterCityView
-            goals={monthlyGoals}
-            effort={effectiveEffort}
-            selectedId={activeId}
-            onSelect={(id) => setActiveId((prev) => (prev === id ? null : id))}
-          />
-        </div>
-
-        {/* Summary list */}
-        <div
-          className="flex flex-col justify-center gap-3 w-44 shrink-0 py-2 cursor-pointer"
-          onClick={onOpenGoals}
-        >
-          {monthlyGoals.map((goal) => {
-            const pct =
-              effectiveEffort.find((e) => e.goalId === goal.id)?.percentage ??
-              0;
-            const isActive = activeId === goal.id;
-            return (
-              <button
-                key={goal.id}
-                onClick={() =>
-                  setActiveId((prev) => (prev === goal.id ? null : goal.id))
-                }
-                className="text-left group focus:outline-none"
-              >
-                <div className="flex items-baseline justify-between gap-2 mb-0.5">
-                  <span className="text-base font-serif leading-snug text-foreground">
-                    {goal.title}
+      {/* Goal list */}
+      <div className="flex flex-col gap-3 cursor-pointer mt-1" onClick={onOpenGoals}>
+        {monthlyGoals.map((goal) => {
+          const pct = effectiveEffort.find((e) => e.goalId === goal.id)?.percentage ?? 0;
+          return (
+            <button
+              key={goal.id}
+              onClick={(e) => { e.stopPropagation(); setActiveId((prev) => prev === goal.id ? null : goal.id); }}
+              className="text-left group focus:outline-none"
+            >
+              <div className="flex items-baseline justify-between gap-2 mb-0.5">
+                <span className="text-base font-serif leading-snug text-foreground">{goal.title}</span>
+                {goal.completed ? (
+                  <Check className="w-3.5 h-3.5 shrink-0 text-orange-700/80" />
+                ) : (
+                  <span className={`text-sm tabular-nums shrink-0 ${pct > 0 ? "text-orange-700/80" : "text-muted-foreground/50"}`}>
+                    {Math.round(pct * 100)}%
                   </span>
-                  {goal.completed ? (
-                    <Check className="w-3.5 h-3.5 shrink-0 text-orange-700/80" />
-                  ) : (
-                    <span
-                      className={`text-sm tabular-nums shrink-0 ${pct > 0 ? "text-orange-700/80" : "text-muted-foreground/50"}`}
-                    >
-                      {Math.round(pct * 100)}%
-                    </span>
-                  )}
-                </div>
-                {/* Progress bar */}
-                <div className="h-0.5 w-full bg-border/60 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-orange-700/50 rounded-full transition-all duration-300"
-                    style={{ width: `${Math.round(pct * 100)}%` }}
-                  />
-                </div>
-              </button>
-            );
-          })}
-        </div>
+                )}
+              </div>
+              <div className="h-0.5 w-full bg-border/60 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-orange-700/50 rounded-full transition-all duration-300"
+                  style={{ width: `${Math.round(pct * 100)}%` }}
+                />
+              </div>
+            </button>
+          );
+        })}
       </div>
 
       {/* Detail panel */}
