@@ -18,6 +18,7 @@ import { useDashboards } from "@/hooks/useDashboards";
 import { DashboardTabs } from "@/components/DashboardTabs";
 import { DashboardDialog } from "@/components/DashboardDialog";
 import type { Dashboard } from "@/types/dashboard";
+import { getCategoryHabits } from "@/lib/categories";
 
 const PageHeader = memo(function PageHeader() {
   return (
@@ -73,11 +74,25 @@ const Index = () => {
     habitIds: string[];
   } | null>(null);
 
+  const categories = useMemo(
+    () => getCategoryHabits(visibleHabits),
+    [visibleHabits]
+  );
+
+  // Default tab aggregates the categories; falls back to the old behaviour if
+  // they are not seeded yet.
   const filteredHabitIds = activeDashboard
     ? activeDashboard.habitIds
-    : defaultTab.habitIds.length > 0
-      ? defaultTab.habitIds
-      : null;
+    : categories.length > 0
+      ? categories.map((c) => c.id)
+      : defaultTab.habitIds.length > 0
+        ? defaultTab.habitIds
+        : null;
+
+  const handleSelectDate = (date: Date) => {
+    setSelectedDate(date);
+    setIsPopoverOpen(true);
+  };
 
   // Calculate completed ratio for the selected date (or today)
   const displayDate = selectedDate || new Date();
@@ -193,10 +208,7 @@ const Index = () => {
               </div>
               <ContributionGrid
                 year={currentYear}
-                onSelectDate={(date) => {
-                  setSelectedDate(date);
-                  setIsPopoverOpen(true);
-                }}
+                onSelectDate={handleSelectDate}
                 selectedDate={selectedDate}
                 filteredHabitIds={filteredHabitIds}
               />
@@ -249,6 +261,24 @@ const Index = () => {
               </PopoverContent>
             </Popover>
           </div>
+
+          {/* One binary grid per category: a single habit makes each day 0 or 1 */}
+          {categories.map((category) => (
+            <div
+              key={category.id}
+              className="p-6 bg-card border border-border rounded-lg"
+            >
+              <h2 className="text-sm font-medium text-foreground mb-6">
+                {category.name}
+              </h2>
+              <ContributionGrid
+                year={currentYear}
+                onSelectDate={handleSelectDate}
+                selectedDate={selectedDate}
+                filteredHabitIds={[category.id]}
+              />
+            </div>
+          ))}
 
           <div className="mt-4">
             <GoalsSection
