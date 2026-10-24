@@ -16,7 +16,7 @@ import { TasksPanel } from "@/components/TasksPanel";
 import { Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDashboards } from "@/hooks/useDashboards";
-import { DashboardTabs } from "@/components/DashboardTabs";
+import { DashboardPicker } from "@/components/DashboardPicker";
 import { DashboardDialog } from "@/components/DashboardDialog";
 import type { Dashboard } from "@/types/dashboard";
 import { getCategoryHabits } from "@/lib/categories";
@@ -80,15 +80,22 @@ const Index = () => {
     [visibleHabits]
   );
 
-  // Default tab aggregates the categories; falls back to the old behaviour if
+  // A category is selected as "cat:<habitId>": one habit, so each day is 0 or 1.
+  const activeCategory = categories.find(
+    (c) => `cat:${c.id}` === activeDashboardId
+  );
+
+  // Main view aggregates the categories; falls back to the old behaviour if
   // they are not seeded yet.
-  const filteredHabitIds = activeDashboard
-    ? activeDashboard.habitIds
-    : categories.length > 0
-      ? categories.map((c) => c.id)
-      : defaultTab.habitIds.length > 0
-        ? defaultTab.habitIds
-        : null;
+  const filteredHabitIds = activeCategory
+    ? [activeCategory.id]
+    : activeDashboard
+      ? activeDashboard.habitIds
+      : categories.length > 0
+        ? categories.map((c) => c.id)
+        : defaultTab.habitIds.length > 0
+          ? defaultTab.habitIds
+          : null;
 
   const handleSelectDate = (date: Date) => {
     setSelectedDate(date);
@@ -146,10 +153,6 @@ const Index = () => {
     updateDefaultTab(name, color, habitIds);
   };
 
-  const gridHeading = activeDashboard
-    ? `${activeDashboard.name} — ${currentYear} contributions`
-    : `${currentYear} contributions`;
-
   return (
     <div className="min-h-screen bg-background">
       {/* Header - isolated so it doesn't re-render when habits data updates (avoids title/subtitle flicker) */}
@@ -176,44 +179,44 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Dashboard tabs + Contribution grid */}
-          <div>
-            <DashboardTabs
-              dashboards={dashboards}
-              activeDashboardId={activeDashboardId}
-              defaultTab={defaultTab}
-              onSelect={setActiveDashboardId}
-              onDelete={deleteDashboard}
-              onEdit={(dashboard) => {
-                setEditingDefault(null);
-                setEditingDashboard(dashboard);
-                setDialogOpen(true);
-              }}
-              onEditDefault={() => {
-                setEditingDashboard(null);
-                setEditingDefault(defaultTab);
-                setDialogOpen(true);
-              }}
-              onCreate={() => {
-                setEditingDefault(null);
-                setEditingDashboard(null);
-                setDialogOpen(true);
-              }}
-            />
-            <div className="p-6 bg-card border border-border rounded-lg rounded-tl-none">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-sm font-medium text-foreground">
-                  {gridHeading}
-                </h2>
-                <Legend />
+          {/* Contribution grid: one window, dashboard picked from the dropdown */}
+          <div className="p-6 bg-card border border-border rounded-lg">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <DashboardPicker
+                  main={defaultTab}
+                  categories={categories.map((c) => ({
+                    id: `cat:${c.id}`,
+                    name: c.name,
+                    color: defaultTab.color,
+                  }))}
+                  dashboards={dashboards}
+                  activeId={activeDashboardId}
+                  onSelect={setActiveDashboardId}
+                  onDelete={deleteDashboard}
+                  onEdit={() => {
+                    setEditingDashboard(activeDashboard);
+                    setEditingDefault(activeDashboard ? null : defaultTab);
+                    setDialogOpen(true);
+                  }}
+                  onCreate={() => {
+                    setEditingDefault(null);
+                    setEditingDashboard(null);
+                    setDialogOpen(true);
+                  }}
+                />
+                <span className="text-sm text-muted-foreground">
+                  {currentYear} contributions
+                </span>
               </div>
-              <ContributionGrid
-                year={currentYear}
-                onSelectDate={handleSelectDate}
-                selectedDate={selectedDate}
-                filteredHabitIds={filteredHabitIds}
-              />
+              <Legend />
             </div>
+            <ContributionGrid
+              year={currentYear}
+              onSelectDate={handleSelectDate}
+              selectedDate={selectedDate}
+              filteredHabitIds={filteredHabitIds}
+            />
           </div>
 
           {/* Today's Completed + Add Contribution */}
@@ -264,24 +267,6 @@ const Index = () => {
           </div>
 
           <TasksPanel />
-
-          {/* One binary grid per category: a single habit makes each day 0 or 1 */}
-          {categories.map((category) => (
-            <div
-              key={category.id}
-              className="p-6 bg-card border border-border rounded-lg"
-            >
-              <h2 className="text-sm font-medium text-foreground mb-6">
-                {category.name}
-              </h2>
-              <ContributionGrid
-                year={currentYear}
-                onSelectDate={handleSelectDate}
-                selectedDate={selectedDate}
-                filteredHabitIds={[category.id]}
-              />
-            </div>
-          ))}
 
           <div className="mt-4">
             <GoalsSection
