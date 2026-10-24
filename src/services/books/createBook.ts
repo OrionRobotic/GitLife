@@ -1,9 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import { Book, BookCreateInput } from "@/types/database";
 
-const BORDER_SHADES = [
-  "#D5E3DF", "#C3D4D0", "#ABBFB8", "#8EA8A1", "#708F88",
-];
+const BORDER_SHADES = ["#D5E3DF", "#C3D4D0", "#ABBFB8", "#8EA8A1", "#708F88"];
 
 /**
  * Create a new book in the database
@@ -16,7 +14,9 @@ export async function createBook(
   userId: string
 ): Promise<Book | null> {
   try {
-    const color = bookInput.color ?? BORDER_SHADES[Math.floor(Math.random() * BORDER_SHADES.length)];
+    const color =
+      bookInput.color ??
+      BORDER_SHADES[Math.floor(Math.random() * BORDER_SHADES.length)];
     const height = bookInput.height ?? Math.floor(Math.random() * 14) * 4 + 140;
     const width = bookInput.width ?? Math.floor(Math.random() * 48) + 48;
     const borderWidth = bookInput.borderWidth ?? 1;

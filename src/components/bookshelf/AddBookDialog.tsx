@@ -23,7 +23,11 @@ interface AddBookDialogProps {
   onSubmit: (input: BookCreateInput) => void;
 }
 
-export function AddBookDialog({ open, onOpenChange, onSubmit }: AddBookDialogProps) {
+export function AddBookDialog({
+  open,
+  onOpenChange,
+  onSubmit,
+}: AddBookDialogProps) {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [status, setStatus] = useState<"reading" | "read">("reading");
@@ -67,7 +71,10 @@ export function AddBookDialog({ open, onOpenChange, onSubmit }: AddBookDialogPro
           </div>
           <div className="flex flex-col gap-2">
             <Label>Status</Label>
-            <Select value={status} onValueChange={(v) => setStatus(v as "reading" | "read")}>
+            <Select
+              value={status}
+              onValueChange={(v) => setStatus(v as "reading" | "read")}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>

@@ -19,7 +19,10 @@ export default function ResizableImageComponent({
       startWidth.current = node.attrs.width ?? 500;
 
       const handleMouseMove = (e: MouseEvent) => {
-        const newWidth = Math.max(80, startWidth.current + (e.clientX - startX.current));
+        const newWidth = Math.max(
+          80,
+          startWidth.current + (e.clientX - startX.current)
+        );
         updateAttributes({ width: newWidth });
       };
 
@@ -36,7 +39,11 @@ export default function ResizableImageComponent({
 
   const align: "left" | "center" | "right" = node.attrs.align ?? "center";
 
-  const justifyMap = { left: "flex-start", center: "center", right: "flex-end" };
+  const justifyMap = {
+    left: "flex-start",
+    center: "center",
+    right: "flex-end",
+  };
 
   return (
     <NodeViewWrapper>
@@ -120,7 +127,11 @@ export default function ResizableImageComponent({
                   {a}
                 </button>
               ))}
-              <span style={{ color: "rgba(255,255,255,0.25)", padding: "0 2px" }}>|</span>
+              <span
+                style={{ color: "rgba(255,255,255,0.25)", padding: "0 2px" }}
+              >
+                |
+              </span>
               <button
                 onMouseDown={(e) => {
                   e.preventDefault();

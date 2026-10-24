@@ -3,18 +3,25 @@ import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import Highlight from "@tiptap/extension-highlight";
 import { ResizableImage } from "./ResizableImageExtension";
-import { Bold, Italic, Heading2, Heading3, Image as ImageIcon, Highlighter } from "lucide-react";
+import {
+  Bold,
+  Italic,
+  Heading2,
+  Heading3,
+  Image as ImageIcon,
+  Highlighter,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRef, useState } from "react";
 import { uploadBlogImage } from "@/services/blogs/uploadBlogImage";
 import { useAuth } from "@/context/AuthContext";
 
 const HIGHLIGHT_COLORS = [
-  { label: "Yellow",  color: "#FEF08A" },
-  { label: "Orange",  color: "#FED7AA" },
-  { label: "Green",   color: "#BBF7D0" },
-  { label: "Blue",    color: "#BAE6FD" },
-  { label: "Pink",    color: "#FBCFE8" },
+  { label: "Yellow", color: "#FEF08A" },
+  { label: "Orange", color: "#FED7AA" },
+  { label: "Green", color: "#BBF7D0" },
+  { label: "Blue", color: "#BAE6FD" },
+  { label: "Pink", color: "#FBCFE8" },
 ];
 
 interface BlogRichEditorProps {
@@ -49,7 +56,10 @@ export function BlogRichEditor({ content, onChange }: BlogRichEditorProps) {
       editor
         .chain()
         .focus()
-        .insertContent({ type: "resizableImage", attrs: { src: url, alt: file.name } })
+        .insertContent({
+          type: "resizableImage",
+          attrs: { src: url, alt: file.name },
+        })
         .run();
     }
     e.target.value = "";
@@ -65,26 +75,46 @@ export function BlogRichEditor({ content, onChange }: BlogRichEditorProps) {
       {/* Toolbar */}
       <div className="flex items-center gap-0.5 mb-4 pb-3 border-b border-border flex-wrap">
         <Button
-          variant="ghost" size="sm" className={btn(editor.isActive("bold"))}
-          onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleBold().run(); }}
+          variant="ghost"
+          size="sm"
+          className={btn(editor.isActive("bold"))}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            editor.chain().focus().toggleBold().run();
+          }}
         >
           <Bold className="h-3.5 w-3.5" />
         </Button>
         <Button
-          variant="ghost" size="sm" className={btn(editor.isActive("italic"))}
-          onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleItalic().run(); }}
+          variant="ghost"
+          size="sm"
+          className={btn(editor.isActive("italic"))}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            editor.chain().focus().toggleItalic().run();
+          }}
         >
           <Italic className="h-3.5 w-3.5" />
         </Button>
         <Button
-          variant="ghost" size="sm" className={btn(editor.isActive("heading", { level: 2 }))}
-          onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleHeading({ level: 2 }).run(); }}
+          variant="ghost"
+          size="sm"
+          className={btn(editor.isActive("heading", { level: 2 }))}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            editor.chain().focus().toggleHeading({ level: 2 }).run();
+          }}
         >
           <Heading2 className="h-3.5 w-3.5" />
         </Button>
         <Button
-          variant="ghost" size="sm" className={btn(editor.isActive("heading", { level: 3 }))}
-          onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleHeading({ level: 3 }).run(); }}
+          variant="ghost"
+          size="sm"
+          className={btn(editor.isActive("heading", { level: 3 }))}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            editor.chain().focus().toggleHeading({ level: 3 }).run();
+          }}
         >
           <Heading3 className="h-3.5 w-3.5" />
         </Button>
@@ -94,7 +124,8 @@ export function BlogRichEditor({ content, onChange }: BlogRichEditorProps) {
         {/* Highlight button + color picker */}
         <div className="relative">
           <Button
-            variant="ghost" size="sm"
+            variant="ghost"
+            size="sm"
             className={btn(editor.isActive("highlight"))}
             onMouseDown={(e) => {
               e.preventDefault();
@@ -138,8 +169,13 @@ export function BlogRichEditor({ content, onChange }: BlogRichEditorProps) {
         <div className="w-px h-4 bg-border mx-1" />
 
         <Button
-          variant="ghost" size="sm" className="h-7 px-2.5 text-muted-foreground"
-          onMouseDown={(e) => { e.preventDefault(); fileInputRef.current?.click(); }}
+          variant="ghost"
+          size="sm"
+          className="h-7 px-2.5 text-muted-foreground"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            fileInputRef.current?.click();
+          }}
         >
           <ImageIcon className="h-3.5 w-3.5" />
         </Button>
@@ -152,7 +188,11 @@ export function BlogRichEditor({ content, onChange }: BlogRichEditorProps) {
         />
       </div>
 
-      <EditorContent editor={editor} className="blog-editor" onClick={() => setShowColors(false)} />
+      <EditorContent
+        editor={editor}
+        className="blog-editor"
+        onClick={() => setShowColors(false)}
+      />
     </div>
   );
 }

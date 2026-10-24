@@ -25,6 +25,8 @@ export interface BookCreateInput {
   borderWidth?: number;
 }
 
-export interface BookUpdateInput extends Partial<Omit<Book, "id" | "createdAt" | "userId">> {
+export interface BookUpdateInput extends Partial<
+  Omit<Book, "id" | "createdAt" | "userId">
+> {
   id: string;
 }

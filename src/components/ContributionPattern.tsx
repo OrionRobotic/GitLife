@@ -85,7 +85,8 @@ const ContributionPattern = () => {
           const breath = easeWave(time * 0.8 + dist * 2);
 
           // Combine waves for opacity — higher base for richer color
-          const combined = 0.3 + (ripple * 0.35 + spiral * 0.3 + breath * 0.25) * 0.7;
+          const combined =
+            0.3 + (ripple * 0.35 + spiral * 0.3 + breath * 0.25) * 0.7;
 
           // Skip cells well outside circular boundary
           if (dist > 1.0) continue;

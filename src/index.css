@@ -53,7 +53,8 @@ All colors MUST be HSL.
     --contribution-4: 22 95% 50%;
     --contribution-5: 20 100% 45%;
 
-    --font-sans: "Crimson Pro", ui-serif, Georgia, Cambria, "Times New Roman", serif;
+    --font-sans:
+      "Crimson Pro", ui-serif, Georgia, Cambria, "Times New Roman", serif;
     --font-mono: "SF Mono", ui-monospace, monospace;
 
     --sidebar-background: 40 30% 98%;
@@ -233,7 +234,7 @@ All colors MUST be HSL.
 .book-item {
   width: 64px;
   border-radius: 5px;
-  border: 1px solid #ABBFB8;
+  border: 1px solid #abbfb8;
   cursor: pointer;
   display: flex;
   align-items: center;

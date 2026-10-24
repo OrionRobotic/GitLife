@@ -189,10 +189,18 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       }
 
       if (completed) {
-        const success = await addHabitLogForDate(existingHabit.id, user.id, date);
+        const success = await addHabitLogForDate(
+          existingHabit.id,
+          user.id,
+          date
+        );
         if (!success) throw new Error("Failed to add habit log");
       } else {
-        const success = await removeHabitLogForDate(existingHabit.id, user.id, date);
+        const success = await removeHabitLogForDate(
+          existingHabit.id,
+          user.id,
+          date
+        );
         if (!success) throw new Error("Failed to remove habit log");
       }
 
@@ -203,13 +211,17 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const createNewHabit = async (name: string, icon?: string): Promise<boolean> => {
+  const createNewHabit = async (
+    name: string,
+    icon?: string
+  ): Promise<boolean> => {
     if (!user) return false;
     try {
       const result = await createHabit({ name, icon }, user.id);
       if (result) {
         const capitalizedName =
-          result.name.charAt(0).toUpperCase() + result.name.slice(1).toLowerCase();
+          result.name.charAt(0).toUpperCase() +
+          result.name.slice(1).toLowerCase();
         setVisibleHabits((prev) => [
           ...prev,
           { id: result.id, name: capitalizedName, icon: result.icon },
@@ -229,7 +241,9 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
       const success = await deleteHabit(habitId, user.id);
       if (success) {
         setVisibleHabits((prev) => prev.filter((h) => h.id !== habitId));
-        setAllHabitLogs((prev) => prev.filter((log) => log.habitId !== habitId));
+        setAllHabitLogs((prev) =>
+          prev.filter((log) => log.habitId !== habitId)
+        );
       }
       return success;
     } catch (error) {
@@ -238,10 +252,15 @@ export const HabitsProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const changeHabitIcon = async (habitId: string, icon: string): Promise<boolean> => {
+  const changeHabitIcon = async (
+    habitId: string,
+    icon: string
+  ): Promise<boolean> => {
     const success = await updateHabitIcon(habitId, icon);
     if (success) {
-      setVisibleHabits((prev) => prev.map((h) => h.id === habitId ? { ...h, icon } : h));
+      setVisibleHabits((prev) =>
+        prev.map((h) => (h.id === habitId ? { ...h, icon } : h))
+      );
     }
     return success;
   };
