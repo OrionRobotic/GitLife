@@ -168,7 +168,9 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
   const [selectedIcon, setSelectedIcon] = useState("BookOpen");
   const [isCreating, setIsCreating] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
-  const [iconPickerHabitId, setIconPickerHabitId] = useState<string | null>(null);
+  const [iconPickerHabitId, setIconPickerHabitId] = useState<string | null>(
+    null
+  );
   const inputRef = useRef<HTMLInputElement>(null);
 
   const visibleHabits = (() => {
@@ -192,7 +194,9 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
     return completedIds;
   };
 
-  const [completedHabitIds, setCompletedHabitIds] = useState(getInitialCompletedIds);
+  const [completedHabitIds, setCompletedHabitIds] = useState(
+    getInitialCompletedIds
+  );
   const future = isFuture(date) && !isToday(date);
 
   useEffect(() => {
@@ -210,7 +214,11 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
     completed: completedHabitIds.has(habit.id),
   }));
 
-  const handleChange = async (habitId: string, habitName: string, completed: boolean) => {
+  const handleChange = async (
+    habitId: string,
+    habitName: string,
+    completed: boolean
+  ) => {
     setCompletedHabitIds((prev) => {
       const next = new Set(prev);
       completed ? next.add(habitId) : next.delete(habitId);
@@ -257,8 +265,12 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
   return (
     <div className="p-6 bg-card border border-border rounded-lg max-w-3xl w-full">
       <div className="mb-5">
-        <h2 className="text-lg font-medium text-foreground">{format(date, "EEEE")}</h2>
-        <p className="text-sm text-muted-foreground">{format(date, "MMMM d, yyyy")}</p>
+        <h2 className="text-lg font-medium text-foreground">
+          {format(date, "EEEE")}
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          {format(date, "MMMM d, yyyy")}
+        </p>
       </div>
 
       {/* Tab filter row */}
@@ -277,7 +289,11 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
           {dashboards.map((dashboard) => (
             <button
               key={dashboard.id}
-              onClick={() => setActiveTabId(activeTabId === dashboard.id ? null : dashboard.id)}
+              onClick={() =>
+                setActiveTabId(
+                  activeTabId === dashboard.id ? null : dashboard.id
+                )
+              }
               className={`flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-md transition-colors ${
                 activeTabId === dashboard.id
                   ? "bg-foreground/10 text-foreground font-medium"
@@ -295,62 +311,73 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
       )}
 
       {future ? (
-        <p className="text-muted-foreground text-sm">Cannot log future dates.</p>
+        <p className="text-muted-foreground text-sm">
+          Cannot log future dates.
+        </p>
       ) : (
         <div className="space-y-3">
           {habitsForDisplay.length === 0 && (
             <p className="text-muted-foreground text-sm">
-              {activeTabId ? "No habits in this tab." : "No habits yet. Add one below!"}
+              {activeTabId
+                ? "No habits in this tab."
+                : "No habits yet. Add one below!"}
             </p>
           )}
 
           {habitsForDisplay.map(({ id, name, icon: Icon, completed }) => (
             <div key={id} className="flex flex-col gap-1">
-            <div className="group flex items-center gap-4">
-              <button
-                type="button"
-                onClick={() => setIconPickerHabitId((prev) => prev === id ? null : id)}
-                className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="Change icon"
-              >
-                <Icon className="w-4 h-4" />
-              </button>
-              <span className="text-sm font-medium text-foreground flex-1">{name}</span>
-              <button
-                onClick={() => handleDelete(id)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive shrink-0"
-                aria-label="Delete habit"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => handleChange(id, name, !completed)}
-                className={`w-3.5 h-3.5 rounded-[2px] transition-all border shrink-0 ${
-                  completed
-                    ? "bg-contribution-3 border-contribution-3"
-                    : "bg-background border-border hover:border-foreground/30"
-                }`}
-                aria-label={completed ? "Mark incomplete" : "Mark complete"}
-              />
-            </div>
-            {iconPickerHabitId === id && (
-              <div className="flex flex-wrap gap-1 pl-8 max-h-24 overflow-y-auto pr-1">
-                {ICON_OPTIONS.map((iconName) => {
-                  const IconOption = ICON_MAP[iconName];
-                  return (
-                    <button
-                      key={iconName}
-                      type="button"
-                      onClick={() => { changeHabitIcon(id, iconName); setIconPickerHabitId(null); }}
-                      className="p-1.5 rounded text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-colors"
-                      aria-label={iconName}
-                    >
-                      <IconOption className="w-3.5 h-3.5" />
-                    </button>
-                  );
-                })}
+              <div className="group flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setIconPickerHabitId((prev) => (prev === id ? null : id))
+                  }
+                  className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Change icon"
+                >
+                  <Icon className="w-4 h-4" />
+                </button>
+                <span className="text-sm font-medium text-foreground flex-1">
+                  {name}
+                </span>
+                <button
+                  onClick={() => handleDelete(id)}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive shrink-0"
+                  aria-label="Delete habit"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => handleChange(id, name, !completed)}
+                  className={`w-3.5 h-3.5 rounded-[2px] transition-all border shrink-0 ${
+                    completed
+                      ? "bg-contribution-3 border-contribution-3"
+                      : "bg-background border-border hover:border-foreground/30"
+                  }`}
+                  aria-label={completed ? "Mark incomplete" : "Mark complete"}
+                />
               </div>
-            )}
+              {iconPickerHabitId === id && (
+                <div className="flex flex-wrap gap-1 pl-8 max-h-24 overflow-y-auto pr-1">
+                  {ICON_OPTIONS.map((iconName) => {
+                    const IconOption = ICON_MAP[iconName];
+                    return (
+                      <button
+                        key={iconName}
+                        type="button"
+                        onClick={() => {
+                          changeHabitIcon(id, iconName);
+                          setIconPickerHabitId(null);
+                        }}
+                        className="p-1.5 rounded text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-colors"
+                        aria-label={iconName}
+                      >
+                        <IconOption className="w-3.5 h-3.5" />
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           ))}
 
@@ -425,7 +452,9 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
                   Cancel
                 </button>
               </div>
-              {addError && <p className="text-xs text-destructive">{addError}</p>}
+              {addError && (
+                <p className="text-xs text-destructive">{addError}</p>
+              )}
             </div>
           ) : (
             <button

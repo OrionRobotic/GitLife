@@ -7,10 +7,7 @@ import { supabase } from "@/lib/supabase";
  */
 export async function deleteBook(bookId: string): Promise<boolean> {
   try {
-    const { error } = await supabase
-      .from("books")
-      .delete()
-      .eq("id", bookId);
+    const { error } = await supabase.from("books").delete().eq("id", bookId);
 
     if (error) {
       console.error("Error deleting book:", error);

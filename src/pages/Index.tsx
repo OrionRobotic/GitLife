@@ -27,7 +27,11 @@ const PageHeader = memo(function PageHeader() {
     <header className="w-full px-6 py-6 flex justify-between items-center">
       <div className="min-w-0">
         <h1 className="text-3xl font-normal text-foreground tracking-tight flex items-center gap-3">
-          <img src="/favicon.svg" alt="GitLife" className="w-10 h-10 shrink-0" />
+          <img
+            src="/favicon.svg"
+            alt="GitLife"
+            className="w-10 h-10 shrink-0"
+          />
           <span className="truncate">GitLife</span>
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
@@ -45,9 +49,19 @@ const Index = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const currentYear = new Date().getFullYear();
   const { visibleHabits, allHabitLogs, isLoading } = useHabits();
-  const { monthlyGoals, quarterEffort, quarterWeeklyGoals, monthlyPeriodTitle, monthlyPeriodDescription, monthlyPeriodStart, monthlyPeriodEnd } = useGoals();
+  const {
+    monthlyGoals,
+    quarterEffort,
+    quarterWeeklyGoals,
+    monthlyPeriodTitle,
+    monthlyPeriodDescription,
+    monthlyPeriodStart,
+    monthlyPeriodEnd,
+  } = useGoals();
   const [goalsDialogOpen, setGoalsDialogOpen] = useState(false);
-  const [goalsDialogTab, setGoalsDialogTab] = useState<"weekly" | "monthly" | "semester">("weekly");
+  const [goalsDialogTab, setGoalsDialogTab] = useState<
+    "weekly" | "monthly" | "semester"
+  >("weekly");
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
@@ -88,9 +102,7 @@ const Index = () => {
       return { totalScore: 0, totalHabits: visibleHabits.length };
     }
 
-    const filterSet = filteredHabitIds
-      ? new Set(filteredHabitIds)
-      : null;
+    const filterSet = filteredHabitIds ? new Set(filteredHabitIds) : null;
 
     const relevantHabits = filterSet
       ? visibleHabits.filter((h) => filterSet.has(h.id))
@@ -113,7 +125,11 @@ const Index = () => {
     };
   }, [displayDate, allHabitLogs, visibleHabits, filteredHabitIds]);
 
-  const handleDialogSave = (name: string, habitIds: string[], color: string) => {
+  const handleDialogSave = (
+    name: string,
+    habitIds: string[],
+    color: string
+  ) => {
     if (editingDashboard) {
       updateDashboard(editingDashboard.id, name, habitIds, color);
     } else {
@@ -121,7 +137,11 @@ const Index = () => {
     }
   };
 
-  const handleSaveDefault = (name: string, color: string, habitIds: string[]) => {
+  const handleSaveDefault = (
+    name: string,
+    color: string,
+    habitIds: string[]
+  ) => {
     updateDefaultTab(name, color, habitIds);
   };
 
@@ -254,7 +274,11 @@ const Index = () => {
               />
             </div>
             <div className="col-span-2">
-              <GoalsSection open={goalsDialogOpen} onOpenChange={setGoalsDialogOpen} initialTab={goalsDialogTab} />
+              <GoalsSection
+                open={goalsDialogOpen}
+                onOpenChange={setGoalsDialogOpen}
+                initialTab={goalsDialogTab}
+              />
             </div>
           </div>
 
@@ -268,7 +292,10 @@ const Index = () => {
               periodDescription={monthlyPeriodDescription}
               periodStart={monthlyPeriodStart}
               periodEnd={monthlyPeriodEnd}
-              onOpenGoals={() => { setGoalsDialogTab("monthly"); setGoalsDialogOpen(true); }}
+              onOpenGoals={() => {
+                setGoalsDialogTab("monthly");
+                setGoalsDialogOpen(true);
+              }}
             />
           )}
 

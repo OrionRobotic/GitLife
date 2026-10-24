@@ -124,9 +124,7 @@ export default function Login() {
           </p>
         </CardFooter>
       </Card>
-      <p className="mt-8 text-sm text-muted-foreground text-center">
-        GitLife
-      </p>
+      <p className="mt-8 text-sm text-muted-foreground text-center">GitLife</p>
     </div>
   );
 }

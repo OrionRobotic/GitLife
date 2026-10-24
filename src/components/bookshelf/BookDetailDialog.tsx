@@ -231,7 +231,9 @@ export function BookDetailDialog({
                         Save
                       </Button>
                     </div>
-                    <Badge variant={status === "read" ? "default" : "secondary"}>
+                    <Badge
+                      variant={status === "read" ? "default" : "secondary"}
+                    >
                       {status === "read" ? "Read" : "Reading"}
                     </Badge>
                   </div>
@@ -249,7 +251,9 @@ export function BookDetailDialog({
                     >
                       Edit
                     </Button>
-                    <Badge variant={status === "read" ? "default" : "secondary"}>
+                    <Badge
+                      variant={status === "read" ? "default" : "secondary"}
+                    >
                       {status === "read" ? "Read" : "Reading"}
                     </Badge>
                   </div>
@@ -363,9 +367,13 @@ export function BookDetailDialog({
                       style={{
                         backgroundColor: "#FAF9F6",
                         border: `3px solid ${shade.value}`,
-                        outline: color === shade.value ? `2px solid ${shade.value}` : "2px solid transparent",
+                        outline:
+                          color === shade.value
+                            ? `2px solid ${shade.value}`
+                            : "2px solid transparent",
                         outlineOffset: "2px",
-                        transform: color === shade.value ? "scale(1.1)" : "scale(1)",
+                        transform:
+                          color === shade.value ? "scale(1.1)" : "scale(1)",
                       }}
                       onClick={() => handleColorChange(shade.value)}
                       title={shade.label}

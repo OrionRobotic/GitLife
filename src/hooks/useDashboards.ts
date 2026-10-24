@@ -20,7 +20,9 @@ const DEFAULT_TAB_DEFAULTS: DefaultTabConfig = {
 function loadDefaultTab(): DefaultTabConfig {
   try {
     const raw = localStorage.getItem(DEFAULT_TAB_KEY);
-    return raw ? { ...DEFAULT_TAB_DEFAULTS, ...JSON.parse(raw) } : DEFAULT_TAB_DEFAULTS;
+    return raw
+      ? { ...DEFAULT_TAB_DEFAULTS, ...JSON.parse(raw) }
+      : DEFAULT_TAB_DEFAULTS;
   } catch {
     return DEFAULT_TAB_DEFAULTS;
   }
@@ -44,7 +46,8 @@ export function useDashboards() {
   const [activeDashboardId, setActiveDashboardId] = useState<string | null>(
     loadActiveDashboardId
   );
-  const [defaultTab, setDefaultTab] = useState<DefaultTabConfig>(loadDefaultTab);
+  const [defaultTab, setDefaultTab] =
+    useState<DefaultTabConfig>(loadDefaultTab);
 
   // Sync dashboards to localStorage
   useEffect(() => {
@@ -95,13 +98,10 @@ export function useDashboards() {
     []
   );
 
-  const deleteDashboard = useCallback(
-    (id: string) => {
-      setDashboards((prev) => prev.filter((d) => d.id !== id));
-      setActiveDashboardId((prev) => (prev === id ? null : prev));
-    },
-    []
-  );
+  const deleteDashboard = useCallback((id: string) => {
+    setDashboards((prev) => prev.filter((d) => d.id !== id));
+    setActiveDashboardId((prev) => (prev === id ? null : prev));
+  }, []);
 
   const activeDashboard =
     dashboards.find((d) => d.id === activeDashboardId) ?? null;

@@ -102,9 +102,14 @@ export function DashboardDialog({
   const handleSave = () => {
     if (!canSave) return;
     if (isDefaultMode) {
-      const allSelected = selectedIds.size === visibleHabits.length &&
+      const allSelected =
+        selectedIds.size === visibleHabits.length &&
         visibleHabits.every((h) => selectedIds.has(h.id));
-      onSaveDefault(name.trim(), color, allSelected ? [] : Array.from(selectedIds));
+      onSaveDefault(
+        name.trim(),
+        color,
+        allSelected ? [] : Array.from(selectedIds)
+      );
     } else {
       onSave(name.trim(), Array.from(selectedIds), color);
     }

@@ -6,7 +6,14 @@ import {
   ReactNode,
 } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { createGoal, getGoals, updateGoal, deleteGoal, getGoalPeriods, upsertGoalPeriod } from "@/services/goals";
+import {
+  createGoal,
+  getGoals,
+  updateGoal,
+  deleteGoal,
+  getGoalPeriods,
+  upsertGoalPeriod,
+} from "@/services/goals";
 import type { Goal, GoalType, GoalPeriod } from "@/types/database/Goal";
 import {
   format,
@@ -18,11 +25,17 @@ import {
   parseISO,
 } from "date-fns";
 
-function getCurrentPeriod(type: GoalType): { periodStart: string; periodEnd: string } {
+function getCurrentPeriod(type: GoalType): {
+  periodStart: string;
+  periodEnd: string;
+} {
   const today = new Date();
   if (type === "weekly") {
     return {
-      periodStart: format(startOfWeek(today, { weekStartsOn: 1 }), "yyyy-MM-dd"),
+      periodStart: format(
+        startOfWeek(today, { weekStartsOn: 1 }),
+        "yyyy-MM-dd"
+      ),
       periodEnd: format(endOfWeek(today, { weekStartsOn: 1 }), "yyyy-MM-dd"),
     };
   }
@@ -93,7 +106,10 @@ interface GoalsContextType {
   weeklyPeriodDescription: string;
   monthlyPeriodDescription: string;
   semesterPeriodDescription: string;
-  updatePeriod: (type: GoalType, updates: { title: string; description: string }) => Promise<void>;
+  updatePeriod: (
+    type: GoalType,
+    updates: { title: string; description: string }
+  ) => Promise<void>;
   updateMonthlyPeriodStart: (startDate: string) => Promise<void>;
   monthlyPeriodStart: string;
   monthlyPeriodEnd: string;
@@ -115,7 +131,10 @@ export const GoalsProvider = ({ children }: { children: ReactNode }) => {
     if (!user) return;
     setIsLoading(true);
     try {
-      const [goalsData, periodsData] = await Promise.all([getGoals(), getGoalPeriods()]);
+      const [goalsData, periodsData] = await Promise.all([
+        getGoals(),
+        getGoalPeriods(),
+      ]);
       if (goalsData) setGoals(goalsData);
       if (periodsData) setGoalPeriods(periodsData);
     } catch (error) {
@@ -136,13 +155,23 @@ export const GoalsProvider = ({ children }: { children: ReactNode }) => {
     const stored = goalPeriods
       .filter((p) => {
         if (p.type !== "monthly") return false;
-        const days = (new Date(p.periodEnd).getTime() - new Date(p.periodStart).getTime()) / 86400000;
+        const days =
+          (new Date(p.periodEnd).getTime() -
+            new Date(p.periodStart).getTime()) /
+          86400000;
         return days >= 60;
       })
       .sort((a, b) => b.periodStart.localeCompare(a.periodStart));
-    const current = stored.find((p) => p.periodStart <= today && p.periodEnd >= today);
-    if (current) return { periodStart: current.periodStart, periodEnd: current.periodEnd };
-    if (stored.length > 0) return { periodStart: stored[0].periodStart, periodEnd: stored[0].periodEnd };
+    const current = stored.find(
+      (p) => p.periodStart <= today && p.periodEnd >= today
+    );
+    if (current)
+      return { periodStart: current.periodStart, periodEnd: current.periodEnd };
+    if (stored.length > 0)
+      return {
+        periodStart: stored[0].periodStart,
+        periodEnd: stored[0].periodEnd,
+      };
     return getCurrentPeriod("monthly");
   })();
 
@@ -159,26 +188,42 @@ export const GoalsProvider = ({ children }: { children: ReactNode }) => {
     (g) => g.type === "semester" && isInCurrentPeriod(g)
   );
 
-  const weeklyPeriodTitle = findPeriodField(goalPeriods, "weekly", "title") as string;
-  const semesterPeriodTitle = findPeriodField(goalPeriods, "semester", "title") as string;
-  const weeklyPeriodDescription = findPeriodField(goalPeriods, "weekly", "description") as string;
-  const semesterPeriodDescription = findPeriodField(goalPeriods, "semester", "description") as string;
+  const weeklyPeriodTitle = findPeriodField(
+    goalPeriods,
+    "weekly",
+    "title"
+  ) as string;
+  const semesterPeriodTitle = findPeriodField(
+    goalPeriods,
+    "semester",
+    "title"
+  ) as string;
+  const weeklyPeriodDescription = findPeriodField(
+    goalPeriods,
+    "weekly",
+    "description"
+  ) as string;
+  const semesterPeriodDescription = findPeriodField(
+    goalPeriods,
+    "semester",
+    "description"
+  ) as string;
   // Monthly uses activeMonthlyPeriod dates for lookup
   const monthlyPeriodRecord = goalPeriods.find(
-    (p) => p.type === "monthly" &&
+    (p) =>
+      p.type === "monthly" &&
       p.periodStart === activeMonthlyPeriod.periodStart &&
       p.periodEnd === activeMonthlyPeriod.periodEnd
   );
   const monthlyPeriodTitle = (monthlyPeriodRecord?.title ?? "") as string;
-  const monthlyPeriodDescription = (monthlyPeriodRecord?.description ?? "") as string;
+  const monthlyPeriodDescription = (monthlyPeriodRecord?.description ??
+    "") as string;
 
   const addGoal = async (title: string, type: GoalType) => {
     if (!user) return;
-    const period = type === "monthly" ? activeMonthlyPeriod : getCurrentPeriod(type);
-    const newGoal = await createGoal(
-      { title, type, ...period },
-      user.id
-    );
+    const period =
+      type === "monthly" ? activeMonthlyPeriod : getCurrentPeriod(type);
+    const newGoal = await createGoal({ title, type, ...period }, user.id);
     if (newGoal) setGoals((prev) => [...prev, newGoal]);
   };
 
@@ -222,41 +267,70 @@ export const GoalsProvider = ({ children }: { children: ReactNode }) => {
   const quarterTotal = quarterWeeklyGoals.length; // denominator = all tasks, not just completed
   const quarterEffort: QuarterEffortEntry[] = (() => {
     if (quarterTotal === 0) {
-      return monthlyGoals.map((mg) => ({ goalId: mg.id, percentage: 0, count: 0 }));
+      return monthlyGoals.map((mg) => ({
+        goalId: mg.id,
+        percentage: 0,
+        count: 0,
+      }));
     }
     const result: QuarterEffortEntry[] = monthlyGoals.map((mg) => {
-      const count = completedQuarter.filter((g) => g.linkedGoalId === mg.id).length;
+      const count = completedQuarter.filter(
+        (g) => g.linkedGoalId === mg.id
+      ).length;
       return { goalId: mg.id, percentage: count / quarterTotal, count };
     });
-    const linkedCount = completedQuarter.filter((g) => g.linkedGoalId != null).length;
-    result.push({ goalId: null, percentage: (completedQuarter.length - linkedCount) / quarterTotal, count: completedQuarter.length - linkedCount });
+    const linkedCount = completedQuarter.filter(
+      (g) => g.linkedGoalId != null
+    ).length;
+    result.push({
+      goalId: null,
+      percentage: (completedQuarter.length - linkedCount) / quarterTotal,
+      count: completedQuarter.length - linkedCount,
+    });
     return result;
   })();
 
   const updateMonthlyPeriodStart = async (startDate: string) => {
     if (!user) return;
-    const endDate = format(subDays(addMonths(parseISO(startDate), 4), 1), "yyyy-MM-dd");
-    const updated = await upsertGoalPeriod({
-      type: "monthly",
-      periodStart: startDate,
-      periodEnd: endDate,
-      title: monthlyPeriodTitle,
-      description: monthlyPeriodDescription,
-    }, user.id);
+    const endDate = format(
+      subDays(addMonths(parseISO(startDate), 4), 1),
+      "yyyy-MM-dd"
+    );
+    const updated = await upsertGoalPeriod(
+      {
+        type: "monthly",
+        periodStart: startDate,
+        periodEnd: endDate,
+        title: monthlyPeriodTitle,
+        description: monthlyPeriodDescription,
+      },
+      user.id
+    );
     if (updated) {
       setGoalPeriods((prev) => {
         const filtered = prev.filter(
-          (p) => !(p.type === "monthly" && p.periodStart === activeMonthlyPeriod.periodStart)
+          (p) =>
+            !(
+              p.type === "monthly" &&
+              p.periodStart === activeMonthlyPeriod.periodStart
+            )
         );
         return [...filtered, updated];
       });
     }
   };
 
-  const updatePeriod = async (type: GoalType, updates: { title: string; description: string }) => {
+  const updatePeriod = async (
+    type: GoalType,
+    updates: { title: string; description: string }
+  ) => {
     if (!user) return;
-    const period = type === "monthly" ? activeMonthlyPeriod : getCurrentPeriod(type);
-    const updated = await upsertGoalPeriod({ type, ...period, ...updates }, user.id);
+    const period =
+      type === "monthly" ? activeMonthlyPeriod : getCurrentPeriod(type);
+    const updated = await upsertGoalPeriod(
+      { type, ...period, ...updates },
+      user.id
+    );
     if (updated) {
       setGoalPeriods((prev) => {
         const idx = prev.findIndex(

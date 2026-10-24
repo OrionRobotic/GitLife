@@ -20,7 +20,7 @@ import {
 
 // Tab definitions: display label maps to existing GoalType values
 const DIALOG_TABS = [
-  { key: "weekly" as GoalType,  label: "Week" },
+  { key: "weekly" as GoalType, label: "Week" },
   { key: "monthly" as GoalType, label: "Quarter" },
 ];
 
@@ -32,14 +32,17 @@ function getPeriodRange(type: GoalType): string {
     return `${format(s, "MMM d")} – ${format(e, "MMM d")}`;
   }
   if (type === "monthly") {
-    const m = today.getMonth(), y = today.getFullYear();
-    if (m < 3)  return `Jan 1 – Mar 31, ${y}`;
-    if (m < 6)  return `Apr 1 – Jun 30, ${y}`;
-    if (m < 9)  return `Jul 1 – Sep 30, ${y}`;
+    const m = today.getMonth(),
+      y = today.getFullYear();
+    if (m < 3) return `Jan 1 – Mar 31, ${y}`;
+    if (m < 6) return `Apr 1 – Jun 30, ${y}`;
+    if (m < 9) return `Jul 1 – Sep 30, ${y}`;
     return `Oct 1 – Dec 31, ${y}`;
   }
   const month = today.getMonth() + 1;
-  return month <= 6 ? `Jan 1 – Jun 30, ${today.getFullYear()}` : `Jul 1 – Dec 31, ${today.getFullYear()}`;
+  return month <= 6
+    ? `Jan 1 – Jun 30, ${today.getFullYear()}`
+    : `Jul 1 – Dec 31, ${today.getFullYear()}`;
 }
 
 // ── GoalRow ───────────────────────────────────────────────────────────────────
@@ -65,14 +68,19 @@ function GoalRow({
   const inputRef = useRef<HTMLInputElement>(null);
   const linkRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { if (editing) inputRef.current?.focus(); }, [editing]);
+  useEffect(() => {
+    if (editing) inputRef.current?.focus();
+  }, [editing]);
 
   // Close link dropdown on outside click or Escape
   useEffect(() => {
     if (!linkOpen) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setLinkOpen(false); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLinkOpen(false);
+    };
     const onClickOutside = (e: MouseEvent) => {
-      if (linkRef.current && !linkRef.current.contains(e.target as Node)) setLinkOpen(false);
+      if (linkRef.current && !linkRef.current.contains(e.target as Node))
+        setLinkOpen(false);
     };
     document.addEventListener("keydown", onKey);
     document.addEventListener("mousedown", onClickOutside);
@@ -106,7 +114,10 @@ function GoalRow({
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") commitEdit();
-            if (e.key === "Escape") { setValue(goal.title); setEditing(false); }
+            if (e.key === "Escape") {
+              setValue(goal.title);
+              setEditing(false);
+            }
           }}
           onBlur={commitEdit}
           className="text-sm flex-1 bg-transparent border-b border-border outline-none text-foreground pb-0.5"
@@ -126,7 +137,9 @@ function GoalRow({
       <span
         onDoubleClick={() => setEditing(true)}
         className={`text-sm flex-1 cursor-default select-none ${
-          goal.completed ? "line-through text-muted-foreground" : "text-foreground"
+          goal.completed
+            ? "line-through text-muted-foreground"
+            : "text-foreground"
         }`}
       >
         {goal.title}
@@ -137,7 +150,11 @@ function GoalRow({
         <div ref={linkRef} className="relative shrink-0">
           <button
             onClick={() => setLinkOpen((v) => !v)}
-            title={linkedGoal ? `Linked to: ${linkedGoal.title}` : "Link to quarter goal"}
+            title={
+              linkedGoal
+                ? `Linked to: ${linkedGoal.title}`
+                : "Link to quarter goal"
+            }
             className={`transition-opacity ${
               linkedGoal
                 ? "text-orange-400/80 opacity-100"
@@ -150,9 +167,14 @@ function GoalRow({
             <div className="absolute right-0 top-5 z-20 bg-background border border-border rounded-md shadow-lg py-1 min-w-[160px] max-w-[220px]">
               <button
                 className={`w-full text-left px-3 py-1.5 text-xs hover:bg-muted transition-colors ${
-                  !goal.linkedGoalId ? "text-foreground font-medium" : "text-muted-foreground"
+                  !goal.linkedGoalId
+                    ? "text-foreground font-medium"
+                    : "text-muted-foreground"
                 }`}
-                onClick={() => { onLink(goal.id, null); setLinkOpen(false); }}
+                onClick={() => {
+                  onLink(goal.id, null);
+                  setLinkOpen(false);
+                }}
               >
                 None
               </button>
@@ -160,9 +182,14 @@ function GoalRow({
                 <button
                   key={mg.id}
                   className={`w-full text-left px-3 py-1.5 text-xs hover:bg-muted transition-colors truncate ${
-                    goal.linkedGoalId === mg.id ? "text-foreground font-medium" : "text-muted-foreground"
+                    goal.linkedGoalId === mg.id
+                      ? "text-foreground font-medium"
+                      : "text-muted-foreground"
                   }`}
-                  onClick={() => { onLink(goal.id, mg.id); setLinkOpen(false); }}
+                  onClick={() => {
+                    onLink(goal.id, mg.id);
+                    setLinkOpen(false);
+                  }}
                 >
                   {mg.title}
                 </button>
@@ -190,12 +217,20 @@ function GoalRow({
 
 // ── AddGoalInput ──────────────────────────────────────────────────────────────
 
-function AddGoalInput({ type, onAdd }: { type: GoalType; onAdd: (title: string, type: GoalType) => void }) {
+function AddGoalInput({
+  type,
+  onAdd,
+}: {
+  type: GoalType;
+  onAdd: (title: string, type: GoalType) => void;
+}) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => { if (open) inputRef.current?.focus(); }, [open]);
+  useEffect(() => {
+    if (open) inputRef.current?.focus();
+  }, [open]);
 
   const submit = () => {
     const trimmed = value.trim();
@@ -222,7 +257,10 @@ function AddGoalInput({ type, onAdd }: { type: GoalType; onAdd: (title: string, 
       onChange={(e) => setValue(e.target.value)}
       onKeyDown={(e) => {
         if (e.key === "Enter") submit();
-        if (e.key === "Escape") { setValue(""); setOpen(false); }
+        if (e.key === "Escape") {
+          setValue("");
+          setOpen(false);
+        }
       }}
       onBlur={submit}
       placeholder="New goal..."
@@ -233,15 +271,28 @@ function AddGoalInput({ type, onAdd }: { type: GoalType; onAdd: (title: string, 
 
 // ── EditableTitle ─────────────────────────────────────────────────────────────
 
-function EditableTitle({ value: externalValue, onSave }: { value: string; onSave: (v: string) => void }) {
+function EditableTitle({
+  value: externalValue,
+  onSave,
+}: {
+  value: string;
+  onSave: (v: string) => void;
+}) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(externalValue);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => { setValue(externalValue); }, [externalValue]);
-  useEffect(() => { if (editing) inputRef.current?.focus(); }, [editing]);
+  useEffect(() => {
+    setValue(externalValue);
+  }, [externalValue]);
+  useEffect(() => {
+    if (editing) inputRef.current?.focus();
+  }, [editing]);
 
-  const commit = () => { onSave(value.trim()); setEditing(false); };
+  const commit = () => {
+    onSave(value.trim());
+    setEditing(false);
+  };
 
   if (editing) {
     return (
@@ -251,7 +302,10 @@ function EditableTitle({ value: externalValue, onSave }: { value: string; onSave
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === "Enter") commit();
-          if (e.key === "Escape") { setValue(externalValue); setEditing(false); }
+          if (e.key === "Escape") {
+            setValue(externalValue);
+            setEditing(false);
+          }
         }}
         onBlur={commit}
         placeholder="Set a focus…"
@@ -308,17 +362,23 @@ function WeekQuarterContent({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [descValue, setDescValue] = useState(periodDescription);
 
-  useEffect(() => { setDescValue(periodDescription); }, [periodDescription]);
+  useEffect(() => {
+    setDescValue(periodDescription);
+  }, [periodDescription]);
 
   useEffect(() => {
     const ta = textareaRef.current;
-    if (ta) { ta.style.height = "auto"; ta.style.height = ta.scrollHeight + "px"; }
+    if (ta) {
+      ta.style.height = "auto";
+      ta.style.height = ta.scrollHeight + "px";
+    }
   }, [descValue]);
 
   const dateInputRef = useRef<HTMLInputElement>(null);
-  const rangeLabel = periodStart && periodEnd
-    ? `${format(parseISO(periodStart), "MMM d")} – ${format(parseISO(periodEnd), "MMM d, yyyy")}`
-    : getPeriodRange(type);
+  const rangeLabel =
+    periodStart && periodEnd
+      ? `${format(parseISO(periodStart), "MMM d")} – ${format(parseISO(periodEnd), "MMM d, yyyy")}`
+      : getPeriodRange(type);
 
   return (
     <div className="space-y-5">
@@ -339,7 +399,9 @@ function WeekQuarterContent({
                 ref={dateInputRef}
                 type="date"
                 defaultValue={periodStart ?? ""}
-                onChange={(e) => { if (e.target.value) onChangePeriodStart(e.target.value); }}
+                onChange={(e) => {
+                  if (e.target.value) onChangePeriodStart(e.target.value);
+                }}
                 className="sr-only"
               />
             </>
@@ -352,12 +414,19 @@ function WeekQuarterContent({
       </div>
 
       <div>
-        <label className="text-xs text-muted-foreground uppercase tracking-wide">Description</label>
+        <label className="text-xs text-muted-foreground uppercase tracking-wide">
+          Description
+        </label>
         <textarea
           ref={textareaRef}
           value={descValue}
           onChange={(e) => setDescValue(e.target.value)}
-          onBlur={() => onUpdatePeriod({ title: periodTitle, description: descValue.trim() })}
+          onBlur={() =>
+            onUpdatePeriod({
+              title: periodTitle,
+              description: descValue.trim(),
+            })
+          }
           placeholder="What does this period mean to you?"
           rows={2}
           className="mt-1 w-full text-sm bg-transparent border-b border-border outline-none text-foreground placeholder:text-muted-foreground pb-0.5 resize-none overflow-hidden leading-relaxed"
@@ -366,7 +435,9 @@ function WeekQuarterContent({
 
       <div>
         <div className="flex items-center justify-between mb-1">
-          <label className="text-xs text-muted-foreground uppercase tracking-wide">Goals</label>
+          <label className="text-xs text-muted-foreground uppercase tracking-wide">
+            Goals
+          </label>
           <span className="text-xs text-muted-foreground">
             {goals.filter((g) => g.completed).length}/{goals.length}
           </span>
@@ -404,17 +475,24 @@ function YearContent({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [descValue, setDescValue] = useState(periodDescription);
 
-  useEffect(() => { setDescValue(periodDescription); }, [periodDescription]);
+  useEffect(() => {
+    setDescValue(periodDescription);
+  }, [periodDescription]);
 
   useEffect(() => {
     const ta = textareaRef.current;
-    if (ta) { ta.style.height = "auto"; ta.style.height = ta.scrollHeight + "px"; }
+    if (ta) {
+      ta.style.height = "auto";
+      ta.style.height = ta.scrollHeight + "px";
+    }
   }, [descValue]);
 
   return (
     <div className="space-y-5">
       <div>
-        <p className="text-xs text-muted-foreground mb-2">{getPeriodRange("semester")}</p>
+        <p className="text-xs text-muted-foreground mb-2">
+          {getPeriodRange("semester")}
+        </p>
         <EditableTitle
           value={periodTitle}
           onSave={(title) => onUpdatePeriod({ title, description: descValue })}
@@ -422,12 +500,19 @@ function YearContent({
       </div>
 
       <div>
-        <label className="text-xs text-muted-foreground uppercase tracking-wide">Reflection</label>
+        <label className="text-xs text-muted-foreground uppercase tracking-wide">
+          Reflection
+        </label>
         <textarea
           ref={textareaRef}
           value={descValue}
           onChange={(e) => setDescValue(e.target.value)}
-          onBlur={() => onUpdatePeriod({ title: periodTitle, description: descValue.trim() })}
+          onBlur={() =>
+            onUpdatePeriod({
+              title: periodTitle,
+              description: descValue.trim(),
+            })
+          }
           placeholder="What do you want this year to stand for?"
           rows={5}
           className="mt-1 w-full text-sm bg-transparent border-b border-border outline-none text-foreground placeholder:text-muted-foreground pb-0.5 resize-none overflow-hidden leading-relaxed"
@@ -440,14 +525,20 @@ function YearContent({
 // ── WeekInfoPanel — always-visible side panel next to torus ───────────────────
 
 function WeekInfoPanel({
-  title, description, goals,
+  title,
+  description,
+  goals,
 }: {
-  title: string; description: string; goals: Goal[];
+  title: string;
+  description: string;
+  goals: Goal[];
 }) {
   return (
     <div className="flex flex-col min-w-0">
       {description && (
-        <p className="text-xs text-muted-foreground mt-1 leading-snug line-clamp-3">{description}</p>
+        <p className="text-xs text-muted-foreground mt-1 leading-snug line-clamp-3">
+          {description}
+        </p>
       )}
       {goals.length > 0 && (
         <div className="mt-3 flex flex-col gap-1">
@@ -499,31 +590,49 @@ export function GoalsSection({
   } = useGoals();
 
   const [internalOpen, setInternalOpen] = useState(false);
-  const dialogOpen    = open    ?? internalOpen;
+  const dialogOpen = open ?? internalOpen;
   const setDialogOpen = onOpenChange ?? setInternalOpen;
 
   const [dialogTab, setDialogTab] = useState<GoalType>(initialTab ?? "weekly");
-  useEffect(() => { if (open && initialTab) setDialogTab(initialTab); }, [open, initialTab]);
-
+  useEffect(() => {
+    if (open && initialTab) setDialogTab(initialTab);
+  }, [open, initialTab]);
 
   const goalsForTab =
-    dialogTab === "weekly" ? weeklyGoals : dialogTab === "monthly" ? monthlyGoals : semesterGoals;
+    dialogTab === "weekly"
+      ? weeklyGoals
+      : dialogTab === "monthly"
+        ? monthlyGoals
+        : semesterGoals;
   const titleForTab =
-    dialogTab === "weekly" ? weeklyPeriodTitle : dialogTab === "monthly" ? monthlyPeriodTitle : semesterPeriodTitle;
+    dialogTab === "weekly"
+      ? weeklyPeriodTitle
+      : dialogTab === "monthly"
+        ? monthlyPeriodTitle
+        : semesterPeriodTitle;
   const descForTab =
-    dialogTab === "weekly" ? weeklyPeriodDescription : dialogTab === "monthly" ? monthlyPeriodDescription : semesterPeriodDescription;
+    dialogTab === "weekly"
+      ? weeklyPeriodDescription
+      : dialogTab === "monthly"
+        ? monthlyPeriodDescription
+        : semesterPeriodDescription;
 
   return (
     <div>
       <h2 className="text-xl font-normal text-foreground font-serif tracking-tight leading-snug">
         {weeklyPeriodTitle || "This week"}
       </h2>
-      <p className="text-xs text-muted-foreground mt-0.5 mb-1">{getPeriodRange("weekly")}</p>
+      <p className="text-xs text-muted-foreground mt-0.5 mb-1">
+        {getPeriodRange("weekly")}
+      </p>
 
       {/* Info panel (left) + Torus (right) */}
       <div
         className="flex items-start gap-4 cursor-pointer"
-        onClick={() => { setDialogTab("weekly"); setDialogOpen(true); }}
+        onClick={() => {
+          setDialogTab("weekly");
+          setDialogOpen(true);
+        }}
       >
         <div className="flex-1 min-w-0 pl-6 pt-2">
           <WeekInfoPanel
@@ -584,9 +693,15 @@ export function GoalsSection({
                 onAdd={addGoal}
                 monthlyGoals={dialogTab === "weekly" ? monthlyGoals : undefined}
                 onLink={dialogTab === "weekly" ? linkGoal : undefined}
-                periodStart={dialogTab === "monthly" ? monthlyPeriodStart : undefined}
-                periodEnd={dialogTab === "monthly" ? monthlyPeriodEnd : undefined}
-                onChangePeriodStart={dialogTab === "monthly" ? updateMonthlyPeriodStart : undefined}
+                periodStart={
+                  dialogTab === "monthly" ? monthlyPeriodStart : undefined
+                }
+                periodEnd={
+                  dialogTab === "monthly" ? monthlyPeriodEnd : undefined
+                }
+                onChangePeriodStart={
+                  dialogTab === "monthly" ? updateMonthlyPeriodStart : undefined
+                }
               />
             )}
           </div>

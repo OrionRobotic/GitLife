@@ -66,8 +66,7 @@ export default function Bookshelf() {
     const q = searchQuery.toLowerCase();
     return books.filter(
       (b) =>
-        b.title.toLowerCase().includes(q) ||
-        b.author.toLowerCase().includes(q)
+        b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q)
     );
   }, [books, searchQuery]);
 
@@ -88,7 +87,9 @@ export default function Bookshelf() {
           <h1 className="text-3xl font-normal text-foreground mb-2">
             Bookshelf
           </h1>
-          <p className="text-sm text-muted-foreground">Your reading collection</p>
+          <p className="text-sm text-muted-foreground">
+            Your reading collection
+          </p>
         </div>
       </div>
 
@@ -107,9 +108,12 @@ export default function Bookshelf() {
 
       <div className="max-w-4xl mx-auto px-6 py-8">
         <p className="text-sm italic text-muted-foreground/70 text-right">
-          "A reader lives a thousand lives before he dies. The man who never reads lives only one."
+          "A reader lives a thousand lives before he dies. The man who never
+          reads lives only one."
         </p>
-        <p className="text-xs text-muted-foreground/50 text-right mt-1">— George R.R. Martin</p>
+        <p className="text-xs text-muted-foreground/50 text-right mt-1">
+          — George R.R. Martin
+        </p>
       </div>
 
       <div className="max-w-4xl mx-auto px-6 flex justify-end gap-2 items-start">
@@ -125,7 +129,10 @@ export default function Bookshelf() {
                   className="w-60 h-9 text-sm pr-8"
                 />
                 <button
-                  onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
+                  onClick={() => {
+                    setSearchOpen(false);
+                    setSearchQuery("");
+                  }}
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   <X className="h-3.5 w-3.5" />
@@ -134,7 +141,9 @@ export default function Bookshelf() {
               {searchQuery.trim() && (
                 <div className="absolute top-10 left-0 w-60 bg-[rgba(245,240,230,0.95)] border border-[rgba(200,190,175,0.4)] backdrop-blur-sm rounded-md shadow-lg z-30 max-h-48 overflow-y-auto">
                   {searchResults.length === 0 ? (
-                    <p className="text-xs text-muted-foreground p-3">No results</p>
+                    <p className="text-xs text-muted-foreground p-3">
+                      No results
+                    </p>
                   ) : (
                     searchResults.map((b) => (
                       <button
@@ -146,8 +155,12 @@ export default function Bookshelf() {
                           setSearchQuery("");
                         }}
                       >
-                        <p className="text-sm font-medium text-foreground">{b.title}</p>
-                        <p className="text-xs text-muted-foreground">{b.author}</p>
+                        <p className="text-sm font-medium text-foreground">
+                          {b.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {b.author}
+                        </p>
                       </button>
                     ))
                   )}

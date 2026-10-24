@@ -92,7 +92,11 @@ export const ActivityOverview = ({
 
   const radarData = useMemo(() => {
     if (data.length === 1) {
-      return [...data, { habit: "\u200B", percentage: 0 }, { habit: "\u200C", percentage: 0 }];
+      return [
+        ...data,
+        { habit: "\u200B", percentage: 0 },
+        { habit: "\u200C", percentage: 0 },
+      ];
     }
     if (data.length === 2) {
       return [...data, { habit: "\u200B", percentage: 0 }];
@@ -102,9 +106,13 @@ export const ActivityOverview = ({
 
   const dummyCount = radarData.length - data.length;
 
-  const visiblePolarAngles = dummyCount > 0
-    ? Array.from({ length: data.length }, (_, i) => 90 - (i / radarData.length) * 360)
-    : undefined;
+  const visiblePolarAngles =
+    dummyCount > 0
+      ? Array.from(
+          { length: data.length },
+          (_, i) => 90 - (i / radarData.length) * 360
+        )
+      : undefined;
 
   if (!data.length) return null;
 
@@ -124,7 +132,9 @@ export const ActivityOverview = ({
           className={`text-xs rounded px-2 py-0.5 outline-none cursor-pointer transition-colors ${creamyBase}`}
         >
           {PERIODS.map((p) => (
-            <option key={p.key} value={p.key}>{p.label}</option>
+            <option key={p.key} value={p.key}>
+              {p.label}
+            </option>
           ))}
         </select>
         {filteredHabitIds && (
@@ -146,13 +156,23 @@ export const ActivityOverview = ({
         className="mx-auto aspect-square max-h-[250px] w-full [&_.recharts-polar-grid-concentric-polygon]:hidden [&_.recharts-polar-grid-concentric-circle]:hidden"
       >
         <RadarChart data={radarData} outerRadius="62%">
-          <PolarGrid {...(visiblePolarAngles ? { polarAngles: visiblePolarAngles } : {})} />
+          <PolarGrid
+            {...(visiblePolarAngles ? { polarAngles: visiblePolarAngles } : {})}
+          />
           <PolarAngleAxis
             dataKey="habit"
             tick={({ x, y, payload, textAnchor }: any) => {
-              if (payload.value === "\u200B" || payload.value === "\u200C") return <g />;
+              if (payload.value === "\u200B" || payload.value === "\u200C")
+                return <g />;
               return (
-                <text x={x} y={y} textAnchor={textAnchor} fontSize={13} fill="var(--foreground)" fontFamily="serif">
+                <text
+                  x={x}
+                  y={y}
+                  textAnchor={textAnchor}
+                  fontSize={13}
+                  fill="var(--foreground)"
+                  fontFamily="serif"
+                >
                   {payload.value}
                 </text>
               );
@@ -174,16 +194,32 @@ export const ActivityOverview = ({
             strokeWidth={data.length === 1 ? 2 : 1}
             dot={(props: any) => {
               const { cx, cy, payload } = props;
-              if (payload?.habit === "\u200B" || payload?.habit === "\u200C") return <g />;
+              if (payload?.habit === "\u200B" || payload?.habit === "\u200C")
+                return <g />;
               return (
-                <circle cx={cx} cy={cy} r={2} fill={color} fillOpacity={1} stroke="none" />
+                <circle
+                  cx={cx}
+                  cy={cy}
+                  r={2}
+                  fill={color}
+                  fillOpacity={1}
+                  stroke="none"
+                />
               );
             }}
             activeDot={(props: any) => {
               const { cx, cy, payload } = props;
-              if (payload?.habit === "\u200B" || payload?.habit === "\u200C") return <g />;
+              if (payload?.habit === "\u200B" || payload?.habit === "\u200C")
+                return <g />;
               return (
-                <circle cx={cx} cy={cy} r={3} fill={color} fillOpacity={1} stroke="none" />
+                <circle
+                  cx={cx}
+                  cy={cy}
+                  r={3}
+                  fill={color}
+                  fillOpacity={1}
+                  stroke="none"
+                />
               );
             }}
           />

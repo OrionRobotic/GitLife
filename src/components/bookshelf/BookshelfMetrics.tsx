@@ -7,7 +7,10 @@ interface BookshelfMetricsProps {
   onBookClick?: (book: Book) => void;
 }
 
-export function BookshelfMetrics({ books, onBookClick }: BookshelfMetricsProps) {
+export function BookshelfMetrics({
+  books,
+  onBookClick,
+}: BookshelfMetricsProps) {
   const { booksLast2Months, top3, mostReadAuthor } = useMemo(() => {
     const twoMonthsAgo = subMonths(new Date(), 2);
     const last2Months = books.filter(
@@ -18,16 +21,11 @@ export function BookshelfMetrics({ books, onBookClick }: BookshelfMetricsProps) 
     const sorted = [...rated].sort((a, b) => {
       const byRating = (b.rating ?? 0) - (a.rating ?? 0);
       if (byRating !== 0) return byRating;
-      return (
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
     const top3Books = sorted.slice(0, 3);
 
-    const byAuthor = new Map<
-      string,
-      { count: number; latestAt: string }
-    >();
+    const byAuthor = new Map<string, { count: number; latestAt: string }>();
     for (const b of books) {
       const existing = byAuthor.get(b.author);
       if (!existing) {
@@ -47,7 +45,9 @@ export function BookshelfMetrics({ books, onBookClick }: BookshelfMetricsProps) 
     return {
       booksLast2Months: last2Months.length,
       top3: top3Books,
-      mostReadAuthor: topAuthor ? { name: topAuthor[0], count: topAuthor[1].count } : null,
+      mostReadAuthor: topAuthor
+        ? { name: topAuthor[0], count: topAuthor[1].count }
+        : null,
     };
   }, [books]);
 
@@ -94,15 +94,14 @@ export function BookshelfMetrics({ books, onBookClick }: BookshelfMetricsProps) 
             </dd>
           </div>
           <div>
-            <dt className="text-xs text-muted-foreground">
-              Most read author
-            </dt>
+            <dt className="text-xs text-muted-foreground">Most read author</dt>
             <dd className="text-lg font-medium text-foreground mt-0.5">
               {mostReadAuthor ? (
                 <>
                   {mostReadAuthor.name}
                   <span className="text-sm font-normal text-muted-foreground ml-1">
-                    ({mostReadAuthor.count} {mostReadAuthor.count === 1 ? "book" : "books"})
+                    ({mostReadAuthor.count}{" "}
+                    {mostReadAuthor.count === 1 ? "book" : "books"})
                   </span>
                 </>
               ) : (

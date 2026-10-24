@@ -49,7 +49,8 @@ export default function Blogs() {
   const filtered = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return blogs.filter((b) => {
-      const matchesSearch = !q || (b.title || "untitled").toLowerCase().includes(q);
+      const matchesSearch =
+        !q || (b.title || "untitled").toLowerCase().includes(q);
       const matchesLabel = !selectedLabel || b.labelName === selectedLabel;
       return matchesSearch && matchesLabel;
     });
@@ -87,7 +88,10 @@ export default function Blogs() {
                   className="h-7 text-sm w-52 pr-7"
                 />
                 <button
-                  onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
+                  onClick={() => {
+                    setSearchOpen(false);
+                    setSearchQuery("");
+                  }}
                   className="absolute right-2 text-muted-foreground hover:text-foreground"
                 >
                   <X className="h-3.5 w-3.5" />
@@ -142,10 +146,14 @@ export default function Blogs() {
         ) : blogs.length === 0 ? (
           <div className="text-center py-24">
             <p className="text-muted-foreground text-sm">No blogs yet.</p>
-            <p className="text-muted-foreground/60 text-xs mt-1">Write your first one.</p>
+            <p className="text-muted-foreground/60 text-xs mt-1">
+              Write your first one.
+            </p>
           </div>
         ) : filtered.length === 0 ? (
-          <p className="text-muted-foreground text-sm text-center py-12">No results.</p>
+          <p className="text-muted-foreground text-sm text-center py-12">
+            No results.
+          </p>
         ) : (
           <div>
             {filtered.map((blog, i) => (

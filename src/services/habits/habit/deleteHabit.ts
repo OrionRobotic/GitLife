@@ -20,10 +20,7 @@ export async function deleteHabit(
       return false;
     }
 
-    const { error } = await supabase
-      .from("habits")
-      .delete()
-      .eq("id", habitId);
+    const { error } = await supabase.from("habits").delete().eq("id", habitId);
 
     if (error) {
       console.error("Error deleting habit:", error);

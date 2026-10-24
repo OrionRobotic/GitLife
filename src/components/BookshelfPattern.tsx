@@ -40,7 +40,13 @@ const BookshelfPattern = () => {
       return (Math.sin(t) + 1) / 2;
     }
 
-    function drawRoundedRect(x: number, y: number, w: number, h: number, r: number) {
+    function drawRoundedRect(
+      x: number,
+      y: number,
+      w: number,
+      h: number,
+      r: number
+    ) {
       ctx!.beginPath();
       ctx!.moveTo(x + r, y);
       ctx!.lineTo(x + w - r, y);
@@ -65,15 +71,19 @@ const BookshelfPattern = () => {
 
           const distFromSpine = Math.abs(col - SPINE_COL) / (COLS / 2);
           const side = col < SPINE_COL ? -1 : 1;
-          const pageCol = col < SPINE_COL
-            ? (SPINE_COL - 1 - col)
-            : (col - SPINE_COL);
+          const pageCol =
+            col < SPINE_COL ? SPINE_COL - 1 - col : col - SPINE_COL;
 
-          const sweep   = easeWave((pageCol * 0.35 + row * 0.25) * side - time * 1.6);
-          const texture = easeWave(row * 0.6 - pageCol * 0.2 * side + time * 0.9);
-          const breath  = easeWave(time * 0.5 + distFromSpine * 1.5);
+          const sweep = easeWave(
+            (pageCol * 0.35 + row * 0.25) * side - time * 1.6
+          );
+          const texture = easeWave(
+            row * 0.6 - pageCol * 0.2 * side + time * 0.9
+          );
+          const breath = easeWave(time * 0.5 + distFromSpine * 1.5);
 
-          const combined = 0.18 + (sweep * 0.45 + texture * 0.30 + breath * 0.25) * 0.82;
+          const combined =
+            0.18 + (sweep * 0.45 + texture * 0.3 + breath * 0.25) * 0.82;
 
           const ex = 1 - Math.pow(distFromSpine, 1.8);
           const ey = 1 - Math.abs((row / (ROWS - 1)) * 2 - 1);
@@ -120,7 +130,9 @@ const BookshelfPattern = () => {
     }
 
     animate();
-    return () => { if (animId) cancelAnimationFrame(animId); };
+    return () => {
+      if (animId) cancelAnimationFrame(animId);
+    };
   }, []);
 
   return (

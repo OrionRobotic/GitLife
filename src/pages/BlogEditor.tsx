@@ -5,23 +5,33 @@ import { format } from "date-fns";
 import { MenuButton } from "@/components/MenuButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useAuth } from "@/context/AuthContext";
-import { getBlog, createBlog, updateBlog, getLabels, saveLabel } from "@/services/blogs";
+import {
+  getBlog,
+  createBlog,
+  updateBlog,
+  getLabels,
+  saveLabel,
+} from "@/services/blogs";
 import type { BlogLabel } from "@/services/blogs/getLabels";
 import { BlogRichEditor } from "@/components/blog/BlogRichEditor";
 
 const LABEL_COLORS = [
   // Orange shades
-  { label: "Amber",       color: "#F5C842" },
-  { label: "Orange",      color: "#F5AA45" },
+  { label: "Amber", color: "#F5C842" },
+  { label: "Orange", color: "#F5AA45" },
   { label: "Deep Orange", color: "#F07020" },
-  { label: "Burnt",       color: "#E8530A" },
+  { label: "Burnt", color: "#E8530A" },
   // Bookshelf teal shades
-  { label: "Mist",        color: "#C3D4D0" },
-  { label: "Sage",        color: "#ABBFB8" },
-  { label: "Teal",        color: "#8EA8A1" },
-  { label: "Forest",      color: "#708F88" },
+  { label: "Mist", color: "#C3D4D0" },
+  { label: "Sage", color: "#ABBFB8" },
+  { label: "Teal", color: "#8EA8A1" },
+  { label: "Forest", color: "#708F88" },
 ];
 
 export default function BlogEditor() {
@@ -74,10 +84,15 @@ export default function BlogEditor() {
     setLabelColor(selectedColor);
     setLabelOpen(false);
     // Save to DB if not already there
-    const exists = savedLabels.some((l) => l.name === name && l.color === selectedColor);
+    const exists = savedLabels.some(
+      (l) => l.name === name && l.color === selectedColor
+    );
     if (!exists) {
       await saveLabel(name, selectedColor, user.id);
-      setSavedLabels((prev) => [{ id: Date.now().toString(), name, color: selectedColor }, ...prev]);
+      setSavedLabels((prev) => [
+        { id: Date.now().toString(), name, color: selectedColor },
+        ...prev,
+      ]);
     }
   };
 
@@ -101,10 +116,19 @@ export default function BlogEditor() {
     setSaving(true);
 
     if (isNew) {
-      const blog = await createBlog({ title, content, labelName, labelColor }, user.id);
+      const blog = await createBlog(
+        { title, content, labelName, labelColor },
+        user.id
+      );
       if (blog) navigate("/blogs", { replace: true });
     } else if (id) {
-      const updated = await updateBlog({ id, title, content, labelName, labelColor });
+      const updated = await updateBlog({
+        id,
+        title,
+        content,
+        labelName,
+        labelColor,
+      });
       if (updated) setIsEditing(false);
     }
 
@@ -169,10 +193,13 @@ export default function BlogEditor() {
         {/* Label */}
         <div className="mb-6 min-h-[24px]">
           {isEditing ? (
-            <Popover open={labelOpen} onOpenChange={(o) => {
-              setLabelOpen(o);
-              if (o && labelName) setLabelInput(labelName);
-            }}>
+            <Popover
+              open={labelOpen}
+              onOpenChange={(o) => {
+                setLabelOpen(o);
+                if (o && labelName) setLabelInput(labelName);
+              }}
+            >
               <PopoverTrigger asChild>
                 {labelName && labelColor ? (
                   <button
@@ -197,7 +224,9 @@ export default function BlogEditor() {
                 {/* Saved labels */}
                 {savedLabels.length > 0 && (
                   <>
-                    <p className="text-xs text-muted-foreground mb-2">Saved labels</p>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      Saved labels
+                    </p>
                     <div className="flex flex-wrap gap-1.5 mb-3">
                       {savedLabels.map((l) => (
                         <button
@@ -236,7 +265,10 @@ export default function BlogEditor() {
                       className="h-5 w-5 rounded-full transition-transform hover:scale-110"
                       style={{
                         background: color,
-                        outline: selectedColor === color ? `2px solid ${color}` : "none",
+                        outline:
+                          selectedColor === color
+                            ? `2px solid ${color}`
+                            : "none",
                         outlineOffset: 2,
                       }}
                     />
@@ -253,7 +285,8 @@ export default function BlogEditor() {
               </PopoverContent>
             </Popover>
           ) : (
-            labelName && labelColor && (
+            labelName &&
+            labelColor && (
               <span
                 className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                 style={{
@@ -277,7 +310,9 @@ export default function BlogEditor() {
         ) : (
           <div
             className="blog-content min-h-[60vh]"
-            dangerouslySetInnerHTML={{ __html: content || "<p class='empty-hint'>Empty</p>" }}
+            dangerouslySetInnerHTML={{
+              __html: content || "<p class='empty-hint'>Empty</p>",
+            }}
           />
         )}
       </div>
