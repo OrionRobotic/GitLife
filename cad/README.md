@@ -4,7 +4,8 @@ Parametric mechanical designs, modelled in [CadQuery](https://cadquery.readthedo
 
 | Design | Script | Outputs |
 | --- | --- | --- |
-| Mechanical Wheel (weekly ring) | `mechanical_wheel.py` | `mechanical_wheel.step`, `../public/models/mechanical_wheel.glb` |
+| Weekly Ring (in-app weekly torus) | `weekly_ring.py` | `weekly_ring.step` (one solid per week) |
+| Mechanical Wheel (gear study) | `mechanical_wheel.py` | `mechanical_wheel.step` |
 
 The `.step` file is the CAD source of truth (open it in Fusion, FreeCAD, Onshape…). The app does not display these models: in-app designs are rendered as CAD-style wireframe structures (see `src/components/WeeklyTorusRing.tsx`), not realistic meshes. The `.glb` output is not committed.
 
@@ -13,5 +14,6 @@ The `.step` file is the CAD source of truth (open it in Fusion, FreeCAD, Onshape
 ```sh
 uv venv -p 3.12 .venv-cad
 VIRTUAL_ENV=.venv-cad uv pip install cadquery trimesh
+.venv-cad/bin/python cad/weekly_ring.py
 .venv-cad/bin/python cad/mechanical_wheel.py
 ```
