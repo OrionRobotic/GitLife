@@ -12,6 +12,7 @@ import {
 import { useHabits } from "@/context/useHabits";
 import { MenuButton } from "@/components/MenuButton";
 import { GoalsSection } from "@/components/GoalsSection";
+import { TasksPanel } from "@/components/TasksPanel";
 import { Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDashboards } from "@/hooks/useDashboards";
@@ -261,6 +262,8 @@ const Index = () => {
               </PopoverContent>
             </Popover>
           </div>
+
+          <TasksPanel />
 
           {/* One binary grid per category: a single habit makes each day 0 or 1 */}
           {categories.map((category) => (
