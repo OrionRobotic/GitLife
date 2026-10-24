@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { differenceInCalendarDays, parseISO } from "date-fns";
 import { useTasks } from "@/hooks/useTasks";
 import type { Task, TaskKind } from "@/types/database/Task";
 
@@ -7,12 +8,97 @@ const COLUMNS: { kind: TaskKind; label: string }[] = [
   { kind: "long", label: "Long" },
 ];
 
+// Pending task due (or overdue) within 2 days.
+const isDueSoon = (task: Task) =>
+  !task.done &&
+  !!task.dueDate &&
+  differenceInCalendarDays(parseISO(task.dueDate), new Date()) <= 2;
+
+type Edit = (
+  id: string,
+  fields: Partial<Pick<Task, "title" | "dueDate">>
+) => void;
+
+function TaskItem({
+  task,
+  onToggle,
+  onEdit,
+  onRemove,
+}: {
+  task: Task;
+  onToggle: (task: Task) => void;
+  onEdit: Edit;
+  onRemove: (id: string) => void;
+}) {
+  const [draft, setDraft] = useState<string | null>(null);
+  const urgent = isDueSoon(task) ? "font-bold text-[#722F37]" : "";
+
+  const save = () => {
+    const value = draft?.trim();
+    if (value && value !== task.title) onEdit(task.id, { title: value });
+    setDraft(null);
+  };
+
+  return (
+    <li
+      className={`group flex items-center gap-2 py-1 ${task.done ? "opacity-40" : ""}`}
+    >
+      <input
+        type="checkbox"
+        checked={task.done}
+        onChange={() => onToggle(task)}
+        aria-label={`${task.done ? "Mark not done" : "Mark done"}: ${task.title}`}
+        className="appearance-none shrink-0 w-3 h-3 rounded-full border border-foreground/40 cursor-pointer checked:bg-[#D97757] checked:border-[#D97757]"
+      />
+      {draft === null ? (
+        <button
+          type="button"
+          onClick={() => setDraft(task.title)}
+          aria-label={`Edit task: ${task.title}`}
+          className={`flex-1 min-w-0 truncate text-left text-sm cursor-text ${task.done ? "line-through" : "text-foreground"} ${urgent}`}
+        >
+          {task.title}
+        </button>
+      ) : (
+        <input
+          autoFocus
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onBlur={save}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") save();
+            if (e.key === "Escape") setDraft(null);
+          }}
+          aria-label="Task title"
+          className="flex-1 min-w-0 bg-transparent text-sm text-foreground outline-none border-b border-foreground/20"
+        />
+      )}
+      <input
+        type="date"
+        value={task.dueDate ?? ""}
+        onChange={(e) => onEdit(task.id, { dueDate: e.target.value || null })}
+        aria-label={`Deadline: ${task.title}`}
+        className={`shrink-0 bg-transparent text-xs text-muted-foreground outline-none ${task.dueDate ? "" : "opacity-0 group-hover:opacity-100 focus-visible:opacity-100"} ${urgent}`}
+      />
+      <button
+        type="button"
+        onClick={() => onRemove(task.id)}
+        aria-label={`Delete task: ${task.title}`}
+        className="text-xs text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+      >
+        ×
+      </button>
+    </li>
+  );
+}
+
 function TaskColumn({
   kind,
   label,
   tasks,
   onAdd,
   onToggle,
+  onEdit,
   onRemove,
 }: {
   kind: TaskKind;
@@ -20,6 +106,7 @@ function TaskColumn({
   tasks: Task[];
   onAdd: (title: string, kind: TaskKind) => void;
   onToggle: (task: Task) => void;
+  onEdit: Edit;
   onRemove: (id: string) => void;
 }) {
   const [title, setTitle] = useState("");
@@ -39,33 +126,13 @@ function TaskColumn({
       </h3>
       <ul>
         {tasks.map((task) => (
-          <li
+          <TaskItem
             key={task.id}
-            className={`group flex items-center gap-2 py-1 ${task.done ? "opacity-40" : ""}`}
-          >
-            <input
-              id={`task-${task.id}`}
-              type="checkbox"
-              checked={task.done}
-              onChange={() => onToggle(task)}
-              aria-label={`${task.done ? "Mark not done" : "Mark done"}: ${task.title}`}
-              className="appearance-none shrink-0 w-3 h-3 rounded-full border border-foreground/40 cursor-pointer checked:bg-[#D97757] checked:border-[#D97757]"
-            />
-            <label
-              htmlFor={`task-${task.id}`}
-              className={`flex-1 min-w-0 truncate text-sm cursor-pointer ${task.done ? "line-through" : "text-foreground"}`}
-            >
-              {task.title}
-            </label>
-            <button
-              type="button"
-              onClick={() => onRemove(task.id)}
-              aria-label={`Delete task: ${task.title}`}
-              className="text-xs text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
-            >
-              ×
-            </button>
-          </li>
+            task={task}
+            onToggle={onToggle}
+            onEdit={onEdit}
+            onRemove={onRemove}
+          />
         ))}
       </ul>
       <form onSubmit={handleSubmit}>
@@ -82,7 +149,7 @@ function TaskColumn({
 }
 
 export function TasksPanel() {
-  const { tasks, add, toggle, remove } = useTasks();
+  const { tasks, add, toggle, edit, remove } = useTasks();
 
   // Hidden while loading or if the tasks table is unavailable.
   if (!tasks) return null;
@@ -100,6 +167,7 @@ export function TasksPanel() {
           tasks={sorted.filter((t) => (t.kind ?? "short") === kind)}
           onAdd={add}
           onToggle={toggle}
+          onEdit={edit}
           onRemove={remove}
         />
       ))}

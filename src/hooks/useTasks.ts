@@ -5,6 +5,7 @@ import {
   createTask,
   setTaskDone,
   deleteTask,
+  updateTask,
 } from "@/services/tasks";
 import type { Task, TaskKind } from "@/types/database/Task";
 
@@ -29,18 +30,25 @@ export function useTasks() {
     if (task) setTasks((prev) => [...(prev ?? []), task]);
   };
 
-  const toggle = async (task: Task) => {
-    const updated = await setTaskDone(task.id, !task.done);
+  const replace = (updated: Task | null) => {
     if (updated)
       setTasks(
-        (prev) => prev?.map((t) => (t.id === task.id ? updated : t)) ?? null
+        (prev) => prev?.map((t) => (t.id === updated.id ? updated : t)) ?? null
       );
   };
+
+  const toggle = async (task: Task) =>
+    replace(await setTaskDone(task.id, !task.done));
+
+  const edit = async (
+    id: string,
+    fields: Partial<Pick<Task, "title" | "dueDate">>
+  ) => replace(await updateTask(id, fields));
 
   const remove = async (id: string) => {
     if (await deleteTask(id))
       setTasks((prev) => prev?.filter((t) => t.id !== id) ?? null);
   };
 
-  return { tasks, add, toggle, remove };
+  return { tasks, add, toggle, edit, remove };
 }
