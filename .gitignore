@@ -33,3 +33,4 @@ __pycache__/
 .env.production
 supabase/.temp/
 .venv-cad/
+public/models/

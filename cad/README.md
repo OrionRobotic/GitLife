@@ -6,7 +6,7 @@ Parametric mechanical designs, modelled in [CadQuery](https://cadquery.readthedo
 | --- | --- | --- |
 | Mechanical Wheel (weekly ring) | `mechanical_wheel.py` | `mechanical_wheel.step`, `../public/models/mechanical_wheel.glb` |
 
-The `.step` file is the CAD source of truth (open it in Fusion, FreeCAD, Onshape…). The `.glb` is the web mesh used by `src/components/WeeklyTorusRing.tsx`; its nodes `rim_0..rim_3` are the weekly quadrants (counter-clockwise from +X), coloured by completion at runtime.
+The `.step` file is the CAD source of truth (open it in Fusion, FreeCAD, Onshape…). The app does not display these models: in-app designs are rendered as CAD-style wireframe structures (see `src/components/WeeklyTorusRing.tsx`), not realistic meshes. The `.glb` output is not committed.
 
 ## Regenerate
 
