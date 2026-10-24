@@ -6,6 +6,7 @@ import {
   ReactNode,
 } from "react";
 import { supabase } from "@/lib/supabase";
+import { clearLocal, flush } from "@/lib/offline";
 import { User } from "@supabase/supabase-js";
 
 interface AuthContextType {
@@ -62,7 +63,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
+    // Sync pending local changes while still signed in, then forget the local
+    // copy so another account never sees or replays it.
+    await flush();
     const { error } = await supabase.auth.signOut();
+    if (!error) await clearLocal();
     return { error };
   };
 
