@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "desktop:build": "python3 desktop/build.py",
+    "desktop:install": "python3 desktop/build.py --install",
+    "desktop:test": "python3 -m unittest discover -s tests",
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
