@@ -153,6 +153,38 @@ Supabase redirect configuration must allow the desktop origin if you use email
 links. The repository currently lacks a `/reset-password` page, so password
 recovery completion needs to be handled on your configured website.
 
+### MCP server (connect LLM clients)
+
+`mcp/server.ts` is a standard [MCP](https://modelcontextprotocol.io) server
+over stdio, so any MCP-capable LLM client (e.g. InstinctAI, Claude Desktop) can
+read and update your GitLife data. It signs in as you with email/password, so
+Supabase Row Level Security applies; never give it a service-role key.
+
+Required env vars (read from the repo `.env`, or set in the client config):
+`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `GITLIFE_EMAIL`, `GITLIFE_PASSWORD`.
+
+Tools: `list_habits`, `get_contributions`, `log_habit`, `unlog_habit`,
+`list_goals`, `list_books`, `list_blogs`.
+
+Run it manually with `bun run mcp`. To attach a client, add to its MCP config
+(`--cwd` makes bun load the repo `.env`; the `env` block is optional if `.env`
+is filled in):
+
+```json
+{
+  "mcpServers": {
+    "gitlife": {
+      "command": "bun",
+      "args": ["--cwd", "/abs/path/GitLife", "mcp/server.ts"],
+      "env": {
+        "GITLIFE_EMAIL": "you@example.com",
+        "GITLIFE_PASSWORD": "your-password"
+      }
+    }
+  }
+}
+```
+
 ## 🤝 Contributing
 
 Contributions are always welcome! Please create a PR to merge your changes.
