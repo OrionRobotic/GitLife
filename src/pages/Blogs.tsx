@@ -113,7 +113,7 @@ export default function Blogs() {
                     <button
                       key={name}
                       onClick={() => setSelectedLabel(active ? null : name)}
-                      className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[11px] font-medium transition-opacity hover:opacity-80"
+                      className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-xs font-medium transition-opacity hover:opacity-80"
                       style={{
                         background: active ? color + "45" : color + "20",
                         color: color,
@@ -127,7 +127,7 @@ export default function Blogs() {
                 {selectedLabel && (
                   <button
                     onClick={() => setSelectedLabel(null)}
-                    className="text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                   >
                     Clear
                   </button>
@@ -170,7 +170,7 @@ export default function Blogs() {
                   <div className="flex items-center gap-2 shrink-0">
                     {blog.labelName && blog.labelColor && (
                       <span
-                        className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[11px] font-medium"
+                        className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-xs font-medium"
                         style={{
                           background: blog.labelColor + "28",
                           color: blog.labelColor,

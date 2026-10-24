@@ -9,14 +9,18 @@ All colors MUST be HSL.
 */
 
 @layer base {
+  html {
+    font-size: 112.5%;
+  }
+
   :root {
-    --background: 60 33% 98%; /* #FDFDF7 */
+    --background: 45 100% 97.6%; /* warm cream */
     --foreground: 30 10% 20%;
 
-    --card: 40 30% 98%;
+    --card: 45 100% 97.6%;
     --card-foreground: 30 10% 20%;
 
-    --popover: 40 30% 98%;
+    --popover: 45 100% 97.6%;
     --popover-foreground: 30 10% 20%;
 
     --primary: 30 10% 25%;
@@ -356,7 +360,7 @@ All colors MUST be HSL.
   writing-mode: vertical-rl;
   text-orientation: mixed;
   color: hsl(var(--muted-foreground));
-  font-size: 13px;
+  font-size: 0.875rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;

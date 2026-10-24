@@ -113,7 +113,7 @@ export function BlogRichEditor({ content, onChange }: BlogRichEditorProps) {
                   editor.chain().focus().unsetHighlight().run();
                   setShowColors(false);
                 }}
-                className="w-5 h-5 rounded border border-border flex items-center justify-center text-muted-foreground hover:bg-muted text-[10px]"
+                className="w-5 h-5 rounded border border-border flex items-center justify-center text-muted-foreground hover:bg-muted text-xs"
                 title="Remove highlight"
               >
                 ✕

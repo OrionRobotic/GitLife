@@ -26,8 +26,8 @@ const PageHeader = memo(function PageHeader() {
   return (
     <header className="w-full px-6 py-6 flex justify-between items-center">
       <div className="min-w-0">
-        <h1 className="text-2xl font-normal text-foreground tracking-tight flex items-center gap-2">
-          <img src="/favicon.svg" alt="GitLife" className="w-6 h-6 shrink-0" />
+        <h1 className="text-3xl font-normal text-foreground tracking-tight flex items-center gap-3">
+          <img src="/favicon.svg" alt="GitLife" className="w-10 h-10 shrink-0" />
           <span className="truncate">GitLife</span>
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
