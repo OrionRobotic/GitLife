@@ -108,7 +108,7 @@ export default function ResizableImageComponent({
                   }}
                   style={{
                     color: align === a ? "#D97757" : "rgba(255,255,255,0.7)",
-                    fontSize: 11,
+                    fontSize: "0.75rem",
                     background: "none",
                     border: "none",
                     cursor: "pointer",
@@ -128,7 +128,7 @@ export default function ResizableImageComponent({
                 }}
                 style={{
                   color: "#ef4444",
-                  fontSize: 11,
+                  fontSize: "0.75rem",
                   background: "none",
                   border: "none",
                   cursor: "pointer",

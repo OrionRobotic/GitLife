@@ -203,7 +203,7 @@ export default function BlogEditor() {
                         <button
                           key={l.id}
                           onClick={() => pickSavedLabel(l)}
-                          className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[11px] font-medium transition-opacity hover:opacity-70"
+                          className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-xs font-medium transition-opacity hover:opacity-70"
                           style={{
                             background: l.color + "28",
                             color: l.color,

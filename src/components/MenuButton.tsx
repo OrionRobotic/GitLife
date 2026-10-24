@@ -45,10 +45,10 @@ export const MenuButton = () => {
       >
         <SheetHeader>
           <SheetTitle
-            className="text-2xl font-normal tracking-tight cursor-pointer hover:opacity-70 transition-opacity flex items-center gap-2"
+            className="text-3xl font-normal tracking-tight cursor-pointer hover:opacity-70 transition-opacity flex items-center gap-3"
             onClick={() => handleNavigate("/")}
           >
-            <img src="/favicon.svg" alt="GitLife" className="w-6 h-6 shrink-0" />
+            <img src="/favicon.svg" alt="GitLife" className="w-10 h-10 shrink-0" />
             GitLife
           </SheetTitle>
         </SheetHeader>
