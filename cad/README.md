@@ -17,3 +17,11 @@ VIRTUAL_ENV=.venv-cad uv pip install cadquery trimesh
 .venv-cad/bin/python cad/weekly_ring.py
 .venv-cad/bin/python cad/mechanical_wheel.py
 ```
+
+## Fusion
+
+`fusion/GitLife/` is a Fusion script that creates a **GitLife** project in your active hub and uploads every `cad/*.step` into it (existing files are skipped). Link it once, then run it from Fusion → Utilities → Scripts and Add-Ins (Shift+S) → GitLife:
+
+```sh
+ln -sfn "$PWD/cad/fusion/GitLife" ~/Library/Application\ Support/Autodesk/Autodesk\ Fusion\ 360/API/Scripts/GitLife
+```
