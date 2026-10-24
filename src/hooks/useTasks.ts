@@ -6,7 +6,7 @@ import {
   setTaskDone,
   deleteTask,
 } from "@/services/tasks";
-import type { Task } from "@/types/database/Task";
+import type { Task, TaskKind } from "@/types/database/Task";
 
 // `tasks` stays null while loading or if the table is unavailable.
 export function useTasks() {
@@ -24,8 +24,8 @@ export function useTasks() {
     return () => window.removeEventListener("focus", refresh);
   }, [refresh]);
 
-  const add = async (title: string) => {
-    const task = await createTask(title);
+  const add = async (title: string, kind: TaskKind) => {
+    const task = await createTask(title, kind);
     if (task) setTasks((prev) => [...(prev ?? []), task]);
   };
 

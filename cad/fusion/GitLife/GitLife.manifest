@@ -1,0 +1,8 @@
+{
+  "autodeskProduct": "Fusion",
+  "type": "script",
+  "author": "GitLife",
+  "description": { "": "Create the GitLife project and upload the cad/*.step designs" },
+  "supportedOS": "windows|mac",
+  "editEnabled": true
+}

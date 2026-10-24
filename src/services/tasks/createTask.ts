@@ -1,12 +1,15 @@
 import { supabase } from "@/lib/supabase";
-import type { Task } from "@/types/database/Task";
+import type { Task, TaskKind } from "@/types/database/Task";
 
-export async function createTask(title: string): Promise<Task | null> {
+export async function createTask(
+  title: string,
+  kind: TaskKind
+): Promise<Task | null> {
   try {
     // userId defaults to auth.uid() in the database.
     const { data, error } = await supabase
       .from("tasks")
-      .insert([{ title }])
+      .insert([{ title, kind }])
       .select()
       .single();
 

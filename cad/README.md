@@ -4,14 +4,24 @@ Parametric mechanical designs, modelled in [CadQuery](https://cadquery.readthedo
 
 | Design | Script | Outputs |
 | --- | --- | --- |
-| Mechanical Wheel (weekly ring) | `mechanical_wheel.py` | `mechanical_wheel.step`, `../public/models/mechanical_wheel.glb` |
+| Weekly Ring (in-app weekly torus) | `weekly_ring.py` | `weekly_ring.step` (one solid per week) |
+| Mechanical Wheel (gear study) | `mechanical_wheel.py` | `mechanical_wheel.step` |
 
-The `.step` file is the CAD source of truth (open it in Fusion, FreeCAD, Onshape…). The `.glb` is the web mesh used by `src/components/WeeklyTorusRing.tsx`; its nodes `rim_0..rim_3` are the weekly quadrants (counter-clockwise from +X), coloured by completion at runtime.
+The `.step` file is the CAD source of truth (open it in Fusion, FreeCAD, Onshape…). The app does not display these models: in-app designs are rendered as CAD-style wireframe structures (see `src/components/WeeklyTorusRing.tsx`), not realistic meshes. The `.glb` output is not committed.
 
 ## Regenerate
 
 ```sh
 uv venv -p 3.12 .venv-cad
 VIRTUAL_ENV=.venv-cad uv pip install cadquery trimesh
+.venv-cad/bin/python cad/weekly_ring.py 4   # sectors = number of weekly goals
 .venv-cad/bin/python cad/mechanical_wheel.py
+```
+
+## Fusion
+
+`fusion/GitLife/` is a Fusion script that creates a **GitLife** project in your active hub and uploads every `cad/*.step` into it (existing files are skipped). Link it once, then run it from Fusion → Utilities → Scripts and Add-Ins (Shift+S) → GitLife:
+
+```sh
+ln -sfn "$PWD/cad/fusion/GitLife" ~/Library/Application\ Support/Autodesk/Autodesk\ Fusion\ 360/API/Scripts/GitLife
 ```
