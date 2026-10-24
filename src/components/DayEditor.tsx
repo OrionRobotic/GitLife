@@ -70,6 +70,7 @@ import {
   Trash2,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { getCategoryHabits } from "@/lib/categories";
 
 interface DayEditorProps {
   date: Date;
@@ -207,6 +208,11 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
     if (showAddHabit && inputRef.current) inputRef.current.focus();
   }, [showAddHabit]);
 
+  // Categories are shared global habits: deleting one would only wipe the user's logs.
+  const categoryIds = new Set(
+    getCategoryHabits(allVisibleHabits).map((c) => c.id)
+  );
+
   const habitsForDisplay = visibleHabits.map((habit) => ({
     id: habit.id,
     name: habit.name,
@@ -340,13 +346,15 @@ export const DayEditor = ({ date, onClose }: DayEditorProps) => {
                 <span className="text-sm font-medium text-foreground flex-1">
                   {name}
                 </span>
-                <button
-                  onClick={() => handleDelete(id)}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive shrink-0"
-                  aria-label="Delete habit"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
+                {!categoryIds.has(id) && (
+                  <button
+                    onClick={() => handleDelete(id)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive shrink-0"
+                    aria-label="Delete habit"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
                 <button
                   onClick={() => handleChange(id, name, !completed)}
                   className={`w-3.5 h-3.5 rounded-[2px] transition-all border shrink-0 ${
