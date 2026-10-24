@@ -1,13 +1,16 @@
 """Weekly Ring: CAD model of the in-app weekly torus (src/components/WeeklyTorusRing.tsx).
 
-An octagonal-section torus split into one segment per week, separated by gaps.
-Same proportions as the three.js version (scene units x 100 = mm).
+An octagonal-section torus split into one sector per weekly goal, separated by
+gaps. Same proportions as the three.js version (scene units x 100 = mm).
+
+Usage:  python cad/weekly_ring.py [SECTORS]   (default 4, like the empty app ring)
 
 Outputs:
-  cad/weekly_ring.step   assembly, one solid per week (week_1..week_N)
+  cad/weekly_ring.step   assembly, one solid per sector (week_1..week_N)
 """
 
 import math
+import sys
 from pathlib import Path
 
 import cadquery as cq
@@ -16,7 +19,7 @@ import cadquery as cq
 TORUS_RADIUS = 80.0  # ring centre radius        (TORUS_RADIUS = 0.8)
 TUBE_APOTHEM = 58.0  # centre -> flat face        (TUBE_RADIUS = 0.58)
 SIDES = 8  # octagonal section                     (N_SIDES = 8)
-WEEKS = 4
+WEEKS = int(sys.argv[1]) if len(sys.argv) > 1 else 4  # one sector per weekly goal
 GAP_HALF_DEG = math.degrees(0.08)  # half gap between weeks (GAP_HALF = 0.08 rad)
 
 STEP_OUT = Path(__file__).with_name("weekly_ring.step")

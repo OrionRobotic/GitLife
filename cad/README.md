@@ -14,7 +14,7 @@ The `.step` file is the CAD source of truth (open it in Fusion, FreeCAD, Onshape
 ```sh
 uv venv -p 3.12 .venv-cad
 VIRTUAL_ENV=.venv-cad uv pip install cadquery trimesh
-.venv-cad/bin/python cad/weekly_ring.py
+.venv-cad/bin/python cad/weekly_ring.py 4   # sectors = number of weekly goals
 .venv-cad/bin/python cad/mechanical_wheel.py
 ```
 
