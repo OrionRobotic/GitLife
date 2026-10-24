@@ -32,3 +32,4 @@ __pycache__/
 .env.test
 .env.production
 supabase/.temp/
+.venv-cad/
