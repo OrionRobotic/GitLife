@@ -316,7 +316,7 @@ export function createServer() {
       const { db } = await auth();
       let query = db
         .from("tasks")
-        .select("id, title, done, dueDate, completedAt, createdAt")
+        .select("id, title, kind, done, dueDate, completedAt, createdAt")
         .order("dueDate", { ascending: true, nullsFirst: false })
         .order("createdAt", { ascending: true });
       if (!includeDone) query = query.eq("done", false);
@@ -329,19 +329,26 @@ export function createServer() {
   server.registerTool(
     "add_task",
     {
-      description: "Add a task, optionally with a due date.",
+      description:
+        "Add a task (short or long, default short), optionally with a due date.",
       inputSchema: {
         title: z.string().min(1).describe("Task title"),
+        kind: z
+          .enum(["short", "long"])
+          .optional()
+          .describe("short = quick task, long = bigger task (default short)"),
         dueDate: dateArg.optional(),
       },
     },
-    async ({ title, dueDate }) => {
+    async ({ title, kind = "short", dueDate }) => {
       const { db, userId } = await auth();
       const now = new Date().toISOString();
       const { data, error } = await db
         .from("tasks")
-        .insert([{ userId, title, dueDate, createdAt: now, updatedAt: now }])
-        .select("id, title, done, dueDate")
+        .insert([
+          { userId, title, kind, dueDate, createdAt: now, updatedAt: now },
+        ])
+        .select("id, title, kind, done, dueDate")
         .single();
       if (error) throw new Error(error.message);
       return ok(data);
