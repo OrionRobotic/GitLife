@@ -164,7 +164,8 @@ Required env vars (read from the repo `.env`, or set in the client config):
 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `GITLIFE_EMAIL`, `GITLIFE_PASSWORD`.
 
 Tools: `list_habits`, `get_contributions`, `log_habit`, `unlog_habit`,
-`list_goals`, `list_books`, `list_blogs`.
+`list_goals`, `list_books`, `list_blogs`, `list_tasks`, `add_task`,
+`complete_task`, `reopen_task`, `delete_task`.
 
 Run it manually with `bun run mcp`. To attach a client, add to its MCP config
 (`--cwd` makes bun load the repo `.env`; the `env` block is optional if `.env`
@@ -184,6 +185,39 @@ is filled in):
   }
 }
 ```
+
+#### Hosted endpoint (remote MCP URL)
+
+The same tools are served over MCP Streamable HTTP by the Vercel function
+`api/mcp.ts` at `https://<deployment>/api/mcp`, for assistants that only take a
+remote URL (Poke, Claude, ChatGPT, ...). It is single-user: one shared token and
+your GitLife account.
+
+1. Generate a token: `openssl rand -hex 32`.
+2. In Vercel → Project → Settings → Environment Variables, set `MCP_TOKEN`,
+   `GITLIFE_EMAIL`, `GITLIFE_PASSWORD`, `VITE_SUPABASE_URL`,
+   `VITE_SUPABASE_ANON_KEY`, then redeploy. Without `MCP_TOKEN` every request
+   gets 401.
+3. Point the client at the URL with the token as a bearer header:
+
+```json
+{
+  "mcpServers": {
+    "gitlife": {
+      "url": "https://<deployment>/api/mcp",
+      "headers": { "Authorization": "Bearer <MCP_TOKEN>" }
+    }
+  }
+}
+```
+
+Claude Code: `claude mcp add --transport http gitlife https://<deployment>/api/mcp --header "Authorization: Bearer <MCP_TOKEN>"`.
+
+Clients that only accept a URL can use `https://<deployment>/api/mcp?token=<MCP_TOKEN>`.
+This is less safe (the token ends up in URLs and request logs), so prefer the
+header when the client supports it and rotate the token if it leaks.
+Vercel Deployment Protection must allow the URL you use (production is public
+by default; previews are not).
 
 ## 🤝 Contributing
 
