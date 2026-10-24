@@ -316,9 +316,11 @@ function WeekContent({
 // ── WeekInfoPanel — always-visible side panel next to torus ───────────────────
 
 function WeekInfoPanel({
-  description, goals,
+  description,
+  goals,
 }: {
-  description: string; goals: Goal[];
+  description: string;
+  goals: Goal[];
 }) {
   return (
     <div className="flex flex-col min-w-0">
@@ -372,7 +374,9 @@ export function GoalsSection({
       <h2 className="text-xl font-normal text-foreground font-serif tracking-tight leading-snug">
         {weeklyPeriodTitle || "This week"}
       </h2>
-      <p className="text-xs text-muted-foreground mt-0.5 mb-1">{getWeekRange()}</p>
+      <p className="text-xs text-muted-foreground mt-0.5 mb-1">
+        {getWeekRange()}
+      </p>
 
       {/* Info panel (left) + Torus (right) */}
       <div

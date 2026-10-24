@@ -251,7 +251,10 @@ const Index = () => {
           </div>
 
           <div className="mt-4">
-            <GoalsSection open={goalsDialogOpen} onOpenChange={setGoalsDialogOpen} />
+            <GoalsSection
+              open={goalsDialogOpen}
+              onOpenChange={setGoalsDialogOpen}
+            />
           </div>
 
           <p className="mt-8 text-sm text-muted-foreground text-center">

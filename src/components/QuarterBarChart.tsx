@@ -79,21 +79,32 @@ export function QuarterBarChart({
       )}
 
       {/* Goal list */}
-      <div className="flex flex-col gap-3 cursor-pointer mt-1" onClick={onOpenGoals}>
+      <div
+        className="flex flex-col gap-3 cursor-pointer mt-1"
+        onClick={onOpenGoals}
+      >
         {monthlyGoals.map((goal) => {
-          const pct = effectiveEffort.find((e) => e.goalId === goal.id)?.percentage ?? 0;
+          const pct =
+            effectiveEffort.find((e) => e.goalId === goal.id)?.percentage ?? 0;
           return (
             <button
               key={goal.id}
-              onClick={(e) => { e.stopPropagation(); setActiveId((prev) => prev === goal.id ? null : goal.id); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveId((prev) => (prev === goal.id ? null : goal.id));
+              }}
               className="text-left group focus:outline-none"
             >
               <div className="flex items-baseline justify-between gap-2 mb-0.5">
-                <span className="text-base font-serif leading-snug text-foreground">{goal.title}</span>
+                <span className="text-base font-serif leading-snug text-foreground">
+                  {goal.title}
+                </span>
                 {goal.completed ? (
                   <Check className="w-3.5 h-3.5 shrink-0 text-orange-700/80" />
                 ) : (
-                  <span className={`text-sm tabular-nums shrink-0 ${pct > 0 ? "text-orange-700/80" : "text-muted-foreground/50"}`}>
+                  <span
+                    className={`text-sm tabular-nums shrink-0 ${pct > 0 ? "text-orange-700/80" : "text-muted-foreground/50"}`}
+                  >
                     {Math.round(pct * 100)}%
                   </span>
                 )}
