@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { dateToInteger } from "@/lib/utils/dateToInteger";
 
 /**
  * Remove a habit log for a specific date
@@ -13,15 +14,15 @@ export async function removeHabitLogForDate(
   date: Date = new Date()
 ): Promise<boolean> {
   try {
-    const dateStart = date.toISOString().split("T")[0];
+    // Local calendar day, same key the grid reads (not the UTC createdAt).
+    const integerDate = dateToInteger(date);
 
     const { error } = await supabase
       .from("habitsLogs")
       .delete()
       .eq("habitId", habitId)
       .eq("userId", userId)
-      .gte("createdAt", `${dateStart}T00:00:00Z`)
-      .lt("createdAt", `${dateStart}T23:59:59Z`);
+      .eq("integerDate", integerDate);
 
     if (error) {
       console.error("Error removing habit log for date:", error);
