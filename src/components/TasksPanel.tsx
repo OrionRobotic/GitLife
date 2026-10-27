@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
+import { Calendar } from "lucide-react";
 import { differenceInCalendarDays, parseISO } from "date-fns";
 import { useTasks } from "@/hooks/useTasks";
 import type { Task, TaskKind } from "@/types/database/Task";
@@ -31,6 +32,7 @@ function TaskItem({
   onRemove: (id: string) => void;
 }) {
   const [draft, setDraft] = useState<string | null>(null);
+  const dateRef = useRef<HTMLInputElement>(null);
   const urgent = isDueSoon(task) ? "font-bold text-[#722F37]" : "";
 
   const save = () => {
@@ -73,13 +75,27 @@ function TaskItem({
           className="flex-1 min-w-0 bg-transparent text-sm text-foreground outline-none border-b border-foreground/20"
         />
       )}
-      <input
-        type="date"
-        value={task.dueDate ?? ""}
-        onChange={(e) => onEdit(task.id, { dueDate: e.target.value || null })}
-        aria-label={`Deadline: ${task.title}`}
-        className={`shrink-0 bg-transparent text-xs text-muted-foreground outline-none ${task.dueDate ? "" : "opacity-0 group-hover:opacity-100 focus-visible:opacity-100"} ${urgent}`}
-      />
+      {/* WebKit (desktop app) has no native picker icon: draw our own everywhere. */}
+      <span
+        className={`shrink-0 flex items-center gap-1 ${task.dueDate ? "" : "opacity-0 group-hover:opacity-100 focus-within:opacity-100"}`}
+      >
+        <input
+          ref={dateRef}
+          type="date"
+          value={task.dueDate ?? ""}
+          onChange={(e) => onEdit(task.id, { dueDate: e.target.value || null })}
+          aria-label={`Deadline: ${task.title}`}
+          className={`bg-transparent text-xs text-muted-foreground outline-none [&::-webkit-calendar-picker-indicator]:hidden ${urgent}`}
+        />
+        <button
+          type="button"
+          onClick={() => dateRef.current?.showPicker?.()}
+          aria-label={`Pick deadline: ${task.title}`}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <Calendar className="w-3.5 h-3.5" />
+        </button>
+      </span>
       <button
         type="button"
         onClick={() => onRemove(task.id)}
