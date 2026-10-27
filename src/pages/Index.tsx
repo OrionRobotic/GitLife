@@ -85,17 +85,12 @@ const Index = () => {
     (c) => `cat:${c.id}` === activeDashboardId
   );
 
-  // Main view aggregates the categories; falls back to the old behaviour if
-  // they are not seeded yet.
+  // Main view counts every saved contribution (all habits).
   const filteredHabitIds = activeCategory
     ? [activeCategory.id]
     : activeDashboard
       ? activeDashboard.habitIds
-      : categories.length > 0
-        ? categories.map((c) => c.id)
-        : defaultTab.habitIds.length > 0
-          ? defaultTab.habitIds
-          : null;
+      : null;
 
   const handleSelectDate = (date: Date) => {
     setSelectedDate(date);

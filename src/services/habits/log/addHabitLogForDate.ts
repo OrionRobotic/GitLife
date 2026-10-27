@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { dateToInteger } from "@/lib/utils/dateToInteger";
 import { createHabitLog } from "./createHabitLog";
 
 /**
@@ -14,15 +15,15 @@ export async function addHabitLogForDate(
   date: Date = new Date()
 ): Promise<boolean> {
   try {
-    const dateStart = date.toISOString().split("T")[0];
+    // Local calendar day, same key the grid reads (not the UTC createdAt).
+    const integerDate = dateToInteger(date);
 
     const { data: existingLogs, error: checkError } = await supabase
       .from("habitsLogs")
       .select("id")
       .eq("habitId", habitId)
       .eq("userId", userId)
-      .gte("createdAt", `${dateStart}T00:00:00Z`)
-      .lt("createdAt", `${dateStart}T23:59:59Z`);
+      .eq("integerDate", integerDate);
 
     if (checkError) {
       console.error("Error checking existing habit log:", checkError);
@@ -30,7 +31,7 @@ export async function addHabitLogForDate(
     }
 
     if (!existingLogs || existingLogs.length === 0) {
-      const result = await createHabitLog({ habitId, userId });
+      const result = await createHabitLog({ habitId, userId, integerDate });
       return result !== null;
     }
 
